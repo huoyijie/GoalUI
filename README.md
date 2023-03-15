@@ -1,5 +1,5 @@
 # goal-vue
-frontend of goal, based on [Sakai Vue]()
+frontend of goal, based on [Sakai Vue](https://github.com/primefaces/sakai-vue)
 
 ## Recommended IDE Setup
 

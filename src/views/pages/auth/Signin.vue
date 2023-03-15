@@ -2,8 +2,10 @@
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
+import { useRouter } from 'vue-router';
 import AuthService from '@/service/AuthService';
 
+const router = useRouter();
 const authService = new AuthService();
 const { layoutConfig, contextPath } = useLayout();
 const username = ref('');
@@ -15,7 +17,7 @@ const logoUrl = computed(() => {
 });
 
 const signin = () => {
-    authService.signin({
+    authService.signin(router, {
         username: username.value,
         password: password.value,
         rememberMe: rememberMe.value

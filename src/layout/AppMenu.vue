@@ -1,14 +1,16 @@
 <script setup>
 import { ref, onBeforeMount } from 'vue';
 
+import { useRouter } from 'vue-router';
 import AppMenuItem from './AppMenuItem.vue';
 import MenuService from '@/service/MenuService';
 
+const router = useRouter();
 const model = ref([]);
 const menuService = new MenuService();
 
 onBeforeMount(() => {
-    menuService.getMenus().then((menus) => {
+    menuService.getMenus(router).then((menus) => {
         model.value = menus;
     });
 });

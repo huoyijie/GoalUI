@@ -6,7 +6,7 @@ iconMap.set('Auth.Session', 'pi pi-fw pi-ticket');
 iconMap.set('Auth.User', 'pi pi-fw pi-users');
 
 export default class MenuService {
-    async getMenus() {
+    async getMenus(router) {
         let res = await fetch(contextPath + 'admin/menus', {
             mode: 'cors',
             credentials: 'include',
@@ -15,7 +15,7 @@ export default class MenuService {
             }
         });
         if (res.status === 401) {
-            window.location.hash = '#/auth/signin';
+            router.push('/auth/signin');
             return;
         }
         let jsonObj = await res.json();

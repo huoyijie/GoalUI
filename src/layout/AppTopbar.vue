@@ -24,9 +24,17 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
+const onViewProfile = () => {
+    topbarMenuActive.value = false;
+    router.push('/profile');
+};
 const onSettingsClick = () => {
     topbarMenuActive.value = false;
     router.push('/documentation');
+};
+const onSignout = () => {
+    topbarMenuActive.value = false;
+    router.push('/');
 };
 const topbarMenuClasses = computed(() => {
     return {
@@ -67,26 +75,26 @@ const isOutsideClicked = (event) => {
             <span>GOAL</span>
         </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle">
             <i class="pi pi-bars"></i>
         </button>
 
-        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
+        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton">
             <i class="pi pi-ellipsis-v"></i>
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+            <button @click="onViewProfile" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
+            <button @click="onSettingsClick" class="p-link layout-topbar-button">
                 <i class="pi pi-cog"></i>
                 <span>Settings</span>
+            </button>
+            <button @click="onSignout" class="p-link layout-topbar-button">
+                <i class="pi pi-sign-out"></i>
+                <span>Sign out</span>
             </button>
         </div>
     </div>

@@ -1,7 +1,7 @@
 const contextPath = 'http://127.0.0.1:8100/';
 
 export default class AuthService {
-    signin(data) {
+    signin(router, data) {
         return fetch(contextPath + 'admin/signin', {
             method: 'POST',
             mode: 'cors',
@@ -13,7 +13,7 @@ export default class AuthService {
         })
             .then((res) => res.json())
             .then(() => {
-                window.location.hash = '#/';
+                router.push('/');
             });
     }
 }

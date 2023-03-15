@@ -2,9 +2,11 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import AuthService from '@/service/AuthService';
 
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
+const authService = new AuthService();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
@@ -34,7 +36,7 @@ const onSettingsClick = () => {
 };
 const onSignout = () => {
     topbarMenuActive.value = false;
-    router.push('/');
+    authService.signout(router);
 };
 const topbarMenuClasses = computed(() => {
     return {

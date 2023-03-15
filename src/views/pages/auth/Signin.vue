@@ -8,7 +8,7 @@ const authService = new AuthService();
 const { layoutConfig, contextPath } = useLayout();
 const username = ref('');
 const password = ref('');
-const checked = ref(false);
+const rememberMe = ref(true);
 
 const logoUrl = computed(() => {
     return `${contextPath}layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
@@ -18,7 +18,7 @@ const signin = () => {
     authService.signin({
         username: username.value,
         password: password.value,
-        checked: checked.value
+        rememberMe: rememberMe.value
     });
 };
 </script>
@@ -42,8 +42,8 @@ const signin = () => {
 
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <div class="flex align-items-center">
-                                <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
-                                <label for="rememberme1">Remember me</label>
+                                <Checkbox v-model="rememberMe" id="rememberMe" binary class="mr-2"></Checkbox>
+                                <label for="rememberMe">Remember me</label>
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div>

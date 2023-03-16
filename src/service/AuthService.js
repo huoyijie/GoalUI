@@ -25,7 +25,7 @@ export default class AuthService {
             .then((res) => res.json())
             .then(() => {
                 localStorage.removeItem('username');
-                router.push('/auth/signin');
+                router.push({ name: 'signin' });
             });
     }
 }

@@ -15,7 +15,7 @@ export default class MenuService {
             }
         });
         if (res.status === 401) {
-            router.push('/auth/signin');
+            router.push({ name: 'signin' });
             return;
         }
         let jsonObj = await res.json();

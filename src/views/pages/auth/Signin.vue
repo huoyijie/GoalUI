@@ -47,7 +47,6 @@ const signin = () => {
                                 <Checkbox v-model="rememberMe" id="rememberMe" binary class="mr-2"></Checkbox>
                                 <label for="rememberMe">Remember me</label>
                             </div>
-                            <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div>
                         <Button label="Sign In" class="w-full p-3 text-xl" @click="signin"></Button>
                     </div>

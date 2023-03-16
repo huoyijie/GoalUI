@@ -28,11 +28,11 @@ const onTopBarMenuButton = () => {
 };
 const onViewProfile = () => {
     topbarMenuActive.value = false;
-    router.push('/profile');
+    router.push({ name: 'profile' });
 };
 const onSettingsClick = () => {
     topbarMenuActive.value = false;
-    router.push('/documentation');
+    router.push({ name: 'documentation' });
 };
 const onSignout = () => {
     topbarMenuActive.value = false;

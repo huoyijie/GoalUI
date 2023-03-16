@@ -13,14 +13,17 @@ export default class AuthService {
         })
             .then((res) => res.json())
             .then((data) => {
-                localStorage.setItem('username', data.Username);
+                localStorage.setItem('username', data.username);
                 router.push({ name: 'dashboard' });
             });
     }
     signout(router) {
         fetch(contextPath + 'admin/signout', {
             mode: 'cors',
-            credentials: 'include'
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
         })
             .then((res) => res.json())
             .then(() => {

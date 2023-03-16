@@ -14,6 +14,7 @@ const { contextPath } = useLayout();
 
 const records = ref(null);
 const columns = ref(null);
+const preloads = ref(null);
 // const products = ref(null);
 const productDialog = ref(false);
 const deleteProductDialog = ref(false);
@@ -41,6 +42,7 @@ onMounted(() => {
     crudService.get(router, group, item).then((data) => {
         records.value = data.records;
         columns.value = data.columns;
+        preloads.value = data.preloads;
     });
     // productService.getProducts().then((data) => (products.value = data));
 });
@@ -50,11 +52,23 @@ onBeforeRouteUpdate((to) => {
     crudService.get(router, group, item).then((data) => {
         records.value = data.records;
         columns.value = data.columns;
+        preloads.value = data.preloads;
     });
 });
 
 const formatCurrency = (value) => {
     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+};
+
+const showPreloadField = (column, data) => {
+    if (preloads.value != null) {
+        for (let preload of preloads.value) {
+            if (column === preload[0]) {
+                return data[column][preload[1]];
+            }
+        }
+    }
+    return data[column];
 };
 
 const openNew = () => {
@@ -187,52 +201,52 @@ const initFilters = () => {
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                     <!-- <Column field="code" header="Code" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Code</span>
-                                            {{ slotProps.data.code }}
-                                        </template>
-                                    </Column> -->
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Code</span>
+                                                {{ slotProps.data.code }}
+                                            </template>
+                                        </Column> -->
                     <Column v-for="c in columns" :key="c" :field="c" :header="c" :sortable="true"
                         headerStyle="width:14%; min-width:10rem;">
                         <template #body="slotProps">
                             <span class="p-column-title">{{ c }}</span>
-                            {{ slotProps.data[c] }}
+                            {{ showPreloadField(c, slotProps.data) }}
                         </template>
                     </Column>
                     <!-- <Column header="Image" headerStyle="width:14%; min-width:10rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Image</span>
-                                            <img :src="contextPath + 'demo/images/product/' + slotProps.data.image"
-                                                :alt="slotProps.data.image" class="shadow-2" width="100" />
-                                        </template>
-                                    </Column>
-                                    <Column field="price" header="Price" :sortable="true" headerStyle="width:14%; min-width:8rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Price</span>
-                                            {{ formatCurrency(slotProps.data.price) }}
-                                        </template>
-                                    </Column>
-                                    <Column field="category" header="Category" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Category</span>
-                                            {{ slotProps.data.category }}
-                                        </template>
-                                    </Column>
-                                    <Column field="rating" header="Reviews" :sortable="true" headerStyle="width:14%; min-width:10rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Rating</span>
-                                            <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
-                                        </template>
-                                    </Column>
-                                    <Column field="inventoryStatus" header="Status" :sortable="true"
-                                        headerStyle="width:14%; min-width:10rem;">
-                                        <template #body="slotProps">
-                                            <span class="p-column-title">Status</span>
-                                            <span
-                                                :class="'product-badge status-' + (slotProps.data.inventoryStatus ? slotProps.data.inventoryStatus.toLowerCase() : '')">{{
-                                                    slotProps.data.inventoryStatus }}</span>
-                                        </template>
-                                    </Column> -->
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Image</span>
+                                                <img :src="contextPath + 'demo/images/product/' + slotProps.data.image"
+                                                    :alt="slotProps.data.image" class="shadow-2" width="100" />
+                                            </template>
+                                        </Column>
+                                        <Column field="price" header="Price" :sortable="true" headerStyle="width:14%; min-width:8rem;">
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Price</span>
+                                                {{ formatCurrency(slotProps.data.price) }}
+                                            </template>
+                                        </Column>
+                                        <Column field="category" header="Category" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Category</span>
+                                                {{ slotProps.data.category }}
+                                            </template>
+                                        </Column>
+                                        <Column field="rating" header="Reviews" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Rating</span>
+                                                <Rating :modelValue="slotProps.data.rating" :readonly="true" :cancel="false" />
+                                            </template>
+                                        </Column>
+                                        <Column field="inventoryStatus" header="Status" :sortable="true"
+                                            headerStyle="width:14%; min-width:10rem;">
+                                            <template #body="slotProps">
+                                                <span class="p-column-title">Status</span>
+                                                <span
+                                                    :class="'product-badge status-' + (slotProps.data.inventoryStatus ? slotProps.data.inventoryStatus.toLowerCase() : '')">{{
+                                                        slotProps.data.inventoryStatus }}</span>
+                                            </template>
+                                        </Column> -->
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"

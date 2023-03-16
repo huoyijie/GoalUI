@@ -14,7 +14,7 @@ export default class AuthService {
             .then((res) => res.json())
             .then((data) => {
                 localStorage.setItem('username', data.Username);
-                router.push('/');
+                router.push({ name: 'dashboard' });
             });
     }
     signout(router) {

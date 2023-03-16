@@ -132,7 +132,7 @@ const router = createRouter({
                     component: () => import('@/views/pages/Empty.vue')
                 },
                 {
-                    path: '/pages/crud',
+                    path: '/crud/:group/:item',
                     name: 'crud',
                     component: () => import('@/views/pages/Crud.vue')
                 },
@@ -149,11 +149,10 @@ const router = createRouter({
             component: () => import('@/views/pages/Landing.vue')
         },
         {
-            path: '/pages/notfound',
-            name: 'notfound',
+            path: '/404',
+            name: '404',
             component: () => import('@/views/pages/NotFound.vue')
         },
-
         {
             path: '/signin',
             name: 'signin',
@@ -168,6 +167,10 @@ const router = createRouter({
             path: '/auth/error',
             name: 'error',
             component: () => import('@/views/pages/auth/Error.vue')
+        },
+        {
+            path: '/:notfound*',
+            redirect: { name: '404' }
         }
     ]
 });

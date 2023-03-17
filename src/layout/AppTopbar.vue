@@ -86,15 +86,15 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onViewProfile" class="p-link layout-topbar-button">
+            <button @click="onViewProfile" class="p-link layout-topbar-button" v-tooltip.bottom="'Profile'">
                 <i class="pi pi-user"></i>
                 <span>Profile</span>
             </button>
-            <button @click="onSettingsClick" class="p-link layout-topbar-button">
+            <button @click="onSettingsClick" class="p-link layout-topbar-button" v-tooltip.bottom="'Settings'">
                 <i class="pi pi-cog"></i>
                 <span>Settings</span>
             </button>
-            <button @click="onSignout" class="p-link layout-topbar-button">
+            <button @click="onSignout" class="p-link layout-topbar-button" v-tooltip.bottom="'Sign out'">
                 <i class="pi pi-sign-out"></i>
                 <span>Sign out</span>
             </button>

@@ -20,7 +20,7 @@ onBeforeMount(() => {
 <template>
     <ul class="layout-menu">
         <li class="my-3 text-center">
-            <Tag icon="pi pi-user" severity="success" :value="username"></Tag>
+            <Tag icon="pi pi-user" severity="primary" :value="username"></Tag>
         </li>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>

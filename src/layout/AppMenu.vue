@@ -20,10 +20,7 @@ onBeforeMount(() => {
 <template>
     <ul class="layout-menu">
         <li class="my-3 text-center">
-            <span class="p-tag p-tag-success p-component">
-                <span class="p-tag-icon pi pi-user"></span>
-                <span class="p-tag-value">{{ username }}</span>
-            </span>
+            <Tag icon="pi pi-user" severity="success" :value="username"></Tag>
         </li>
         <template v-for="(item, i) in model" :key="item">
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>

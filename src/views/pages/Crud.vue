@@ -95,7 +95,7 @@ const saveRecord = async () => {
 
     let msg = null;
     if (record.value[pk]) {
-        await crudService.change(group, item, record.value, record.value[pk]);
+        await crudService.change(group, item, record.value);
         for (let i = 0; i < records.value.length; i++) {
             if (records.value[i][pk] == record.value[pk]) {
                 records.value[i] = record.value;
@@ -124,8 +124,9 @@ const confirmDeleteRecord = (editRecord) => {
     deleteRecordDialog.value = true;
 };
 
-const deleteRecord = () => {
-    products.value = products.value.filter((val) => val.id !== record.value.id);
+const deleteRecord = async () => {
+    await crudService.delete(group, item, record.value);
+    records.value = records.value.filter((val) => val[getPrimarykey()] !== record.value[getPrimarykey()]);
     deleteRecordDialog.value = false;
     record.value = {};
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item} Deleted`, life: 3000 });
@@ -138,8 +139,10 @@ const exportCSV = () => {
 const confirmDeleteSelected = () => {
     deleteRecordsDialog.value = true;
 };
-const deleteSelectedRecords = () => {
-    products.value = products.value.filter((val) => !selectedRecords.value.includes(val));
+const deleteSelectedRecords = async () => {
+    let ids = selectedRecords.value.map((val) => val[getPrimarykey()]);
+    await crudService.batchDelete(group, item, ids);
+    records.value = records.value.filter((val) => !selectedRecords.value.includes(val));
     deleteRecordsDialog.value = false;
     selectedRecords.value = null;
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item}s Deleted`, life: 3000 });
@@ -237,7 +240,8 @@ const initFilters = () => {
                 <Dialog v-model:visible="deleteRecordDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="record">Are you sure you want to delete {{ item }} <Badge :value="record[getPrimarykey()]"></Badge> ?</span>
+                        <span v-if="record">Are you sure you want to delete {{ item }} <Badge
+                                :value="record[getPrimarykey()]"></Badge> ?</span>
                     </div>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteRecordDialog = false" />

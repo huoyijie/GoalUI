@@ -1,7 +1,11 @@
 const contextPath = 'http://127.0.0.1:8100/';
 
-const crudFetch = (group, item, method, body) => {
-    return fetch(contextPath + `admin/${group}/${item}`, {
+const crudFetch = (group, item, method, body, batch) => {
+    let url = contextPath + `admin/${group}/${item}`;
+    if (batch) {
+        url += '/batch';
+    }
+    return fetch(url, {
         method,
         mode: 'cors',
         credentials: 'include',
@@ -23,5 +27,11 @@ export default class CrudService {
     }
     change(group, item, record) {
         return crudFetch(group, item, 'PUT', JSON.stringify(record));
+    }
+    delete(group, item, record) {
+        return crudFetch(group, item, 'DELETE', JSON.stringify(record));
+    }
+    batchDelete(group, item, ids) {
+        return crudFetch(group, item, 'DELETE', JSON.stringify(ids), true);
     }
 }

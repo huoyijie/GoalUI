@@ -7,21 +7,20 @@ import { useToast } from 'primevue/usetoast';
 
 const route = useRoute();
 const toast = useToast();
-
 const records = ref(null);
 const columns = ref(null);
 const preloads = ref(null);
 const recordDialog = ref(false);
-const deleteProductDialog = ref(false);
-const deleteProductsDialog = ref(false);
+const deleteRecordDialog = ref(false);
+const deleteRecordsDialog = ref(false);
 const record = ref({});
-const selectedProducts = ref(null);
+const selectedRecords = ref(null);
 const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
+const crudService = new CrudService();
 
 let { group, item } = route.params;
-const crudService = new CrudService();
 
 onBeforeMount(() => {
     initFilters();
@@ -60,6 +59,14 @@ const showPreloadField = (column, data) => {
         }
     }
     return data[column.Name];
+};
+
+const getPrimarykey = () => {
+    for (let column of columns.value) {
+        if (column.Primary) {
+            return column.Name;
+        }
+    }
 };
 
 const openNew = () => {
@@ -104,22 +111,6 @@ const saveRecord = async () => {
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item} ${msg}`, life: 3000 });
     recordDialog.value = false;
     record.value = {};
-    // if (record.value.name && record.value.name.trim() && record.value.price) {
-    //     if (record.value.id) {
-    //         record.value.inventoryStatus = record.value.inventoryStatus.value ? record.value.inventoryStatus.value : record.value.inventoryStatus;
-    //         products.value[findIndexById(record.value.id)] = record.value;
-    //         toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
-    //     } else {
-    //         record.value.id = createId();
-    //         record.value.code = createId();
-    //         record.value.image = 'product-placeholder.svg';
-    //         record.value.inventoryStatus = record.value.inventoryStatus ? record.value.inventoryStatus.value : 'INSTOCK';
-    //         products.value.push(record.value);
-    //         toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
-    //     }
-    //     recordDialog.value = false;
-    //     record.value = {};
-    // }
 };
 
 const editRecord = (editRecord) => {
@@ -128,16 +119,16 @@ const editRecord = (editRecord) => {
     recordDialog.value = true;
 };
 
-const confirmDeleteProduct = (editRecord) => {
+const confirmDeleteRecord = (editRecord) => {
     record.value = editRecord;
-    deleteProductDialog.value = true;
+    deleteRecordDialog.value = true;
 };
 
-const deleteProduct = () => {
+const deleteRecord = () => {
     products.value = products.value.filter((val) => val.id !== record.value.id);
-    deleteProductDialog.value = false;
+    deleteRecordDialog.value = false;
     record.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+    toast.add({ severity: 'success', summary: 'Successful', detail: `${item} Deleted`, life: 3000 });
 };
 
 const exportCSV = () => {
@@ -145,13 +136,13 @@ const exportCSV = () => {
 };
 
 const confirmDeleteSelected = () => {
-    deleteProductsDialog.value = true;
+    deleteRecordsDialog.value = true;
 };
-const deleteSelectedProducts = () => {
-    products.value = products.value.filter((val) => !selectedProducts.value.includes(val));
-    deleteProductsDialog.value = false;
-    selectedProducts.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+const deleteSelectedRecords = () => {
+    products.value = products.value.filter((val) => !selectedRecords.value.includes(val));
+    deleteRecordsDialog.value = false;
+    selectedRecords.value = null;
+    toast.add({ severity: 'success', summary: 'Successful', detail: `${item}s Deleted`, life: 3000 });
 };
 
 const initFilters = () => {
@@ -171,7 +162,7 @@ const initFilters = () => {
                         <div class="my-2">
                             <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
                             <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected"
-                                :disabled="!selectedProducts || !selectedProducts.length" />
+                                :disabled="!selectedRecords || !selectedRecords.length" />
                         </div>
                     </template>
 
@@ -182,7 +173,7 @@ const initFilters = () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="records" v-model:selection="selectedProducts" dataKey="ID" :paginator="true"
+                <DataTable ref="dt" :value="records" v-model:selection="selectedRecords" dataKey="ID" :paginator="true"
                     :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
@@ -222,7 +213,7 @@ const initFilters = () => {
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editRecord(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
-                                @click="confirmDeleteProduct(slotProps.data)" />
+                                @click="confirmDeleteRecord(slotProps.data)" />
                         </template>
                     </Column>
                 </DataTable>
@@ -243,25 +234,25 @@ const initFilters = () => {
                     </template>
                 </Dialog>
 
-                <Dialog v-model:visible="deleteProductDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+                <Dialog v-model:visible="deleteRecordDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="record">Are you sure you want to delete <b>{{ record.name }}</b>?</span>
+                        <span v-if="record">Are you sure you want to delete {{ item }} <Badge :value="record[getPrimarykey()]"></Badge> ?</span>
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteProduct" />
+                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteRecordDialog = false" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteRecord" />
                     </template>
                 </Dialog>
 
-                <Dialog v-model:visible="deleteProductsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
+                <Dialog v-model:visible="deleteRecordsDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="record">Are you sure you want to delete the selected products?</span>
+                        <span v-if="record">Are you sure you want to delete the selected {{ item }}s?</span>
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteProductsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedProducts" />
+                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="deleteRecordsDialog = false" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deleteSelectedRecords" />
                     </template>
                 </Dialog>
             </div>

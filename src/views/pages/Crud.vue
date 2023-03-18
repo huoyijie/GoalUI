@@ -256,7 +256,7 @@ const initFilters = () => {
 
                 <Dialog v-if="authRole" v-model:visible="changePermsDialog" class="col-12 lg:col-8"
                     :header="`${item} Details`" :modal="true">
-                    <PickList v-model="permsPicklistValue" listStyle="height:250px" dataKey="code">
+                    <PickList v-model="permsPicklistValue" listStyle="height:250px" dataKey="Code">
                         <template #sourceheader> Available </template>
                         <template #targetheader> Selected </template>
                         <template #item="slotProps">

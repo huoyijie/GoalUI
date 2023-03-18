@@ -1,12 +1,16 @@
 <script setup>
 import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount } from 'vue';
-import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+import { ref, onMounted, onBeforeMount, computed } from 'vue';
+import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import CrudService from '@/service/CrudService';
 import { useToast } from 'primevue/usetoast';
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast();
+const group = ref(route.params.group);
+const item = ref(route.params.item);
+const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const records = ref(null);
 const columns = ref(null);
 const preloads = ref(null);
@@ -19,39 +23,43 @@ const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
 const crudService = new CrudService();
-
-let { group, item } = route.params;
+const changePermsDialog = ref(false);
+const permsPicklistValue = ref([[], []]);
+const pickPerms = async (pickRecord) => {
+    changePermsDialog.value = true;
+}
+const changePerms = async (pickRecord) => {
+    changePermsDialog.value = false;
+};
 
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(() => {
-    crudService.get(group, item).then((data) => {
+    crudService.get(router, group.value, item.value).then((data) => {
+        data ||= {};
         records.value = data.records;
         columns.value = data.columns;
         preloads.value = data.preloads;
     });
 });
 onBeforeRouteUpdate((to) => {
-    group = to.params.group;
-    item = to.params.item;
-    crudService.get(group, item).then((data) => {
+    group.value = to.params.group;
+    item.value = to.params.item;
+    crudService.get(router, group.value, item.value).then((data) => {
+        data ||= {};
         records.value = data.records;
         columns.value = data.columns;
         preloads.value = data.preloads;
     });
 });
 
-// const formatCurrency = (value) => {
-//     return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-// };
-
 const formatDate = (date) => {
     return new Date(date);
 };
 
 const showPreloadField = (column, data) => {
-    if (preloads.value != null) {
+    if (preloads.value) {
         for (let preload of preloads.value) {
             if (column.Name === preload[0]) {
                 return data[column.Name][preload[1]];
@@ -62,9 +70,11 @@ const showPreloadField = (column, data) => {
 };
 
 const getPrimarykey = () => {
-    for (let column of columns.value) {
-        if (column.Primary) {
-            return column.Name;
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (column.Primary) {
+                return column.Name;
+            }
         }
     }
 };
@@ -95,7 +105,7 @@ const saveRecord = async () => {
 
     let msg = null;
     if (record.value[pk]) {
-        await crudService.change(group, item, record.value);
+        await crudService.change(router, group.value, item.value, record.value);
         for (let i = 0; i < records.value.length; i++) {
             if (records.value[i][pk] == record.value[pk]) {
                 records.value[i] = record.value;
@@ -103,33 +113,32 @@ const saveRecord = async () => {
         }
         msg = 'Updated';
     } else {
-        let res = await crudService.add(group, item, record.value);
+        let res = await crudService.add(router, group.value, item.value, record.value);
         records.value ||= [];
         records.value.push(res);
         msg = 'Created';
     }
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item} ${msg}`, life: 3000 });
+    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
     recordDialog.value = false;
     record.value = {};
 };
 
 const editRecord = (editRecord) => {
-    record.value = { ...editRecord };
-    console.log(record);
+    record.value = editRecord;
     recordDialog.value = true;
 };
 
-const confirmDeleteRecord = (editRecord) => {
-    record.value = editRecord;
+const confirmDeleteRecord = (delRecord) => {
+    record.value = delRecord;
     deleteRecordDialog.value = true;
 };
 
 const deleteRecord = async () => {
-    await crudService.delete(group, item, record.value);
+    await crudService.delete(router, group.value, item.value, record.value);
     records.value = records.value.filter((val) => val[getPrimarykey()] !== record.value[getPrimarykey()]);
     deleteRecordDialog.value = false;
     record.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item} Deleted`, life: 3000 });
+    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} Deleted`, life: 3000 });
 };
 
 const exportCSV = () => {
@@ -141,11 +150,11 @@ const confirmDeleteSelected = () => {
 };
 const deleteSelectedRecords = async () => {
     let ids = selectedRecords.value.map((val) => val[getPrimarykey()]);
-    await crudService.batchDelete(group, item, ids);
+    await crudService.batchDelete(router, group.value, item.value, ids);
     records.value = records.value.filter((val) => !selectedRecords.value.includes(val));
     deleteRecordsDialog.value = false;
     selectedRecords.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item}s Deleted`, life: 3000 });
+    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value}s Deleted`, life: 3000 });
 };
 
 const initFilters = () => {
@@ -176,8 +185,8 @@ const initFilters = () => {
                     </template>
                 </Toolbar>
 
-                <DataTable ref="dt" :value="records" v-model:selection="selectedRecords" dataKey="ID" :paginator="true"
-                    :rows="10" :filters="filters"
+                <DataTable ref="dt" :value="records" v-model:selection="selectedRecords" :dataKey="getPrimarykey()"
+                    :paginator="true" :rows="10" :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`Showing {first} to {last} of {totalRecords} ${item}`"
@@ -213,6 +222,8 @@ const initFilters = () => {
 
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
+                            <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2"
+                                @click="pickPerms(slotProps.data)" />
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editRecord(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
@@ -234,6 +245,21 @@ const initFilters = () => {
                     <template #footer>
                         <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
                         <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveRecord" />
+                    </template>
+                </Dialog>
+
+                <Dialog v-if="authRole" v-model:visible="changePermsDialog" class="col-12 lg:col-8"
+                    :header="`${item} Details`" :modal="true">
+                    <PickList v-model="permsPicklistValue" listStyle="height:250px" dataKey="code">
+                        <template #sourceheader> Available </template>
+                        <template #targetheader> Selected </template>
+                        <template #item="slotProps">
+                            <div>{{ slotProps.item.name }}</div>
+                        </template>
+                    </PickList>
+                    <template #footer>
+                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="changePermsDialog = false" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="changePerms(slotProps.data)" />
                     </template>
                 </Dialog>
 
@@ -264,6 +290,4 @@ const initFilters = () => {
     </div>
 </template>
 
-<style scoped lang="scss">
-@import '@/assets/demo/styles/badges.scss';
-</style>
+<style scoped lang="scss"></style>

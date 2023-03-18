@@ -159,9 +159,9 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Signin.vue')
         },
         {
-            path: '/auth/access',
-            name: 'accessDenied',
-            component: () => import('@/views/pages/auth/Access.vue')
+            path: '/denied',
+            name: 'denied',
+            component: () => import('@/views/pages/auth/AccessDenied.vue')
         },
         {
             path: '/auth/error',

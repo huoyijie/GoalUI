@@ -10,6 +10,7 @@ const authService = new AuthService();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
+const username = localStorage.getItem('username');
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -86,9 +87,9 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onViewProfile" class="p-link layout-topbar-button" v-tooltip.bottom="'Profile'">
+            <button @click="onViewProfile" class="p-link layout-topbar-button" v-tooltip.bottom="username">
                 <i class="pi pi-user"></i>
-                <span>Profile</span>
+                <span>{{ username }}</span>
             </button>
             <button @click="onSettingsClick" class="p-link layout-topbar-button" v-tooltip.bottom="'Settings'">
                 <i class="pi pi-cog"></i>

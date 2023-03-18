@@ -4,6 +4,7 @@ frontend of goal, based on [Sakai Vue](https://github.com/primefaces/sakai-vue)
 ## TODO
 
 signin validate messages
+except crud, add another page cud, recently action
 
 ## Recommended IDE Setup
 

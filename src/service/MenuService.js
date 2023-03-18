@@ -1,7 +1,7 @@
 import doFetch from './FetchService';
 
 const menuConfig = new Map();
-menuConfig.set('Auth.Role', {
+menuConfig.set('auth.role', {
     icon: 'pi pi-fw pi-key',
     to: {
         name: 'crud',
@@ -11,7 +11,7 @@ menuConfig.set('Auth.Role', {
         }
     }
 });
-menuConfig.set('Auth.Session', {
+menuConfig.set('auth.session', {
     icon: 'pi pi-fw pi-ticket',
     to: {
         name: 'crud',
@@ -21,7 +21,7 @@ menuConfig.set('Auth.Session', {
         }
     }
 });
-menuConfig.set('Auth.User', {
+menuConfig.set('auth.user', {
     icon: 'pi pi-fw pi-users',
     to: {
         name: 'crud',

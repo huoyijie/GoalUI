@@ -3,6 +3,7 @@ import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import CrudService from '@/service/CrudService';
+import AuthService from '@/service/AuthService';
 import { useToast } from 'primevue/usetoast';
 
 const route = useRoute();
@@ -23,12 +24,17 @@ const dt = ref(null);
 const filters = ref({});
 const submitted = ref(false);
 const crudService = new CrudService();
+const authService = new AuthService();
 const changePermsDialog = ref(false);
 const permsPicklistValue = ref([[], []]);
 const pickPerms = async (pickRecord) => {
+    record.value = pickRecord;
+    let perms = await authService.perms(router, pickRecord[getPrimarykey()]);
+    permsPicklistValue.value = perms;
     changePermsDialog.value = true;
-}
-const changePerms = async (pickRecord) => {
+};
+const changePerms = async () => {
+    record.value = {};
     changePermsDialog.value = false;
 };
 
@@ -254,12 +260,12 @@ const initFilters = () => {
                         <template #sourceheader> Available </template>
                         <template #targetheader> Selected </template>
                         <template #item="slotProps">
-                            <div>{{ slotProps.item.name }}</div>
+                            <div>{{ slotProps.item.Name }}</div>
                         </template>
                     </PickList>
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="changePermsDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="changePerms(slotProps.data)" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="changePerms" />
                     </template>
                 </Dialog>
 

@@ -13,7 +13,16 @@ export default class AuthService {
             router.push({ name: 'signin' });
         });
     }
-    perms(router, roleId) {
-        return doFetch(router, `perms/${roleId}`).then((perms) => perms);
+    perms(router, roleID) {
+        return doFetch(router, `perms/${roleID}`).then((perms) => perms);
+    }
+    changePerms(router, roleID, perms) {
+        return doFetch(router, `perms/${roleID}`, 'PUT', JSON.stringify(perms));
+    }
+    roles(router, userID) {
+        return doFetch(router, `roles/${userID}`).then((roles) => roles);
+    }
+    changeRoles(router, userID, roles) {
+        return doFetch(router, `roles/${userID}`, 'PUT', JSON.stringify(roles));
     }
 }

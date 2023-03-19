@@ -12,6 +12,7 @@ const toast = useToast();
 const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
+const authUser = computed(() => group.value == 'auth' && item.value == 'user');
 const records = ref(null);
 const columns = ref(null);
 const preloads = ref(null);
@@ -34,8 +35,22 @@ const pickPerms = async (pickRecord) => {
     changePermsDialog.value = true;
 };
 const changePerms = async () => {
+    await authService.changePerms(router, record.value[getPrimarykey()], permsPicklistValue.value[1]);
     record.value = {};
     changePermsDialog.value = false;
+};
+const rolesPicklistValue = ref([[], []]);
+const changeRolesDialog = ref(false);
+const pickRoles = async (pickRecord) => {
+    record.value = pickRecord;
+    let roles = await authService.roles(router, pickRecord[getPrimarykey()]);
+    rolesPicklistValue.value = roles;
+    changeRolesDialog.value = true;
+};
+const changeRoles = async () => {
+    await authService.changeRoles(router, record.value[getPrimarykey()], rolesPicklistValue.value[1]);
+    record.value = {};
+    changeRolesDialog.value = false;
 };
 
 onBeforeMount(() => {
@@ -230,6 +245,8 @@ const initFilters = () => {
                         <template #body="slotProps">
                             <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2"
                                 @click="pickPerms(slotProps.data)" />
+                            <Button v-if="authUser" icon="pi pi-users" class="p-button-rounded p-button-primary mr-2"
+                                @click="pickRoles(slotProps.data)" />
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editRecord(slotProps.data)" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
@@ -266,6 +283,21 @@ const initFilters = () => {
                     <template #footer>
                         <Button label="No" icon="pi pi-times" class="p-button-text" @click="changePermsDialog = false" />
                         <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="changePerms" />
+                    </template>
+                </Dialog>
+
+                <Dialog v-if="authUser" v-model:visible="changeRolesDialog" class="col-12 lg:col-8"
+                    :header="`${item} Details`" :modal="true">
+                    <PickList v-model="rolesPicklistValue" listStyle="height:250px" dataKey="ID">
+                        <template #sourceheader> Available </template>
+                        <template #targetheader> Selected </template>
+                        <template #item="slotProps">
+                            <div>{{ slotProps.item.Name }}</div>
+                        </template>
+                    </PickList>
+                    <template #footer>
+                        <Button label="No" icon="pi pi-times" class="p-button-text" @click="changeRolesDialog = false" />
+                        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="changeRoles" />
                     </template>
                 </Dialog>
 

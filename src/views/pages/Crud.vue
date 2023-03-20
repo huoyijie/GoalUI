@@ -100,6 +100,69 @@ const getPrimarykey = () => {
     }
 };
 
+const isUint = (c) => {
+    return c.Type === 'uint';
+};
+
+const isInt = (c) => {
+    return c.Type === 'int';
+};
+
+const isInteger = (c) => {
+    return isUint(c) || isInt(c);
+};
+
+const isFloat = (c) => {
+    return c.Type === 'float';
+};
+
+const isNumber = (c) => {
+    return isInteger(c) || isFloat(c);
+};
+
+const minVal = (c) => {
+    if (isInteger(c)) {
+        if (c.ValidateRule) {
+            for (let rule of c.ValidateRule.split(',')) {
+                if (rule.includes('min=')) {
+                    return Number(rule.split('=')[1]);
+                }
+            }
+        }
+        if (isUint(c)) {
+            return 0;
+        }
+    }
+    return null;
+};
+
+const minFractionDigits = (c) => {
+    if (isFloat(c)) {
+        return 2;
+    }
+    return null;
+};
+
+const maxFractionDigits = (c) => {
+    if (isFloat(c)) {
+        return 5;
+    }
+    return null;
+};
+
+const maxVal = (c) => {
+    if (isInteger(c)) {
+        if (c.ValidateRule) {
+            for (let rule of c.ValidateRule.split(',')) {
+                if (rule.includes('max=')) {
+                    return Number(rule.split('=')[1]);
+                }
+            }
+        }
+    }
+    return null;
+};
+
 const openNew = () => {
     record.value = {};
     errors.value = {};
@@ -318,11 +381,12 @@ const readonly = (c) => {
                     <div v-for="(c, idx) in columns" :key="c.Name" class="field">
                         <template v-if="!(c.Primary || c.Preload)">
                             <label :for="c.Name">{{ c.Name }}</label>
-                            <InputNumber v-if="c.Type === 'uint'" showButtons :id="c.Name" v-model="record[c.Name]" required
-                                :disabled="readonly(c)" :autofocus="autofocus(idx)"
-                                :class="{ 'p-invalid': submitted && hasErr(c) }">
+                            <InputNumber v-if="isNumber(c)" :min="minVal(c)" :max="maxVal(c)"
+                                :minFractionDigits="minFractionDigits(c)" :maxFractionDigits="maxFractionDigits(c)"
+                                showButtons :id="c.Name" v-model="record[c.Name]" required :disabled="readonly(c)"
+                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && hasErr(c) }">
                             </InputNumber>
-                            <Calendar v-else-if="c.Type === 'Time'" v-model="record[c.Name]" showTime
+                            <Calendar v-else-if="c.Type === 'Time'" :id="c.Name" v-model="record[c.Name]" showTime
                                 :class="{ 'p-invalid': submitted && hasErr(c) }" />
                             <div v-else-if="c.Type === 'bool'">
                                 <InputSwitch :id="c.Name" v-model="record[c.Name]" />

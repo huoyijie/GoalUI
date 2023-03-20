@@ -116,7 +116,7 @@ const saveRecord = async () => {
         if (column.Preload) {
             continue;
         }
-        if (!record.value[column.Name] || !record.value[column.Name]) {
+        if (!(column.Type === 'bool' || !!record.value[column.Name])) {
             return;
         }
     }
@@ -195,7 +195,7 @@ const isEditRecord = computed(() => {
 });
 
 const readonly = (c) => {
-    return isEditRecord.value || (c.Name === 'Key' && !!record.value.Key);
+    return (isEditRecord.value && c.Name === 'UserID') || (c.Name === 'Key' && !!record.value.Key);
 };
 </script>
 
@@ -279,9 +279,11 @@ const readonly = (c) => {
                                 :class="{ 'p-invalid': submitted && !record[c.Name] }">
                             </InputNumber>
                             <Calendar v-else-if="c.Type === 'Time'" v-model="record[c.Name]" showTime />
+                            <div v-else-if="c.Type === 'bool'">
+                                <InputSwitch :id="c.Name" v-model="record[c.Name]" />
+                            </div>
                             <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" required :disabled="readonly(c)"
                                 :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && !record[c.Name] }" />
-                            <small class="p-invalid" v-if="submitted && !record[c.Name]">{{ c.Name }} is required.</small>
                         </template>
                     </div>
                     <template #footer>

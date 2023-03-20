@@ -6,6 +6,8 @@ import CrudService from '@/service/CrudService';
 import AuthService from '@/service/AuthService';
 import { useToast } from 'primevue/usetoast';
 import { v4 as uuidv4 } from 'uuid';
+import useValidate from '@vuelidate/core';
+import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxValue } from '@vuelidate/validators';
 
 const route = useRoute();
 const router = useRouter();
@@ -16,6 +18,13 @@ const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
 const authSession = computed(() => group.value == 'auth' && item.value == 'session');
 const records = ref(null);
+const errors = ref({});
+const hasErr = (c) => {
+    return !!errors.value[c.Name];
+};
+const showErr = (c) => {
+    return errors.value[c.Name];
+};
 const columns = ref(null);
 const recordDialog = ref(false);
 const deleteRecordDialog = ref(false);
@@ -93,6 +102,7 @@ const getPrimarykey = () => {
 
 const openNew = () => {
     record.value = {};
+    errors.value = {};
     if (authSession.value) {
         record.value.Key = uuidv4().replaceAll('-', '');
     }
@@ -102,26 +112,59 @@ const openNew = () => {
 
 const hideDialog = () => {
     recordDialog.value = false;
+    errors.value = {};
     submitted.value = false;
 };
 
 const saveRecord = async () => {
     submitted.value = true;
-    let pk = null;
+    errors.value = {};
+    let rules = {};
     for (let column of columns.value) {
-        if (column.Primary) {
-            pk = column.Name;
+        if (column.Primary || column.Preload) {
             continue;
         }
-        if (column.Preload) {
-            continue;
+        if (column.ValidateRule) {
+            rules[column.Name] = {};
+            for (let rule of column.ValidateRule.split(',')) {
+                if (rule === 'required') {
+                    rules[column.Name].required = required;
+                } else if (rule === 'alpha') {
+                    rules[column.Name].alpha = alpha;
+                } else if (rule === 'alphanum') {
+                    rules[column.Name].alphaNum = alphaNum;
+                } else if (rule === 'email') {
+                    rules[column.Name].email = email;
+                }
+                if (rule.includes('=')) {
+                    let parts = rule.split('=');
+                    if (parts[0] === 'min') {
+                        if (column.Type === 'string') {
+                            rules[column.Name].minLength = minLength(parts[1]);
+                        } else {
+                            rules[column.Name].minValue = minValue(parts[1]);
+                        }
+                    } else if (parts[0] === 'max') {
+                        if (column.Type === 'string') {
+                            rules[column.Name].maxLength = maxLength(parts[1]);
+                        } else {
+                            rules[column.Name].maxValue = maxValue(parts[1]);
+                        }
+                    }
+                }
+            }
         }
-        if (!(column.Type === 'bool' || !!record.value[column.Name])) {
-            return;
+    }
+    const v$ = useValidate(rules, record.value);
+    if (!(await v$.value.$validate())) {
+        for (let err of v$.value.$errors) {
+            errors.value[err.$property] = err.$message;
         }
+        return;
     }
 
     let msg = null;
+    const pk = getPrimarykey();
     if (record.value[pk]) {
         await crudService.change(router, group.value, item.value, record.value);
         for (let i = 0; i < records.value.length; i++) {
@@ -144,6 +187,7 @@ const saveRecord = async () => {
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
     recordDialog.value = false;
     record.value = {};
+    errors.value = {};
 };
 
 const editRecord = (editRecord) => {
@@ -274,16 +318,18 @@ const readonly = (c) => {
                     <div v-for="(c, idx) in columns" :key="c.Name" class="field">
                         <template v-if="!(c.Primary || c.Preload)">
                             <label :for="c.Name">{{ c.Name }}</label>
-                            <InputNumber v-if="c.Type === 'uint'" :min="1" showButtons :id="c.Name" v-model="record[c.Name]"
-                                required :disabled="readonly(c)" :autofocus="autofocus(idx)"
-                                :class="{ 'p-invalid': submitted && !record[c.Name] }">
+                            <InputNumber v-if="c.Type === 'uint'" showButtons :id="c.Name" v-model="record[c.Name]" required
+                                :disabled="readonly(c)" :autofocus="autofocus(idx)"
+                                :class="{ 'p-invalid': submitted && hasErr(c) }">
                             </InputNumber>
-                            <Calendar v-else-if="c.Type === 'Time'" v-model="record[c.Name]" showTime />
+                            <Calendar v-else-if="c.Type === 'Time'" v-model="record[c.Name]" showTime
+                                :class="{ 'p-invalid': submitted && hasErr(c) }" />
                             <div v-else-if="c.Type === 'bool'">
                                 <InputSwitch :id="c.Name" v-model="record[c.Name]" />
                             </div>
                             <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" required :disabled="readonly(c)"
-                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && !record[c.Name] }" />
+                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && hasErr(c) }" />
+                            <span class="p-invalid">{{ showErr(c) }}</span>
                         </template>
                     </div>
                     <template #footer>

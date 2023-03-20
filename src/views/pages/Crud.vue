@@ -15,7 +15,6 @@ const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
 const records = ref(null);
 const columns = ref(null);
-const preloads = ref(null);
 const recordDialog = ref(false);
 const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
@@ -61,7 +60,6 @@ onMounted(() => {
         data ||= {};
         records.value = data.records;
         columns.value = data.columns;
-        preloads.value = data.preloads;
     });
 });
 onBeforeRouteUpdate((to) => {
@@ -71,7 +69,6 @@ onBeforeRouteUpdate((to) => {
         data ||= {};
         records.value = data.records;
         columns.value = data.columns;
-        preloads.value = data.preloads;
     });
 });
 
@@ -80,12 +77,8 @@ const formatDate = (date) => {
 };
 
 const showPreloadField = (column, data) => {
-    if (preloads.value) {
-        for (let preload of preloads.value) {
-            if (column.Name === preload[0]) {
-                return data[column.Name][preload[1]];
-            }
-        }
+    if (column.Preload) {
+        return data[column.Name][column.PreloadField];
     }
     return data[column.Name];
 };
@@ -258,7 +251,7 @@ const initFilters = () => {
                 <Dialog v-model:visible="recordDialog" :style="{ width: '450px' }" :header="`${item} Details`" :modal="true"
                     class="p-fluid">
                     <div v-for="c in columns" :key="c.Name" class="field">
-                        <template v-if="!c.Primary">
+                        <template v-if="!(c.Primary || c.Preload)">
                             <label :for="c.Name">{{ c.Name }}</label>
                             <InputText :id="c.Name" v-model.trim="record[c.Name]" required="true" autofocus
                                 :class="{ 'p-invalid': submitted && !record[c.Name] }" />

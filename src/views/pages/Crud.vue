@@ -5,6 +5,7 @@ import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import CrudService from '@/service/CrudService';
 import AuthService from '@/service/AuthService';
 import { useToast } from 'primevue/usetoast';
+import { v4 as uuidv4 } from 'uuid';
 
 const route = useRoute();
 const router = useRouter();
@@ -13,6 +14,7 @@ const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
+const authSession = computed(() => group.value == 'auth' && item.value == 'session');
 const records = ref(null);
 const columns = ref(null);
 const recordDialog = ref(false);
@@ -72,10 +74,6 @@ onBeforeRouteUpdate((to) => {
     });
 });
 
-const formatDate = (date) => {
-    return new Date(date);
-};
-
 const showPreloadField = (column, data) => {
     if (column.Preload) {
         return data[column.Name][column.PreloadField];
@@ -95,6 +93,9 @@ const getPrimarykey = () => {
 
 const openNew = () => {
     record.value = {};
+    if (authSession.value) {
+        record.value.Key = uuidv4().replaceAll('-', '');
+    }
     submitted.value = false;
     recordDialog.value = true;
 };
@@ -112,7 +113,10 @@ const saveRecord = async () => {
             pk = column.Name;
             continue;
         }
-        if (!record.value[column.Name] || !record.value[column.Name].trim()) {
+        if (column.Preload) {
+            continue;
+        }
+        if (!record.value[column.Name] || !record.value[column.Name]) {
             return;
         }
     }
@@ -131,6 +135,11 @@ const saveRecord = async () => {
         records.value ||= [];
         records.value.push(res);
         msg = 'Created';
+    }
+    if (authSession.value && !isEditRecord.value) {
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     }
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
     recordDialog.value = false;
@@ -175,6 +184,18 @@ const initFilters = () => {
     filters.value = {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS }
     };
+};
+
+const autofocus = (idx) => {
+    return idx == 1;
+};
+
+const isEditRecord = computed(() => {
+    return !!record.value[getPrimarykey()];
+});
+
+const readonly = (c) => {
+    return isEditRecord.value || (c.Name === 'Key' && !!record.value.Key);
 };
 </script>
 
@@ -226,7 +247,7 @@ const initFilters = () => {
                                 <Badge v-else value="x" severity="danger"></Badge>
                             </template>
                             <template v-else-if="c.Type === 'Time'">
-                                <Calendar :modelValue="formatDate(showPreloadField(c, slotProps.data))" showTime readonly />
+                                <Calendar :modelValue="showPreloadField(c, slotProps.data)" showTime readonly />
                             </template>
                             <template v-else>
                                 {{ showPreloadField(c, slotProps.data) }}
@@ -250,11 +271,16 @@ const initFilters = () => {
 
                 <Dialog v-model:visible="recordDialog" :style="{ width: '450px' }" :header="`${item} Details`" :modal="true"
                     class="p-fluid">
-                    <div v-for="c in columns" :key="c.Name" class="field">
+                    <div v-for="(c, idx) in columns" :key="c.Name" class="field">
                         <template v-if="!(c.Primary || c.Preload)">
                             <label :for="c.Name">{{ c.Name }}</label>
-                            <InputText :id="c.Name" v-model.trim="record[c.Name]" required="true" autofocus
-                                :class="{ 'p-invalid': submitted && !record[c.Name] }" />
+                            <InputNumber v-if="c.Type === 'uint'" :min="1" showButtons :id="c.Name" v-model="record[c.Name]"
+                                required :disabled="readonly(c)" :autofocus="autofocus(idx)"
+                                :class="{ 'p-invalid': submitted && !record[c.Name] }">
+                            </InputNumber>
+                            <Calendar v-else-if="c.Type === 'Time'" v-model="record[c.Name]" showTime />
+                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" required :disabled="readonly(c)"
+                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && !record[c.Name] }" />
                             <small class="p-invalid" v-if="submitted && !record[c.Name]">{{ c.Name }} is required.</small>
                         </template>
                     </div>

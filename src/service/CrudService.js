@@ -10,7 +10,16 @@ const crudFetch = (router, group, item, method, body, batch) => {
 
 export default class CrudService {
     get(router, group, item) {
-        return crudFetch(router, group, item);
+        return crudFetch(router, group, item).then((data) => {
+            for (let c of data.columns) {
+                if (c.Type === 'Time') {
+                    for (let r of data.records) {
+                        r[c.Name] = new Date(r[c.Name]);
+                    }
+                }
+            }
+            return data;
+        });
     }
     add(router, group, item, record) {
         return crudFetch(router, group, item, 'POST', JSON.stringify(record));

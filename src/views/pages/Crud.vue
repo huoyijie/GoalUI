@@ -389,7 +389,7 @@ const isSessionRDOnly = (c) => {
                         </template>
                     </Column>
 
-                    <Column headerStyle="min-width:10rem;">
+                    <Column headerStyle="min-width:15rem;">
                         <template #body="slotProps">
                             <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2"
                                 @click="pickPerms(slotProps.data)" />

@@ -1,9 +1,9 @@
 import doFetch from './FetchService';
 
-const crudFetch = (router, group, item, method, body, batch) => {
+const crudFetch = (router, group, item, method, body, path) => {
     let url = `${group}/${item}`;
-    if (batch) {
-        url += '/batch';
+    if (path) {
+        url += `/${path}`;
     }
     return doFetch(router, url, method, body);
 };
@@ -31,6 +31,9 @@ export default class CrudService {
         return crudFetch(router, group, item, 'DELETE', JSON.stringify(record));
     }
     batchDelete(router, group, item, ids) {
-        return crudFetch(router, group, item, 'DELETE', JSON.stringify(ids), true);
+        return crudFetch(router, group, item, 'DELETE', JSON.stringify(ids), 'batch');
+    }
+    exist(router, group, item, record) {
+        return crudFetch(router, group, item, 'POST', JSON.stringify(record), 'exist');
     }
 }

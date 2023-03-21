@@ -33,7 +33,6 @@ const record = ref({});
 const selectedRecords = ref(null);
 const dt = ref(null);
 const filters = ref({});
-const submitted = ref(false);
 const crudService = new CrudService();
 const authService = new AuthService();
 const changePermsDialog = ref(false);
@@ -98,6 +97,18 @@ const getPrimarykey = () => {
             }
         }
     }
+};
+
+const getUniquekey = () => {
+    let keys = [];
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (column.Unique) {
+                keys.push(column);
+            }
+        }
+    }
+    return keys;
 };
 
 const isUint = (c) => {
@@ -169,18 +180,19 @@ const openNew = () => {
     if (authSession.value) {
         record.value.Key = uuidv4().replaceAll('-', '');
     }
-    submitted.value = false;
     recordDialog.value = true;
 };
 
 const hideDialog = () => {
     recordDialog.value = false;
     errors.value = {};
-    submitted.value = false;
+};
+
+const clearErr = (c) => {
+    delete errors.value[c.Name];
 };
 
 const saveRecord = async () => {
-    submitted.value = true;
     errors.value = {};
     let rules = {};
     for (let column of columns.value) {
@@ -226,6 +238,18 @@ const saveRecord = async () => {
         return;
     }
 
+    for (let c of getUniquekey()) {
+        let data = {};
+        data[c.Name] = record.value[c.Name];
+        let exist = await crudService.exist(router, group.value, item.value, data);
+        if (exist) {
+            if (exist[getPrimarykey()] != record.value[getPrimarykey()]) {
+                errors.value[c.Name] = 'Value is used';
+                return;
+            }
+        }
+    }
+
     let msg = null;
     const pk = getPrimarykey();
     if (record.value[pk]) {
@@ -254,7 +278,7 @@ const saveRecord = async () => {
 };
 
 const editRecord = (editRecord) => {
-    record.value = editRecord;
+    record.value = { ...editRecord };
     recordDialog.value = true;
 };
 
@@ -293,7 +317,7 @@ const initFilters = () => {
     };
 };
 
-const autofocus = (idx) => {
+const isAutofocus = (c, idx) => {
     return idx == 1;
 };
 
@@ -301,8 +325,11 @@ const isEditRecord = computed(() => {
     return !!record.value[getPrimarykey()];
 });
 
-const readonly = (c) => {
-    return (isEditRecord.value && c.Name === 'UserID') || (c.Name === 'Key' && !!record.value.Key);
+const isSessionRDOnly = (c) => {
+    if (!authSession.value) {
+        return false;
+    }
+    return (isEditRecord.value && c.Name === 'UserID') || c.Name === 'Key';
 };
 </script>
 
@@ -370,7 +397,7 @@ const readonly = (c) => {
                                 @click="pickRoles(slotProps.data)" />
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
                                 @click="editRecord(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning mt-2"
+                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning"
                                 @click="confirmDeleteRecord(slotProps.data)" />
                         </template>
                     </Column>
@@ -383,17 +410,19 @@ const readonly = (c) => {
                             <label :for="c.Name">{{ c.Name }}</label>
                             <InputNumber v-if="isNumber(c)" :min="minVal(c)" :max="maxVal(c)"
                                 :minFractionDigits="minFractionDigits(c)" :maxFractionDigits="maxFractionDigits(c)"
-                                showButtons :id="c.Name" v-model="record[c.Name]" required :disabled="readonly(c)"
-                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && hasErr(c) }">
+                                showButtons :id="c.Name" v-model="record[c.Name]" @focus="clearErr(c)" required
+                                :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
+                                :class="{ 'p-invalid': hasErr(c) }">
                             </InputNumber>
-                            <Calendar v-else-if="c.Type === 'Time'" :id="c.Name" v-model="record[c.Name]" showTime
-                                :class="{ 'p-invalid': submitted && hasErr(c) }" />
+                            <Calendar v-else-if="c.Type === 'Time'" :id="c.Name" v-model="record[c.Name]"
+                                @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" />
                             <div v-else-if="c.Type === 'bool'">
                                 <InputSwitch :id="c.Name" v-model="record[c.Name]" />
                             </div>
-                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" required :disabled="readonly(c)"
-                                :autofocus="autofocus(idx)" :class="{ 'p-invalid': submitted && hasErr(c) }" />
-                            <span class="p-invalid">{{ showErr(c) }}</span>
+                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)" required
+                                :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
+                                :class="{ 'p-invalid': hasErr(c) }" />
+                            <small class="p-invalid">{{ showErr(c) }}</small>
                         </template>
                     </div>
                     <template #footer>

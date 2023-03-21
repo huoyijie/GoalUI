@@ -1,7 +1,7 @@
 import doFetch from './FetchService';
 
 const crudFetch = (router, group, item, method, body, path) => {
-    let url = `${group}/${item}`;
+    let url = `crud/${group}/${item}`;
     if (path) {
         url += `/${path}`;
     }

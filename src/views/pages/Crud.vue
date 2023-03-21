@@ -111,6 +111,14 @@ const getUniquekey = () => {
     return keys;
 };
 
+const isBool = (c) => {
+    return c.Type === 'bool';
+};
+
+const isTime = (c) => {
+    return c.Type === 'Time';
+};
+
 const isUint = (c) => {
     return c.Type === 'uint';
 };
@@ -371,23 +379,25 @@ const isSessionRDOnly = (c) => {
                     </template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                    <Column v-for="c in columns" :key="c.Name" :field="c.Name" :header="c.Name" :sortable="true"
-                        headerStyle="width:14%; min-width:10rem;">
-                        <template #body="slotProps">
-                            <span class="p-column-title">{{ c.Name }}</span>
-                            <template v-if="c.Type === 'bool'">
-                                <Badge v-if="showPreloadField(c, slotProps.data) == true" value="✓" severity="success">
-                                </Badge>
-                                <Badge v-else value="x" severity="danger"></Badge>
+                    <template v-for="c in columns" :key="c.Name">
+                        <Column v-if="!c.Hidden" :field="c.Name" :header="c.Name" :sortable="true"
+                            headerStyle="width:14%; min-width:10rem;">
+                            <template #body="slotProps">
+                                <span class="p-column-title">{{ c.Name }}</span>
+                                <template v-if="isBool(c)">
+                                    <Badge v-if="showPreloadField(c, slotProps.data) == true" value="✓" severity="success">
+                                    </Badge>
+                                    <Badge v-else value="x" severity="danger"></Badge>
+                                </template>
+                                <template v-else-if="isTime(c)">
+                                    <Calendar :modelValue="showPreloadField(c, slotProps.data)" showTime readonly />
+                                </template>
+                                <template v-else>
+                                    {{ showPreloadField(c, slotProps.data) }}
+                                </template>
                             </template>
-                            <template v-else-if="c.Type === 'Time'">
-                                <Calendar :modelValue="showPreloadField(c, slotProps.data)" showTime readonly />
-                            </template>
-                            <template v-else>
-                                {{ showPreloadField(c, slotProps.data) }}
-                            </template>
-                        </template>
-                    </Column>
+                        </Column>
+                    </template>
 
                     <Column headerStyle="min-width:15rem;">
                         <template #body="slotProps">
@@ -414,9 +424,9 @@ const isSessionRDOnly = (c) => {
                                 :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
                                 :class="{ 'p-invalid': hasErr(c) }">
                             </InputNumber>
-                            <Calendar v-else-if="c.Type === 'Time'" :id="c.Name" v-model="record[c.Name]"
-                                @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" />
-                            <div v-else-if="c.Type === 'bool'">
+                            <Calendar v-else-if="isTime(c)" :id="c.Name" v-model="record[c.Name]" @show="clearErr(c)"
+                                showTime showIcon :class="{ 'p-invalid': hasErr(c) }" />
+                            <div v-else-if="isBool(c)">
                                 <InputSwitch :id="c.Name" v-model="record[c.Name]" />
                             </div>
                             <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)" required

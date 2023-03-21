@@ -111,6 +111,10 @@ const getUniquekey = () => {
     return keys;
 };
 
+const isPassword = (c) => {
+    return c.Type === 'string' && c.Name === 'Password';
+};
+
 const isBool = (c) => {
     return c.Type === 'bool';
 };
@@ -420,7 +424,7 @@ const isSessionRDOnly = (c) => {
                             <label :for="c.Name">{{ c.Name }}</label>
                             <InputNumber v-if="isNumber(c)" :min="minVal(c)" :max="maxVal(c)"
                                 :minFractionDigits="minFractionDigits(c)" :maxFractionDigits="maxFractionDigits(c)"
-                                showButtons :id="c.Name" v-model="record[c.Name]" @focus="clearErr(c)" required
+                                showButtons :id="c.Name" v-model="record[c.Name]" @focus="clearErr(c)"
                                 :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
                                 :class="{ 'p-invalid': hasErr(c) }">
                             </InputNumber>
@@ -429,7 +433,9 @@ const isSessionRDOnly = (c) => {
                             <div v-else-if="isBool(c)">
                                 <InputSwitch :id="c.Name" v-model="record[c.Name]" />
                             </div>
-                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)" required
+                            <Password v-else-if="isPassword(c)" :id="c.Name" v-model="record[c.Name]" @focus="clearErr(c)"
+                                :class="{ 'p-invalid': hasErr(c) }" :feedback="false" />
+                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)"
                                 :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
                                 :class="{ 'p-invalid': hasErr(c) }" />
                             <small class="p-invalid">{{ showErr(c) }}</small>

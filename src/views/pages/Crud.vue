@@ -17,6 +17,7 @@ const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
 const authSession = computed(() => group.value == 'auth' && item.value == 'session');
+const columns = ref(null);
 const records = ref(null);
 const errors = ref({});
 const hasErr = (c) => {
@@ -25,7 +26,6 @@ const hasErr = (c) => {
 const showErr = (c) => {
     return errors.value[c.Name];
 };
-const columns = ref(null);
 const recordDialog = ref(false);
 const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
@@ -64,13 +64,12 @@ const changeRoles = async () => {
 const crudPerms = ref({});
 const crudGet = async () => {
     crudPerms.value = await crudService.perms(router, group.value, item.value);
+    let data = {};
     if (crudPerms.value.get) {
-        crudService.get(router, group.value, item.value).then((data) => {
-            data ||= {};
-            records.value = data.records;
-            columns.value = data.columns;
-        });
+        data = (await crudService.get(router, group.value, item.value)) || {};
     }
+    records.value = data.records;
+    columns.value = data.columns;
 };
 onBeforeMount(() => {
     initFilters();

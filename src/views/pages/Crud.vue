@@ -61,12 +61,16 @@ const changeRoles = async () => {
     record.value = {};
     changeRolesDialog.value = false;
 };
-const crudGet = () => {
-    crudService.get(router, group.value, item.value).then((data) => {
-        data ||= {};
-        records.value = data.records;
-        columns.value = data.columns;
-    });
+const crudPerms = ref({});
+const crudGet = async () => {
+    crudPerms.value = await crudService.perms(router, group.value, item.value);
+    if (crudPerms.value.get) {
+        crudService.get(router, group.value, item.value).then((data) => {
+            data ||= {};
+            records.value = data.records;
+            columns.value = data.columns;
+        });
+    }
 };
 onBeforeMount(() => {
     initFilters();
@@ -341,6 +345,30 @@ const isSessionRDOnly = (c) => {
     }
     return (isEditRecord.value && c.Name === 'UserID') || c.Name === 'Key';
 };
+const btnNewDisabled = computed(() => {
+    return !crudPerms.value.post;
+});
+const btnChangeDisabled = computed(() => {
+    return !crudPerms.value.put;
+});
+const btnPickPermsDisabled = computed(() => {
+    return !crudPerms.value.put;
+});
+const btnPickRolesDisabled = computed(() => {
+    return !crudPerms.value.put;
+});
+const btnDeleteDisabled = computed(() => {
+    return !crudPerms.value.delete;
+});
+const btnBatchDeleteDisabled = computed(() => {
+    return !crudPerms.value.delete || !selectedRecords.value || !selectedRecords.value.length;
+});
+const btnImportDisabled = computed(() => {
+    return !crudPerms.value.post;
+});
+const btnExportDisabled = computed(() => {
+    return !crudPerms.value.get;
+});
 </script>
 
 <template>
@@ -351,16 +379,18 @@ const isSessionRDOnly = (c) => {
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                            <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" />
+                            <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew"
+                                :disabled="btnNewDisabled" />
                             <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected"
-                                :disabled="!selectedRecords || !selectedRecords.length" />
+                                :disabled="btnBatchDeleteDisabled" />
                         </div>
                     </template>
 
                     <template v-slot:end>
                         <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import"
-                            class="mr-2 inline-block" />
-                        <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" />
+                            class="mr-2 inline-block" :disabled="btnImportDisabled" />
+                        <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)"
+                            :disabled="btnExportDisabled" />
                     </template>
                 </Toolbar>
 
@@ -404,13 +434,13 @@ const isSessionRDOnly = (c) => {
                     <Column headerStyle="min-width:15rem;">
                         <template #body="slotProps">
                             <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2"
-                                @click="pickPerms(slotProps.data)" />
+                                @click="pickPerms(slotProps.data)" :disabled="btnPickPermsDisabled" />
                             <Button v-if="authUser" icon="pi pi-users" class="p-button-rounded p-button-primary mr-2"
-                                @click="pickRoles(slotProps.data)" />
+                                @click="pickRoles(slotProps.data)" :disabled="btnPickRolesDisabled" />
                             <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2"
-                                @click="editRecord(slotProps.data)" />
+                                @click="editRecord(slotProps.data)" :disabled="btnChangeDisabled" />
                             <Button icon="pi pi-trash" class="p-button-rounded p-button-warning"
-                                @click="confirmDeleteRecord(slotProps.data)" />
+                                @click="confirmDeleteRecord(slotProps.data)" :disabled="btnDeleteDisabled" />
                         </template>
                     </Column>
                 </DataTable>

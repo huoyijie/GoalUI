@@ -1,5 +1,6 @@
-# goal-vue
-frontend of goal, based on [Sakai Vue](https://github.com/primefaces/sakai-vue)
+# GoalUI
+[Goal](https://github.com/huoyijie/Goal) is a lightweight web framework like Django written in Golang.
+[GoalUI](https://github.com/huoyijie/GoalUI)
 
 ## TODO
 

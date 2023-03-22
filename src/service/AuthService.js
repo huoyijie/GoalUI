@@ -3,8 +3,11 @@ import doFetch from './FetchService';
 export default class AuthService {
     signin(router, data) {
         return doFetch(router, 'signin', 'POST', JSON.stringify(data)).then((username) => {
-            localStorage.setItem('username', username);
-            router.push({ name: 'dashboard' });
+            if (username) {
+                localStorage.setItem('username', username);
+                router.push({ name: 'dashboard' });
+            }
+            return username;
         });
     }
     signout(router) {

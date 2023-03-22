@@ -438,7 +438,7 @@ const isSessionRDOnly = (c) => {
                             <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)"
                                 :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)"
                                 :class="{ 'p-invalid': hasErr(c) }" />
-                            <small class="p-invalid">{{ showErr(c) }}</small>
+                            <small>{{ showErr(c) }}</small>
                         </template>
                     </div>
                     <template #footer>

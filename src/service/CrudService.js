@@ -11,14 +11,15 @@ const crudFetch = (router, group, item, method, body, path) => {
 export default class CrudService {
     get(router, group, item) {
         return crudFetch(router, group, item).then((data) => {
-            for (let c of data.columns) {
+            let { cols, records } = data;
+            for (let c of cols) {
                 if (c.Type === 'Time') {
-                    for (let r of data.records) {
+                    for (let r of records) {
                         r[c.Name] = new Date(r[c.Name]);
                     }
                 }
             }
-            return data;
+            return records;
         });
     }
     add(router, group, item, record) {

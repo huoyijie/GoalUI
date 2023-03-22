@@ -63,13 +63,16 @@ const changeRoles = async () => {
 };
 const crudPerms = ref({});
 const crudGet = async () => {
-    crudPerms.value = await crudService.perms(router, group.value, item.value);
-    let data = {};
+    let { perms, cols } = await crudService.perms(router, group.value, item.value);
+    crudPerms.value = perms;
+
     if (crudPerms.value.get) {
-        data = (await crudService.get(router, group.value, item.value)) || {};
+        records.value = await crudService.get(router, group.value, item.value);
+    } else {
+        records.value = null;
     }
-    records.value = data.records;
-    columns.value = data.columns;
+    // must update columns together with records
+    columns.value = cols;
 };
 onBeforeMount(() => {
     initFilters();

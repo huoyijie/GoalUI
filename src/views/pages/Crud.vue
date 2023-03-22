@@ -61,25 +61,23 @@ const changeRoles = async () => {
     record.value = {};
     changeRolesDialog.value = false;
 };
-
+const crudGet = () => {
+    crudService.get(router, group.value, item.value).then((data) => {
+        data ||= {};
+        records.value = data.records;
+        columns.value = data.columns;
+    });
+};
 onBeforeMount(() => {
     initFilters();
 });
 onMounted(() => {
-    crudService.get(router, group.value, item.value).then((data) => {
-        data ||= {};
-        records.value = data.records;
-        columns.value = data.columns;
-    });
+    crudGet();
 });
 onBeforeRouteUpdate((to) => {
     group.value = to.params.group;
     item.value = to.params.item;
-    crudService.get(router, group.value, item.value).then((data) => {
-        data ||= {};
-        records.value = data.records;
-        columns.value = data.columns;
-    });
+    crudGet();
 });
 
 const showPreloadField = (column, data) => {

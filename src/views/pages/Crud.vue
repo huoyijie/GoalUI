@@ -4,7 +4,6 @@ import { ref, onMounted, onBeforeMount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import CrudService from '@/service/CrudService';
-import CrudHelper from '@/helper/CrudHelper';
 import AuthService from '@/service/AuthService';
 import { v4 as uuidv4 } from 'uuid';
 import useValidate from '@vuelidate/core';
@@ -15,7 +14,6 @@ const router = useRouter();
 const toast = useToast();
 
 const crudService = new CrudService();
-const crudHelper = new CrudHelper();
 const authService = new AuthService();
 
 const group = ref(route.params.group);
@@ -93,13 +91,6 @@ const changeRoles = async () => {
     await authService.changeRoles(router, record.value[primaryKey.value], pickRolesValue.value[1]);
     record.value = {};
     pickRolesDialog.value = false;
-};
-
-const showPreloadField = (c, data) => {
-    if (c.Preload) {
-        return data[c.Name][c.PreloadField];
-    }
-    return data[c.Name];
 };
 
 const primaryKey = computed(() => {
@@ -302,20 +293,11 @@ const deleteSelectedRecords = async () => {
                     </template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+
                     <template v-for="c in columns" :key="c.Name">
                         <Column v-if="!c.Hidden" :field="c.Name" :header="c.Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                             <template #body="slotProps">
-                                <span class="p-column-title">{{ c.Name }}</span>
-                                <template v-if="crudHelper.isBool(c)">
-                                    <Badge v-if="showPreloadField(c, slotProps.data) == true" value="✓" severity="success"> </Badge>
-                                    <Badge v-else value="x" severity="danger"></Badge>
-                                </template>
-                                <template v-else-if="crudHelper.isTime(c)">
-                                    <Calendar :modelValue="showPreloadField(c, slotProps.data)" showTime readonly />
-                                </template>
-                                <template v-else>
-                                    {{ showPreloadField(c, slotProps.data) }}
-                                </template>
+                                <RecordView :column="c" :record="slotProps.data" />
                             </template>
                         </Column>
                     </template>

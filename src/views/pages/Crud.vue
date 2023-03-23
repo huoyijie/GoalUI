@@ -273,9 +273,6 @@ const isSessionRDOnly = (c) => {
     }
     return (isEditRecord.value && c.Name === 'UserID') || c.Name === 'Key';
 };
-const btnNewDisabled = computed(() => {
-    return !crudPerms.value.post;
-});
 const btnChangeDisabled = computed(() => {
     return !crudPerms.value.put;
 });
@@ -288,15 +285,6 @@ const btnPickRolesDisabled = computed(() => {
 const btnDeleteDisabled = computed(() => {
     return !crudPerms.value.delete;
 });
-const btnBatchDeleteDisabled = computed(() => {
-    return !crudPerms.value.delete || !selectedRecords.value || !selectedRecords.value.length;
-});
-const btnImportDisabled = computed(() => {
-    return !crudPerms.value.post;
-});
-const btnExportDisabled = computed(() => {
-    return !crudPerms.value.get;
-});
 </script>
 
 <template>
@@ -304,19 +292,7 @@ const btnExportDisabled = computed(() => {
         <div class="col-12">
             <div class="card">
                 <Toast />
-                <Toolbar class="mb-4">
-                    <template v-slot:start>
-                        <div class="my-2">
-                            <Button label="New" icon="pi pi-plus" class="p-button-success mr-2" @click="openNew" :disabled="btnNewDisabled" />
-                            <Button label="Delete" icon="pi pi-trash" class="p-button-danger" @click="confirmDeleteSelected" :disabled="btnBatchDeleteDisabled" />
-                        </div>
-                    </template>
-
-                    <template v-slot:end>
-                        <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="Import" chooseLabel="Import" class="mr-2 inline-block" :disabled="btnImportDisabled" />
-                        <Button label="Export" icon="pi pi-upload" class="p-button-help" @click="exportCSV($event)" :disabled="btnExportDisabled" />
-                    </template>
-                </Toolbar>
+                <TopToolbar :crudPerms="crudPerms" :selectedRecords="selectedRecords" @new-record="openNew" @delete-records="confirmDeleteSelected" @export="exportCSV($event)" />
 
                 <DataTable
                     ref="dt"

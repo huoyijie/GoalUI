@@ -103,6 +103,7 @@ import PickPermsDialog from './components/crud/PickPermsDialog.vue';
 import PickRolesDialog from './components/crud/PickRolesDialog.vue';
 import ConfirmDelDialog from './components/crud/ConfirmDelDialog.vue';
 import TopToolbar from './components/crud/TopToolbar.vue';
+import RecordDialog from './components/crud/RecordDialog.vue';
 
 import '@/assets/styles.scss';
 
@@ -212,5 +213,6 @@ app.component('PickPermsDialog', PickPermsDialog);
 app.component('PickRolesDialog', PickRolesDialog);
 app.component('ConfirmDelDialog', ConfirmDelDialog);
 app.component('TopToolbar', TopToolbar);
+app.component('RecordDialog', RecordDialog);
 
 app.mount('#app');

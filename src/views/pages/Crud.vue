@@ -21,15 +21,6 @@ const authSession = computed(() => group.value == 'auth' && item.value == 'sessi
 const columns = ref(null);
 const records = ref(null);
 const errors = ref({});
-const hasErr = (c) => {
-    return !!errors.value[c.Name];
-};
-const showErr = (c) => {
-    return errors.value[c.Name];
-};
-const clearErr = (c) => {
-    delete errors.value[c.Name];
-};
 const recordDialog = ref(false);
 const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
@@ -129,11 +120,6 @@ const openNew = () => {
     recordDialog.value = true;
 };
 
-const hideDialog = () => {
-    recordDialog.value = false;
-    errors.value = {};
-};
-
 const saveRecord = async () => {
     errors.value = {};
     let rules = {};
@@ -221,6 +207,7 @@ const saveRecord = async () => {
 
 const editRecord = (editRecord) => {
     record.value = { ...editRecord };
+    errors.value = {};
     recordDialog.value = true;
 };
 
@@ -259,20 +246,10 @@ const initFilters = () => {
     };
 };
 
-const isAutofocus = (c, idx) => {
-    return idx == 1;
-};
-
 const isEditRecord = computed(() => {
     return !!record.value[getPrimarykey()];
 });
 
-const isSessionRDOnly = (c) => {
-    if (!authSession.value) {
-        return false;
-    }
-    return (isEditRecord.value && c.Name === 'UserID') || c.Name === 'Key';
-};
 const btnChangeDisabled = computed(() => {
     return !crudPerms.value.put;
 });
@@ -346,39 +323,7 @@ const btnDeleteDisabled = computed(() => {
                     </Column>
                 </DataTable>
 
-                <Dialog v-model:visible="recordDialog" :style="{ width: '450px' }" :header="`${item} Details`" :modal="true" class="p-fluid">
-                    <div v-for="(c, idx) in columns" :key="c.Name" class="field">
-                        <template v-if="!(c.Primary || c.Preload)">
-                            <label :for="c.Name">{{ c.Name }}</label>
-                            <InputNumber
-                                v-if="crudHelper.isNumber(c)"
-                                :min="crudHelper.minVal(c)"
-                                :max="crudHelper.maxVal(c)"
-                                :minFractionDigits="crudHelper.minFractionDigits(c)"
-                                :maxFractionDigits="crudHelper.maxFractionDigits(c)"
-                                showButtons
-                                :id="c.Name"
-                                v-model="record[c.Name]"
-                                @focus="clearErr(c)"
-                                :disabled="isSessionRDOnly(c)"
-                                :autofocus="isAutofocus(c, idx)"
-                                :class="{ 'p-invalid': hasErr(c) }"
-                            >
-                            </InputNumber>
-                            <Calendar v-else-if="crudHelper.isTime(c)" :id="c.Name" v-model="record[c.Name]" @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" />
-                            <div v-else-if="crudHelper.isBool(c)">
-                                <InputSwitch :id="c.Name" v-model="record[c.Name]" />
-                            </div>
-                            <Password v-else-if="crudHelper.isPassword(c)" :id="c.Name" v-model="record[c.Name]" @focus="clearErr(c)" :class="{ 'p-invalid': hasErr(c) }" :feedback="false" />
-                            <InputText v-else :id="c.Name" v-model.trim="record[c.Name]" @focus="clearErr(c)" :disabled="isSessionRDOnly(c)" :autofocus="isAutofocus(c, idx)" :class="{ 'p-invalid': hasErr(c) }" />
-                            <small>{{ showErr(c) }}</small>
-                        </template>
-                    </div>
-                    <template #footer>
-                        <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="hideDialog" />
-                        <Button label="Save" icon="pi pi-check" class="p-button-text" @click="saveRecord" />
-                    </template>
-                </Dialog>
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="columns" :pk="getPrimarykey()" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 

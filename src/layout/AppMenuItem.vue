@@ -64,8 +64,10 @@ const itemClick = (event, item) => {
     setActiveMenuItem(foundItemKey);
 };
 
-const checkActiveRoute = (item) => {
-    return route.path === item.to;
+const checkActiveRoute = (it) => {
+    let { group, item } = it.to.params;
+    let itemPath = `/${it.to.name}/${group}/${item}`;
+    return route.path === itemPath;
 };
 </script>
 

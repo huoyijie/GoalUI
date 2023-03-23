@@ -104,6 +104,7 @@ import PickRolesDialog from './components/crud/PickRolesDialog.vue';
 import ConfirmDelDialog from './components/crud/ConfirmDelDialog.vue';
 import TopToolbar from './components/crud/TopToolbar.vue';
 import RecordDialog from './components/crud/RecordDialog.vue';
+import OperationGroup from './components/crud/OperationGroup.vue'
 
 import '@/assets/styles.scss';
 
@@ -214,5 +215,6 @@ app.component('PickRolesDialog', PickRolesDialog);
 app.component('ConfirmDelDialog', ConfirmDelDialog);
 app.component('TopToolbar', TopToolbar);
 app.component('RecordDialog', RecordDialog);
+app.component('OperationGroup', OperationGroup);
 
 app.mount('#app');

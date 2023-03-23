@@ -205,8 +205,8 @@ const saveRecord = async () => {
     errors.value = {};
 };
 
-const editRecord = (editRecord) => {
-    record.value = { ...editRecord };
+const changeRecord = (changeRecord) => {
+    record.value = { ...changeRecord };
     errors.value = {};
     recordDialog.value = true;
 };
@@ -248,19 +248,6 @@ const initFilters = () => {
 
 const isEditRecord = computed(() => {
     return !!record.value[getPrimarykey()];
-});
-
-const btnChangeDisabled = computed(() => {
-    return !crudPerms.value.put;
-});
-const btnPickPermsDisabled = computed(() => {
-    return !crudPerms.value.put;
-});
-const btnPickRolesDisabled = computed(() => {
-    return !crudPerms.value.put;
-});
-const btnDeleteDisabled = computed(() => {
-    return !crudPerms.value.delete;
 });
 </script>
 
@@ -315,10 +302,15 @@ const btnDeleteDisabled = computed(() => {
 
                     <Column headerStyle="min-width:15rem;">
                         <template #body="slotProps">
-                            <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2" @click="pickPerms(slotProps.data)" :disabled="btnPickPermsDisabled" />
-                            <Button v-if="authUser" icon="pi pi-users" class="p-button-rounded p-button-primary mr-2" @click="pickRoles(slotProps.data)" :disabled="btnPickRolesDisabled" />
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="editRecord(slotProps.data)" :disabled="btnChangeDisabled" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="confirmDeleteRecord(slotProps.data)" :disabled="btnDeleteDisabled" />
+                            <OperationGroup
+                                :group="group"
+                                :item="item"
+                                :crudPerms="crudPerms"
+                                @pick-perms="pickPerms(slotProps.data)"
+                                @pick-roles="pickRoles(slotProps.data)"
+                                @change-record="changeRecord(slotProps.data)"
+                                @delete-record="confirmDeleteRecord(slotProps.data)"
+                            />
                         </template>
                     </Column>
                 </DataTable>

@@ -114,7 +114,7 @@ const primaryKey = computed(() => {
 });
 
 const uniqueKeys = computed(() => {
-    let keys = [];
+    const keys = [];
     if (columns.value) {
         for (let column of columns.value) {
             if (column.Unique) {
@@ -129,18 +129,8 @@ const isEditRecord = computed(() => {
     return !!record.value[primaryKey.value];
 });
 
-const openNew = () => {
-    record.value = {};
-    errors.value = {};
-    if (authSession.value) {
-        record.value.Key = uuidv4().replaceAll('-', '');
-    }
-    recordDialog.value = true;
-};
-
-const saveRecord = async () => {
-    errors.value = {};
-    let rules = {};
+const rules = computed(() => {
+    const rules = {};
     for (let column of columns.value) {
         if (column.Primary || column.Preload) {
             continue;
@@ -176,7 +166,23 @@ const saveRecord = async () => {
             }
         }
     }
-    const v$ = useValidate(rules, record.value);
+    return rules;
+});
+
+const openNew = () => {
+    record.value = {};
+    errors.value = {};
+    if (authSession.value) {
+        record.value.Key = uuidv4().replaceAll('-', '');
+    }
+    recordDialog.value = true;
+};
+
+const saveRecord = async () => {
+    errors.value = {};
+
+    // validate forms
+    const v$ = useValidate(rules.value, record.value);
     if (!(await v$.value.$validate())) {
         for (let err of v$.value.$errors) {
             errors.value[err.$property] = err.$message;
@@ -184,6 +190,7 @@ const saveRecord = async () => {
         return;
     }
 
+    // check unique keys
     for (let c of uniqueKeys.value) {
         let data = {};
         data[c.Name] = record.value[c.Name];
@@ -212,12 +219,16 @@ const saveRecord = async () => {
         records.value.push(res);
         msg = 'Created';
     }
+
+    // todo reload username
     if (authSession.value && !isEditRecord.value) {
         setTimeout(() => {
             window.location.reload();
         }, 1000);
     }
+
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
+
     recordDialog.value = false;
     record.value = {};
     errors.value = {};

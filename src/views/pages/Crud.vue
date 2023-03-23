@@ -2,10 +2,10 @@
 import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
 import CrudService from '@/service/CrudService';
 import CrudHelper from '@/helper/CrudHelper';
 import AuthService from '@/service/AuthService';
-import { useToast } from 'primevue/usetoast';
 import { v4 as uuidv4 } from 'uuid';
 import useValidate from '@vuelidate/core';
 import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxValue } from '@vuelidate/validators';
@@ -13,51 +13,26 @@ import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxVa
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+
+const crudService = new CrudService();
+const crudHelper = new CrudHelper();
+const authService = new AuthService();
+
 const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
 const authSession = computed(() => group.value == 'auth' && item.value == 'session');
-const columns = ref(null);
-const records = ref(null);
-const errors = ref({});
-const recordDialog = ref(false);
-const deleteRecordDialog = ref(false);
-const deleteRecordsDialog = ref(false);
-const record = ref({});
-const selectedRecords = ref(null);
+
 const dt = ref(null);
 const filters = ref({});
-const crudService = new CrudService();
-const crudHelper = new CrudHelper();
-const authService = new AuthService();
-const pickPermsDialog = ref(false);
-const pickPermsValue = ref([[], []]);
-const pickPerms = async (pickRecord) => {
-    record.value = pickRecord;
-    let perms = await authService.perms(router, pickRecord[getPrimarykey()]);
-    pickPermsValue.value = perms;
-    pickPermsDialog.value = true;
-};
-const changePerms = async () => {
-    await authService.changePerms(router, record.value[getPrimarykey()], pickPermsValue.value[1]);
-    record.value = {};
-    pickPermsDialog.value = false;
-};
-const pickRolesValue = ref([[], []]);
-const pickRolesDialog = ref(false);
-const pickRoles = async (pickRecord) => {
-    record.value = pickRecord;
-    let roles = await authService.roles(router, pickRecord[getPrimarykey()]);
-    pickRolesValue.value = roles;
-    pickRolesDialog.value = true;
-};
-const changeRoles = async () => {
-    await authService.changeRoles(router, record.value[getPrimarykey()], pickRolesValue.value[1]);
-    record.value = {};
-    pickRolesDialog.value = false;
-};
+const columns = ref(null);
+const records = ref(null);
+const record = ref({});
+const selectedRecords = ref(null);
+const errors = ref({});
 const crudPerms = ref({});
+
 const crudGet = async () => {
     let { perms, cols } = await crudService.perms(router, group.value, item.value);
     crudPerms.value = perms;
@@ -69,6 +44,12 @@ const crudGet = async () => {
     }
     // must update columns together with records
     columns.value = cols;
+};
+
+const initFilters = () => {
+    filters.value = {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+    };
 };
 onBeforeMount(() => {
     initFilters();
@@ -82,14 +63,46 @@ onBeforeRouteUpdate((to) => {
     crudGet();
 });
 
-const showPreloadField = (column, data) => {
-    if (column.Preload) {
-        return data[column.Name][column.PreloadField];
-    }
-    return data[column.Name];
+const recordDialog = ref(false);
+const deleteRecordDialog = ref(false);
+const deleteRecordsDialog = ref(false);
+const pickPermsDialog = ref(false);
+const pickRolesDialog = ref(false);
+
+const pickPermsValue = ref([[], []]);
+const pickPerms = async (pickRecord) => {
+    record.value = pickRecord;
+    let perms = await authService.perms(router, pickRecord[primaryKey.value]);
+    pickPermsValue.value = perms;
+    pickPermsDialog.value = true;
+};
+const changePerms = async () => {
+    await authService.changePerms(router, record.value[primaryKey.value], pickPermsValue.value[1]);
+    record.value = {};
+    pickPermsDialog.value = false;
 };
 
-const getPrimarykey = () => {
+const pickRolesValue = ref([[], []]);
+const pickRoles = async (pickRecord) => {
+    record.value = pickRecord;
+    let roles = await authService.roles(router, pickRecord[primaryKey.value]);
+    pickRolesValue.value = roles;
+    pickRolesDialog.value = true;
+};
+const changeRoles = async () => {
+    await authService.changeRoles(router, record.value[primaryKey.value], pickRolesValue.value[1]);
+    record.value = {};
+    pickRolesDialog.value = false;
+};
+
+const showPreloadField = (c, data) => {
+    if (c.Preload) {
+        return data[c.Name][c.PreloadField];
+    }
+    return data[c.Name];
+};
+
+const primaryKey = computed(() => {
     if (columns.value) {
         for (let column of columns.value) {
             if (column.Primary) {
@@ -97,9 +110,10 @@ const getPrimarykey = () => {
             }
         }
     }
-};
+    return '';
+});
 
-const getUniquekey = () => {
+const uniqueKeys = computed(() => {
     let keys = [];
     if (columns.value) {
         for (let column of columns.value) {
@@ -109,7 +123,11 @@ const getUniquekey = () => {
         }
     }
     return keys;
-};
+});
+
+const isEditRecord = computed(() => {
+    return !!record.value[primaryKey.value];
+});
 
 const openNew = () => {
     record.value = {};
@@ -166,12 +184,12 @@ const saveRecord = async () => {
         return;
     }
 
-    for (let c of getUniquekey()) {
+    for (let c of uniqueKeys.value) {
         let data = {};
         data[c.Name] = record.value[c.Name];
         let exist = await crudService.exist(router, group.value, item.value, data);
         if (exist) {
-            if (exist[getPrimarykey()] != record.value[getPrimarykey()]) {
+            if (exist[primaryKey.value] != record.value[primaryKey.value]) {
                 errors.value[c.Name] = 'Value is used';
                 return;
             }
@@ -179,7 +197,7 @@ const saveRecord = async () => {
     }
 
     let msg = null;
-    const pk = getPrimarykey();
+    const pk = primaryKey.value;
     if (record.value[pk]) {
         await crudService.change(router, group.value, item.value, record.value);
         for (let i = 0; i < records.value.length; i++) {
@@ -218,7 +236,7 @@ const confirmDeleteRecord = (delRecord) => {
 
 const deleteRecord = async () => {
     await crudService.delete(router, group.value, item.value, record.value);
-    records.value = records.value.filter((val) => val[getPrimarykey()] !== record.value[getPrimarykey()]);
+    records.value = records.value.filter((val) => val[primaryKey.value] !== record.value[primaryKey.value]);
     deleteRecordDialog.value = false;
     record.value = {};
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} Deleted`, life: 3000 });
@@ -231,24 +249,15 @@ const exportCSV = () => {
 const confirmDeleteSelected = () => {
     deleteRecordsDialog.value = true;
 };
+
 const deleteSelectedRecords = async () => {
-    let ids = selectedRecords.value.map((val) => val[getPrimarykey()]);
+    let ids = selectedRecords.value.map((val) => val[primaryKey.value]);
     await crudService.batchDelete(router, group.value, item.value, ids);
     records.value = records.value.filter((val) => !selectedRecords.value.includes(val));
     deleteRecordsDialog.value = false;
     selectedRecords.value = null;
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value}s Deleted`, life: 3000 });
 };
-
-const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
-};
-
-const isEditRecord = computed(() => {
-    return !!record.value[getPrimarykey()];
-});
 </script>
 
 <template>
@@ -262,7 +271,7 @@ const isEditRecord = computed(() => {
                     ref="dt"
                     :value="records"
                     v-model:selection="selectedRecords"
-                    :dataKey="getPrimarykey()"
+                    :dataKey="primaryKey"
                     :paginator="true"
                     :rows="10"
                     :filters="filters"
@@ -315,13 +324,13 @@ const isEditRecord = computed(() => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="columns" :pk="getPrimarykey()" @save-record="saveRecord" />
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="columns" :pk="primaryKey" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 
                 <PickRolesDialog :authUser="authUser" v-model:visible="pickRolesDialog" v-model="pickRolesValue" :yes="changeRoles" />
 
-                <ConfirmDelDialog :item="item" :record="record" :pk="getPrimarykey()" v-model:visible="deleteRecordDialog" v-model="deleteRecordsDialog" @delete-record="deleteRecord" @delete-records="deleteSelectedRecords" />
+                <ConfirmDelDialog :item="item" :record="record" :pk="primaryKey" v-model:visible="deleteRecordDialog" v-model="deleteRecordsDialog" @delete-record="deleteRecord" @delete-records="deleteSelectedRecords" />
             </div>
         </div>
     </div>

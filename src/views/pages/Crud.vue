@@ -44,7 +44,7 @@ const crudGet = async () => {
     if (crudPerms.value.get) {
         records.value = await crudService.get(router, group.value, item.value);
     } else {
-        records.value = null;
+        records.value = await crudService.getMine(router, group.value, item.value);
     }
     // must update columns together with records
     columns.value = cols;

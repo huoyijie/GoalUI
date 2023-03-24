@@ -8,18 +8,27 @@ const crudFetch = (router, group, item, method, body, path) => {
     return doFetch(router, url, method, body);
 };
 
+const postProcess = (data) => {
+    let { cols, records } = data;
+    for (let c of cols) {
+        if (c.Type === 'Time') {
+            for (let r of records) {
+                r[c.Name] = new Date(r[c.Name]);
+            }
+        }
+    }
+    return records;
+};
+
 export default class CrudService {
     get(router, group, item) {
         return crudFetch(router, group, item).then((data) => {
-            let { cols, records } = data;
-            for (let c of cols) {
-                if (c.Type === 'Time') {
-                    for (let r of records) {
-                        r[c.Name] = new Date(r[c.Name]);
-                    }
-                }
-            }
-            return records;
+            return postProcess(data);
+        });
+    }
+    getMine(router, group, item) {
+        return crudFetch(router, group, item, 'GET', null, 'mine').then((data) => {
+            return postProcess(data);
         });
     }
     add(router, group, item, record) {

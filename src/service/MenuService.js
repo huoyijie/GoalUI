@@ -31,6 +31,16 @@ menuConfig.set('auth.user', {
         }
     }
 });
+menuConfig.set('admin.operationlog', {
+    icon: 'pi pi-fw pi-save',
+    to: {
+        name: 'crud',
+        params: {
+            group: 'admin',
+            item: 'operationlog'
+        }
+    }
+});
 
 export default class MenuService {
     async getMenus(router) {

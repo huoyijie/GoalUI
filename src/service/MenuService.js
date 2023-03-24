@@ -1,46 +1,11 @@
 import doFetch from './FetchService';
 
-const menuConfig = new Map();
-menuConfig.set('auth.role', {
-    icon: 'pi pi-fw pi-key',
-    to: {
-        name: 'crud',
-        params: {
-            group: 'auth',
-            item: 'role'
-        }
-    }
-});
-menuConfig.set('auth.session', {
-    icon: 'pi pi-fw pi-ticket',
-    to: {
-        name: 'crud',
-        params: {
-            group: 'auth',
-            item: 'session'
-        }
-    }
-});
-menuConfig.set('auth.user', {
-    icon: 'pi pi-fw pi-users',
-    to: {
-        name: 'crud',
-        params: {
-            group: 'auth',
-            item: 'user'
-        }
-    }
-});
-menuConfig.set('admin.operationlog', {
-    icon: 'pi pi-fw pi-save',
-    to: {
-        name: 'crud',
-        params: {
-            group: 'admin',
-            item: 'operationlog'
-        }
-    }
-});
+const menuConfig = new Map([
+    ['auth.role', { icon: 'key' }],
+    ['auth.session', { icon: 'ticket' }],
+    ['auth.user', { icon: 'users' }],
+    ['admin.operationlog', { icon: 'save' }]
+]);
 
 export default class MenuService {
     async getMenus(router) {
@@ -49,8 +14,16 @@ export default class MenuService {
         for (let menu of menus) {
             for (let item of menu.items) {
                 let config = menuConfig.get(`${menu.label}.${item.label}`);
-                item.icon = config.icon;
-                item.to = config.to;
+                if (config) {
+                    item.icon = `pi pi-fw pi-${config.icon}`;
+                }
+                item.to = {
+                    name: 'crud',
+                    params: {
+                        group: `${menu.label}`,
+                        item: `${item.label}`
+                    }
+                };
             }
         }
         return menus;

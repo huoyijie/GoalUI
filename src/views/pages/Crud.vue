@@ -31,6 +31,12 @@ const selectedRecords = ref(null);
 const errors = ref({});
 const crudPerms = ref({});
 
+const resetState = () => {
+    record.value = {};
+    selectedRecords.value = null;
+    errors.value = {};
+};
+
 const crudGet = async () => {
     let { perms, cols } = await crudService.perms(router, group.value, item.value);
     crudPerms.value = perms;
@@ -42,6 +48,7 @@ const crudGet = async () => {
     }
     // must update columns together with records
     columns.value = cols;
+    resetState();
 };
 
 const initFilters = () => {

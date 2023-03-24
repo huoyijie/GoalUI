@@ -2,7 +2,7 @@
 import CrudHelper from '@/helper/CrudHelper';
 import { computed } from 'vue';
 
-const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'errors']);
+const props = defineProps(['visible', 'item', 'record', 'columns', 'pk', 'errors']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
@@ -22,12 +22,9 @@ const clearErr = (c) => {
 const isEditRecord = computed(() => {
     return !!props.record[props.pk];
 });
-const authSession = computed(() => props.group == 'auth' && props.item == 'session');
-const isSessionRDOnly = (c) => {
-    if (!authSession.value) {
-        return false;
-    }
-    return (isEditRecord.value && c.Name === 'UserID') || c.Name === 'Key';
+
+const isReadonly = (c) => {
+    return c.Readonly || (c.Postonly && isEditRecord.value);
 };
 
 const updateRecord = (c, $event) => {
@@ -53,17 +50,26 @@ const updateRecord = (c, $event) => {
                     :modelValue="record[c.Name]"
                     @update:modelValue="updateRecord(c, $event)"
                     @focus="clearErr(c)"
-                    :disabled="isSessionRDOnly(c)"
+                    :disabled="isReadonly(c)"
                     :autofocus="idx == 1"
                     :class="{ 'p-invalid': hasErr(c) }"
                 >
                 </InputNumber>
-                <Calendar v-else-if="crudHelper.isTime(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" />
+                <Calendar v-else-if="crudHelper.isTime(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" :disabled="isReadonly(c)" />
                 <div v-else-if="crudHelper.isBool(c)">
-                    <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" />
+                    <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" :disabled="isReadonly(c)" />
                 </div>
-                <Password v-else-if="crudHelper.isPassword(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :class="{ 'p-invalid': hasErr(c) }" :feedback="false" />
-                <InputText v-else :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :disabled="isSessionRDOnly(c)" :autofocus="idx == 1" :class="{ 'p-invalid': hasErr(c) }" />
+                <Password
+                    v-else-if="crudHelper.isPassword(c)"
+                    :id="c.Name"
+                    :modelValue="record[c.Name]"
+                    @update:modelValue="updateRecord(c, $event)"
+                    @focus="clearErr(c)"
+                    :class="{ 'p-invalid': hasErr(c) }"
+                    :feedback="false"
+                    :disabled="isReadonly(c)"
+                />
+                <InputText v-else :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :disabled="isReadonly(c)" :autofocus="idx == 1" :class="{ 'p-invalid': hasErr(c) }" />
                 <small>{{ showErr(c) }}</small>
             </template>
         </div>

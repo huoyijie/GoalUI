@@ -123,6 +123,18 @@ const uniqueKeys = computed(() => {
     return keys;
 });
 
+const uuids = computed(() => {
+    const uuids = [];
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (column.Uuid) {
+                uuids.push(column);
+            }
+        }
+    }
+    return uuids;
+});
+
 const isEditRecord = computed(() => {
     return !!record.value[primaryKey.value];
 });
@@ -170,8 +182,8 @@ const rules = computed(() => {
 const openNew = () => {
     record.value = {};
     errors.value = {};
-    if (authSession.value) {
-        record.value.Key = uuidv4().replaceAll('-', '');
+    for (let c of uuids.value) {
+        record.value[c.Name] = uuidv4().replaceAll('-', '');
     }
     recordDialog.value = true;
 };
@@ -324,7 +336,7 @@ const deleteSelectedRecords = async () => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="columns" :pk="primaryKey" @save-record="saveRecord" />
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :item="item" :columns="columns" :pk="primaryKey" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 

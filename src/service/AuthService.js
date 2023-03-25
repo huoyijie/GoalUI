@@ -28,4 +28,7 @@ export default class AuthService {
     changeRoles(router, userID, roles) {
         return doFetch(router, `roles/${userID}`, 'PUT', JSON.stringify(roles));
     }
+    userinfo(router) {
+        return doFetch(router, 'userinfo');
+    }
 }

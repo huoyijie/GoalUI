@@ -11,6 +11,8 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const username = localStorage.getItem('username');
+const userinfo = ref({});
+const profileDialog = ref(false);
 const signoutDialog = ref(false);
 
 onMounted(() => {
@@ -28,9 +30,10 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onViewProfile = () => {
+const onViewProfile = async () => {
     topbarMenuActive.value = false;
-    router.push({ name: 'profile' });
+    userinfo.value = await authService.userinfo(router);
+    profileDialog.value = true;
 };
 const onSettingsClick = () => {
     topbarMenuActive.value = false;
@@ -102,6 +105,12 @@ const isOutsideClicked = (event) => {
             </button>
         </div>
     </div>
+
+    <Dialog v-model:visible="profileDialog" :style="{ width: '300px' }" header="Profile" modal>
+        <p><i class="pi pi-fw pi-mobile"></i> <Badge :value="userinfo.ID"></Badge></p>
+        <p><i class="pi pi-fw pi-user"></i> {{ userinfo.Username }}</p>
+        <p><i class="pi pi-fw pi-inbox"></i> {{ userinfo.Email }}</p>
+    </Dialog>
 
     <Dialog v-model:visible="signoutDialog" :style="{ width: '450px' }" header="Confirm" modal>
         <div class="flex align-items-center justify-content-center">

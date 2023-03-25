@@ -20,13 +20,13 @@ const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
-const authSession = computed(() => group.value == 'auth' && item.value == 'session');
 
 const dt = ref(null);
 const filters = ref({});
 const columns = ref(null);
 const records = ref(null);
 const record = ref({});
+const refList = ref([]);
 const selectedRecords = ref(null);
 const errors = ref({});
 const crudPerms = ref({});
@@ -35,6 +35,16 @@ const resetState = () => {
     record.value = {};
     selectedRecords.value = null;
     errors.value = {};
+};
+
+const postProcess = (records) => {
+    for (let c of columns.value) {
+        if (c.Type === 'Time') {
+            for (let r of records) {
+                r[c.Name] = new Date(r[c.Name]);
+            }
+        }
+    }
 };
 
 const crudGet = async () => {
@@ -48,6 +58,7 @@ const crudGet = async () => {
     }
     // must update columns together with records
     columns.value = cols;
+    postProcess(records.value);
     resetState();
 };
 
@@ -135,8 +146,15 @@ const uuids = computed(() => {
     return uuids;
 });
 
-const isEditRecord = computed(() => {
-    return !!record.value[primaryKey.value];
+const refs = computed(() => {
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (column.Ref) {
+                return column;
+            }
+        }
+    }
+    return null;
 });
 
 const rules = computed(() => {
@@ -179,12 +197,19 @@ const rules = computed(() => {
     return rules;
 });
 
-const openNew = () => {
+const loadRefs = async () => {
+    if (refs.value) {
+        refList.value = await crudService.get(router, refs.value.Ref.Pkg, refs.value.Ref.Name);
+    }
+};
+
+const openNew = async () => {
     record.value = {};
     errors.value = {};
     for (let c of uuids.value) {
         record.value[c.Name] = uuidv4().replaceAll('-', '');
     }
+    await loadRefs();
     recordDialog.value = true;
 };
 
@@ -225,16 +250,10 @@ const saveRecord = async () => {
         msg = 'Updated';
     } else {
         let res = await crudService.add(router, group.value, item.value, record.value);
+        postProcess([res]);
         records.value ||= [];
         records.value.push(res);
         msg = 'Created';
-    }
-
-    // todo reload username
-    if (authSession.value && !isEditRecord.value) {
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
     }
 
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
@@ -244,9 +263,10 @@ const saveRecord = async () => {
     errors.value = {};
 };
 
-const changeRecord = (changeRecord) => {
+const changeRecord = async (changeRecord) => {
     record.value = { ...changeRecord };
     errors.value = {};
+    await loadRefs();
     recordDialog.value = true;
 };
 
@@ -336,7 +356,7 @@ const deleteSelectedRecords = async () => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :item="item" :columns="columns" :pk="primaryKey" @save-record="saveRecord" />
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :item="item" :columns="columns" :pk="primaryKey" :refList="refList" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 

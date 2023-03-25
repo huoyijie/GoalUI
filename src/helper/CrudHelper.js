@@ -31,6 +31,10 @@ export default class CrudHelper {
         return this.isInteger(c) || this.isFloat(c);
     }
 
+    isRef(c) {
+        return this.isInteger(c) && c.Ref != null;
+    }
+
     minVal(c) {
         if (this.isInteger(c)) {
             if (c.ValidateRule) {

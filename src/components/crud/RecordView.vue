@@ -9,7 +9,7 @@ const crudHelper = new CrudHelper();
 <template>
     <span class="p-column-title">{{ column.Name }}</span>
     <template v-if="crudHelper.isBool(column)">
-        <Badge v-if="crudHelper.showPreloadField(column, record) == true" value="✓" severity="success"> </Badge>
+        <Badge v-if="crudHelper.showPreloadField(column, record)" value="✓" severity="success"> </Badge>
         <Badge v-else value="x" severity="danger"></Badge>
     </template>
     <template v-else-if="crudHelper.isTime(column)">

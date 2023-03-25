@@ -86,7 +86,7 @@ const signin = async () => {
                             :toggleMask="true"
                             :class="{ 'w-full': true, 'p-invalid': passwordErr }"
                             inputClass="w-full"
-                            inputStyle="padding:1rem"
+                            :inputStyle="{ padding: '1rem' }"
                             :feedback="false"
                         ></Password>
                         <small>{{ passwordErr }}</small>

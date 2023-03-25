@@ -11,6 +11,7 @@ const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
 const username = localStorage.getItem('username');
+const signoutDialog = ref(false);
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -37,7 +38,7 @@ const onSettingsClick = () => {
 };
 const onSignout = () => {
     topbarMenuActive.value = false;
-    authService.signout(router);
+    signoutDialog.value = true;
 };
 const topbarMenuClasses = computed(() => {
     return {
@@ -101,6 +102,17 @@ const isOutsideClicked = (event) => {
             </button>
         </div>
     </div>
+
+    <Dialog v-model:visible="signoutDialog" :style="{ width: '450px' }" header="Confirm" modal>
+        <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+            <span>Are you sure you want to sign out?</span>
+        </div>
+        <template #footer>
+            <Button label="No" icon="pi pi-times" class="p-button-text" @click="signoutDialog = false" />
+            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="authService.signout(router)" />
+        </template>
+    </Dialog>
 </template>
 
 <style lang="scss" scoped></style>

@@ -111,7 +111,7 @@ const updateRecord = (c, $event) => {
                     :disabled="isReadonly(c)"
                 />
                 <InputText v-else :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :disabled="isReadonly(c)" :autofocus="idx == 1" :class="{ 'p-invalid': hasErr(c) }" />
-                <small>{{ showErr(c) }}</small>
+                <small class="p-error">{{ showErr(c) }}</small>
             </template>
         </div>
         <template #footer>

@@ -73,9 +73,7 @@ const signin = async () => {
                     <div>
                         <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
                         <InputText id="username" type="text" placeholder="Username" @focus="clearUsernameErr" :class="{ 'w-full': true, 'md:w-30rem': true, 'p-invalid': usernameErr }" style="padding: 1rem" autofocus v-model="signinForm.Username" />
-                        <div>
-                            <small class="p-invalid">{{ usernameErr }}</small>
-                        </div>
+                        <small class="p-error">{{ usernameErr }}</small>
 
                         <label for="password" class="block text-900 font-medium text-xl mt-5 mb-2">Password</label>
                         <Password
@@ -89,7 +87,7 @@ const signin = async () => {
                             :inputStyle="{ padding: '1rem' }"
                             :feedback="false"
                         ></Password>
-                        <small>{{ passwordErr }}</small>
+                        <small class="p-error">{{ passwordErr }}</small>
 
                         <div class="flex align-items-center justify-content-between mt-3 mb-5 gap-5">
                             <div class="flex align-items-center">

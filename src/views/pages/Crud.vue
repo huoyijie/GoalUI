@@ -48,7 +48,11 @@ const postProcess = (records) => {
 };
 
 const crudGet = async () => {
-    let { perms, cols } = await crudService.perms(router, group.value, item.value);
+    let { perms, cols } = (await crudService.perms(router, group.value, item.value)) || {};
+    if (!perms) {
+        return;
+    }
+
     crudPerms.value = perms;
 
     if (crudPerms.value.get) {

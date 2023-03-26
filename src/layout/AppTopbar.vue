@@ -194,7 +194,7 @@ const isOutsideClicked = (event) => {
         </template>
     </Dialog>
 
-    <Dialog v-model:visible="profileDialog" :style="{ width: '300px' }" header="Profile" modal class="p-fluid">
+    <Dialog v-model:visible="profileDialog" :style="{ width: '400px' }" header="Profile" modal class="p-fluid">
         <div class="container text-left">
             <div class="grid">
                 <div class="col col-6"><i class="pi pi-mobile"></i> ID:</div>

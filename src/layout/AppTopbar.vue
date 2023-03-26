@@ -8,10 +8,12 @@ import AuthService from '@/service/AuthService';
 
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
+const router = useRouter();
+
 const authService = new AuthService();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
-const router = useRouter();
+
 const username = localStorage.getItem('username');
 const userinfo = ref({});
 
@@ -42,6 +44,7 @@ const clearConfirmPasswordErr = () => {
 const openChangePWDialog = () => {
     passwords.value = {};
     errors.value = {};
+    submitDisabled.value = false;
     changePWDialog.value = true;
 };
 const submitDisabled = ref(false);
@@ -73,6 +76,7 @@ const changePassword = async () => {
     changePWDialog.value = false;
     passwords.value = {};
     errors.value = {};
+    submitDisabled.value = false;
 };
 
 onMounted(() => {

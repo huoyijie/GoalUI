@@ -31,4 +31,7 @@ export default class AuthService {
     userinfo(router) {
         return doFetch(router, 'userinfo');
     }
+    changePassword(router, data) {
+        return doFetch(router, 'changepw', 'POST', JSON.stringify(data));
+    }
 }

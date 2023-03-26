@@ -30,14 +30,13 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
+const onSwitchLang = () => {
+    topbarMenuActive.value = false;
+};
 const onViewProfile = async () => {
     topbarMenuActive.value = false;
     userinfo.value = await authService.userinfo(router);
     profileDialog.value = true;
-};
-const onSettingsClick = () => {
-    topbarMenuActive.value = false;
-    router.push({ name: 'documentation' });
 };
 const onSignout = () => {
     topbarMenuActive.value = false;
@@ -91,13 +90,13 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
+            <button @click="onSwitchLang" class="p-link layout-topbar-button">
+                <i class="pi pi-language"></i>
+                <span>Language</span>
+            </button>
             <button @click="onViewProfile" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
                 <span>{{ username }}</span>
-            </button>
-            <button @click="onSettingsClick" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
             </button>
             <button @click="onSignout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
@@ -107,9 +106,16 @@ const isOutsideClicked = (event) => {
     </div>
 
     <Dialog v-model:visible="profileDialog" :style="{ width: '300px' }" header="Profile" modal>
-        <p><i class="pi pi-fw pi-mobile"></i> <Badge :value="userinfo.ID"></Badge></p>
-        <p><i class="pi pi-fw pi-user"></i> {{ userinfo.Username }}</p>
-        <p><i class="pi pi-fw pi-inbox"></i> {{ userinfo.Email }}</p>
+        <div class="container text-start">
+            <div class="grid">
+                <div class="col col-6"><i class="pi pi-mobile"></i> ID:</div>
+                <div class="col col-6"><Badge :value="userinfo.ID"></Badge></div>
+                <div class="col-6"><i class="pi pi-user"></i> Username:</div>
+                <div class="col-6">{{ userinfo.Username }}</div>
+                <div class="col-6"><i class="pi pi-inbox"></i> Email:</div>
+                <div class="col-6">{{ userinfo.Email }}</div>
+            </div>
+        </div>
     </Dialog>
 
     <Dialog v-model:visible="signoutDialog" :style="{ width: '450px' }" header="Confirm" modal>

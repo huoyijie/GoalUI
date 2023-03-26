@@ -12,6 +12,7 @@ const { layoutConfig, contextPath } = useLayout();
 
 const authService = new AuthService();
 
+const btnSigninDisabled = ref(false);
 const signinForm = ref({
     Username: '',
     Password: '',
@@ -47,15 +48,18 @@ const logoUrl = computed(() => {
 });
 
 const signin = async () => {
+    btnSigninDisabled.value = true;
     if (!(await v$.value.$validate())) {
         for (let err of v$.value.$errors) {
             errors.value[err.$property] = err.$message;
         }
+        btnSigninDisabled.value = false;
         return;
     }
 
     if (!(await authService.signin(router, signinForm.value))) {
         errors.value.Global = 'Invalid username or password';
+        btnSigninDisabled.value = false;
     }
 };
 </script>
@@ -99,7 +103,7 @@ const signin = async () => {
                                 <label for="rememberMe">Remember me</label>
                             </div>
                         </div>
-                        <Button label="Sign In" class="w-full p-3 text-xl" @click="signin"></Button>
+                        <Button label="Sign In" class="w-full p-3 text-xl" @click="signin" :disabled="btnSigninDisabled"></Button>
                     </div>
                 </div>
             </div>

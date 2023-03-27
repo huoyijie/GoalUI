@@ -77,13 +77,13 @@ const signin = async () => {
                     </div>
 
                     <div>
-                        <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
+                        <label for="username" class="block text-900 text-xl font-medium mb-2">{{ t('signin.username') }}</label>
                         <InputText id="username" type="text" placeholder="Username" @focus="clearUsernameErr" :class="{ 'w-full': true, 'md:w-30rem': true, 'p-invalid': usernameErr }" style="padding: 1rem" autofocus v-model="signinForm.Username" />
                         <div>
                             <small class="p-error">{{ usernameErr }}</small>
                         </div>
 
-                        <label for="password" class="block text-900 font-medium text-xl mt-5 mb-2">Password</label>
+                        <label for="password" class="block text-900 font-medium text-xl mt-5 mb-2">{{ t('signin.password') }}</label>
                         <Password
                             id="password"
                             v-model="signinForm.Password"
@@ -102,10 +102,10 @@ const signin = async () => {
                         <div class="flex align-items-center justify-content-between mt-3 mb-5 gap-5">
                             <div class="flex align-items-center">
                                 <Checkbox v-model="signinForm.RememberMe" id="rememberMe" binary class="mr-2"></Checkbox>
-                                <label for="rememberMe">Remember me</label>
+                                <label for="rememberMe">{{ t('signin.rememberMe') }}</label>
                             </div>
                         </div>
-                        <Button label="Sign In" class="w-full p-3 text-xl" @click="signin" :disabled="btnSigninDisabled"></Button>
+                        <Button :label="t('signin.button')" class="w-full p-3 text-xl" @click="signin" :disabled="btnSigninDisabled"></Button>
                     </div>
                 </div>
             </div>

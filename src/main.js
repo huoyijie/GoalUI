@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import { createI18n } from 'vue-i18n';
+import i18n from './i18n';
 
 import PrimeVue from 'primevue/config';
 import AutoComplete from 'primevue/autocomplete';
@@ -111,25 +111,14 @@ import RecordView from './components/crud/RecordView.vue';
 import '@/assets/styles.scss';
 import primeEn from './locale/prime/en';
 import primeZh_CN from './locale/prime/zh_CN';
-import messagesEn from './locale/messages/en';
-import messagesZh_CN from './locale/messages/zh_CN';
 
 const lang = localStorage.getItem('lang') || 'zh_CN';
+
 const primeConfig = {
     ripple: true,
     en: primeEn,
     zh_CN: primeZh_CN
 };
-
-const i18n = createI18n({
-    legacy: false,
-    locale: lang,
-    fallbackLocale: 'en',
-    messages: {
-        en: messagesEn,
-        zh_CN: messagesZh_CN
-    }
-});
 
 const app = createApp(App);
 

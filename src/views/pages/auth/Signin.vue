@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AuthService from '@/service/AuthService';
 import useValidate from '@vuelidate/core';
-import { required, alphaNum, minLength, maxLength } from '@vuelidate/validators';
+import { required, alphaNum, minLength, maxLength } from '@/helper/i18n-validators';
 
 const router = useRouter();
 const { layoutConfig, contextPath } = useLayout();
@@ -60,7 +60,7 @@ const signin = async () => {
     }
 
     if (!(await authService.signin(router, signinForm.value))) {
-        errors.value.Global = 'Invalid username or password';
+        errors.value.Global = t('signin.invalidUserOrPassword');
         btnSigninDisabled.value = false;
     }
 };

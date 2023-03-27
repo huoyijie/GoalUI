@@ -7,6 +7,22 @@ export default {
         button: '登录',
         invalidUserOrPassword: '用户名或密码错误'
     },
+    appTopbar: {
+        language: '切换语言',
+        signout: '登出',
+        profile: '用户信息',
+        username: '用户名',
+        email: '邮箱地址',
+        changePassword: '修改密码',
+        password: '密码',
+        newPassword: '新密码',
+        confirmPassword: '确认新密码',
+        submit: '提交修改',
+        confirm: '登出确认',
+        isConfirmSignout: '你确定要退出登录吗?',
+        yes: '是',
+        no: '否'
+    },
     changePassword: {
         invalidPassword: '密码错误'
     },

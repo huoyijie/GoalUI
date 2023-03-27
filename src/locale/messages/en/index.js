@@ -7,6 +7,22 @@ export default {
         button: 'Sign in',
         invalidUserOrPassword: 'Invalid username or password'
     },
+    appTopbar: {
+        language: 'Language',
+        signout: 'Sign out',
+        profile: 'Profile',
+        username: 'Username',
+        email: 'Email',
+        changePassword: 'Change Password',
+        password: 'Password',
+        newPassword: 'New password',
+        confirmPassword: 'Confirm password',
+        submit: 'Submit',
+        confirm: 'Confirm',
+        isConfirmSignout: 'Are you sure you want to sign out?',
+        yes: 'Yes',
+        no: 'No'
+    },
     changePassword: {
         invalidPassword: 'Invalid password'
     },

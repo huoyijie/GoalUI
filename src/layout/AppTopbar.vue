@@ -180,7 +180,7 @@ const isOutsideClicked = (event) => {
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
             <button @click="onSwitchLang" class="p-link layout-topbar-button">
                 <i class="pi pi-language"></i>
-                <span>Language</span>
+                <span>{{ t('appTopbar.language') }}</span>
             </button>
             <button @click="onViewProfile" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
@@ -188,7 +188,7 @@ const isOutsideClicked = (event) => {
             </button>
             <button @click="onSignout" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
-                <span>Sign out</span>
+                <span>{{ t('appTopbar.signout') }}</span>
             </button>
         </div>
     </div>
@@ -197,55 +197,55 @@ const isOutsideClicked = (event) => {
         <Listbox v-model="selectedLang" :options="langs" optionLabel="name" optionValue="value" class="w-full md:w-14rem" @change="changeLang" />
     </OverlayPanel>
 
-    <Dialog v-model:visible="changePWDialog" modal header="Change Password" :style="{ width: '400px' }" class="p-fluid">
+    <Dialog v-model:visible="changePWDialog" modal :header="t('appTopbar.changePassword')" :style="{ width: '400px' }" class="p-fluid">
         <div class="field">
-            <label for="password">Password</label>
+            <label for="password">{{ t('appTopbar.password') }}</label>
             <Password id="password" v-model="passwords.Password" @focus="clearPasswordErr" :class="{ 'p-invalid': passwordErr }" autofocus :feedback="false" toogleMask></Password>
             <small class="p-error">{{ passwordErr }}</small>
         </div>
         <div class="field">
-            <label for="newPassword1">New password</label>
+            <label for="newPassword1">{{ t('appTopbar.newPassword') }}</label>
             <Password id="newPassword1" v-model="passwords.NewPassword" @focus="clearNewPasswordErr" :class="{ 'p-invalid': newPasswordErr }" toogleMask></Password>
             <small class="p-error">{{ newPasswordErr }}</small>
         </div>
         <div class="field">
-            <label for="newPassword2">Confirm password</label>
+            <label for="newPassword2">{{ t('appTopbar.confirmPassword') }}</label>
             <Password id="newPassword2" v-model="passwords.ConfirmPassword" @focus="clearConfirmPasswordErr" :class="{ 'p-invalid': confirmPasswordErr }" :feedback="false" toogleMask></Password>
             <small class="p-error">{{ confirmPasswordErr }}</small>
         </div>
         <template #footer>
             <div>
-                <Button label="Submit" icon="pi pi-check" @click="changePassword" text :disabled="submitDisabled" />
+                <Button :label="t('appTopbar.submit')" icon="pi pi-check" @click="changePassword" text :disabled="submitDisabled" />
             </div>
         </template>
     </Dialog>
 
-    <Dialog v-model:visible="profileDialog" :style="{ width: '400px' }" header="Profile" modal class="p-fluid">
+    <Dialog v-model:visible="profileDialog" :style="{ width: '400px' }" :header="t('appTopbar.profile')" modal class="p-fluid">
         <div class="container text-left">
             <div class="grid">
                 <div class="col col-6"><i class="pi pi-mobile"></i> ID:</div>
                 <div class="col col-6"><Badge :value="userinfo.ID"></Badge></div>
-                <div class="col-6"><i class="pi pi-user"></i> Username:</div>
+                <div class="col-6"><i class="pi pi-user"></i> {{ t('appTopbar.username') }}:</div>
                 <div class="col-6">{{ userinfo.Username }}</div>
-                <div class="col-6"><i class="pi pi-inbox"></i> Email:</div>
+                <div class="col-6"><i class="pi pi-inbox"></i> {{ t('appTopbar.email') }}:</div>
                 <div class="col-6">{{ userinfo.Email }}</div>
             </div>
         </div>
         <template #footer>
             <div class="text-left">
-                <Button label="Change password" icon="pi pi-pencil" @click="openChangePWDialog" text />
+                <Button :label="t('appTopbar.changePassword')" icon="pi pi-pencil" @click="openChangePWDialog" text />
             </div>
         </template>
     </Dialog>
 
-    <Dialog v-model:visible="signoutDialog" :style="{ width: '450px' }" header="Confirm" modal class="p-fluid">
+    <Dialog v-model:visible="signoutDialog" :style="{ width: '450px' }" :header="t('appTopbar.confirm')" modal class="p-fluid">
         <div class="flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-            <span>Are you sure you want to sign out?</span>
+            <span>{{ t('appTopbar.isConfirmSignout') }}</span>
         </div>
         <template #footer>
-            <Button label="No" icon="pi pi-times" class="p-button-text" @click="signoutDialog = false" />
-            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="authService.signout(router)" />
+            <Button :label="t('appTopbar.no')" icon="pi pi-times" class="p-button-text" @click="signoutDialog = false" />
+            <Button :label="t('appTopbar.yes')" icon="pi pi-check" class="p-button-text" @click="authService.signout(router)" />
         </template>
     </Dialog>
 </template>

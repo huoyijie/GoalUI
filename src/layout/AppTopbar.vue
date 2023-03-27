@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { usePrimeVue } from 'primevue/config';
 import { useI18n } from 'vue-i18n';
 import useValidate from '@vuelidate/core';
-import { required, minLength, sameAs } from '@vuelidate/validators';
+import { required, minLength, sameAs } from '@/helper/i18n-validators';
 import AuthService from '@/service/AuthService';
 
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
@@ -13,7 +13,8 @@ const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 const router = useRouter();
 const primevue = usePrimeVue();
 const i18n = useI18n();
-const selectedLang = ref(i18n.locale);
+const { t } = i18n;
+const selectedLang = ref(i18n.locale.value);
 const langs = ref([
     { name: 'EN', value: 'en' },
     { name: '简体中文', value: 'zh_CN' }
@@ -78,7 +79,7 @@ const changePassword = async () => {
     }
 
     if (!(await authService.changePassword(router, { Password: passwords.value.Password, NewPassword: passwords.value.NewPassword }))) {
-        errors.value.Password = 'Invalid password';
+        errors.value.Password = t('changePassword.invalidPassword');
         submitDisabled.value = false;
         return;
     }
@@ -109,9 +110,13 @@ const onSwitchLang = (event) => {
     topbarMenuActive.value = false;
 };
 const changeLang = () => {
-    i18n.locale = selectedLang.value;
-    primevue.config.locale = primevue.config[i18n.locale];
-    localStorage.setItem('lang', i18n.locale);
+    if (selectedLang.value) {
+        i18n.locale.value = selectedLang.value;
+        primevue.config.locale = primevue.config[selectedLang.value];
+        localStorage.setItem('lang', selectedLang.value);
+    } else {
+        selectedLang.value = i18n.locale.value;
+    }
     op.value.toggle(false);
 };
 const onViewProfile = async () => {

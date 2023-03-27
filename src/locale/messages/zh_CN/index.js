@@ -7,10 +7,14 @@ export default {
         button: '登录',
         invalidUserOrPassword: '用户名或密码错误'
     },
+    changePassword: {
+        invalidPassword: '密码错误'
+    },
     validations: {
-        required: `必填字段`,
+        required: '必填字段',
         minLength: `字段长度不能小于 {min}`,
         maxLength: `字段长度不能大于 {max}`,
-        alphaNum: `字段只能由字母和数字组成`
+        alphaNum: '字段只能由字母和数字组成',
+        sameAs: '字段值必须和另一个字段值相同'
     }
 };

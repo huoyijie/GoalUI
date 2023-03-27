@@ -108,8 +108,8 @@ import OperationGroup from './components/crud/OperationGroup.vue';
 import RecordView from './components/crud/RecordView.vue';
 
 import '@/assets/styles.scss';
-import en from './i18n/en';
-import zh_CN from './i18n/zh-CN';
+import en from './locale/primevue/en';
+import zh_CN from './locale/primevue/zh_CN';
 
 const app = createApp(App);
 

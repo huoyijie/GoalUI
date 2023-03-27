@@ -1,6 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
+import { createI18n } from 'vue-i18n';
 
 import PrimeVue from 'primevue/config';
 import AutoComplete from 'primevue/autocomplete';
@@ -108,17 +109,36 @@ import OperationGroup from './components/crud/OperationGroup.vue';
 import RecordView from './components/crud/RecordView.vue';
 
 import '@/assets/styles.scss';
-import en from './locale/prime/en';
-import zh_CN from './locale/prime/zh_CN';
+import primeEn from './locale/prime/en';
+import primeZh_CN from './locale/prime/zh_CN';
+import messagesEn from './locale/messages/en';
+import messagesZh_CN from './locale/messages/zh_CN';
+
+const lang = localStorage.getItem('lang') || 'zh_CN';
+const primeConfig = {
+    ripple: true,
+    en: primeEn,
+    zh_CN: primeZh_CN
+};
+
+const i18n = createI18n({
+    legacy: false,
+    locale: lang,
+    fallbackLocale: 'en',
+    messages: {
+        en: messagesEn,
+        zh_CN: messagesZh_CN
+    }
+});
 
 const app = createApp(App);
 
 app.use(router);
 app.use(PrimeVue, {
-    ripple: true,
-    en,
-    zh_CN
+    ...primeConfig,
+    locale: primeConfig[lang]
 });
+app.use(i18n);
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
 import { usePrimeVue } from 'primevue/config';
+import { useI18n } from 'vue-i18n';
 import useValidate from '@vuelidate/core';
 import { required, minLength, sameAs } from '@vuelidate/validators';
 import AuthService from '@/service/AuthService';
@@ -11,9 +12,8 @@ const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
 const router = useRouter();
 const primevue = usePrimeVue();
-const lang = 'zh_CN';
-primevue.config.locale = primevue.config[lang];
-const selectedLang = ref(lang);
+const i18n = useI18n();
+const selectedLang = ref(i18n.locale);
 const langs = ref([
     { name: 'EN', value: 'en' },
     { name: '简体中文', value: 'zh_CN' }
@@ -109,7 +109,9 @@ const onSwitchLang = (event) => {
     topbarMenuActive.value = false;
 };
 const changeLang = () => {
-    primevue.config.locale = primevue.config[selectedLang.value];
+    i18n.locale = selectedLang.value;
+    primevue.config.locale = primevue.config[i18n.locale];
+    localStorage.setItem('lang', i18n.locale);
     op.value.toggle(false);
 };
 const onViewProfile = async () => {

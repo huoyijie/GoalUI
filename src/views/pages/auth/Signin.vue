@@ -3,12 +3,14 @@ import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import AuthService from '@/service/AuthService';
 import useValidate from '@vuelidate/core';
 import { required, alphaNum, minLength, maxLength } from '@vuelidate/validators';
 
 const router = useRouter();
 const { layoutConfig, contextPath } = useLayout();
+const { t } = useI18n();
 
 const authService = new AuthService();
 
@@ -71,7 +73,7 @@ const signin = async () => {
                 <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
                     <div class="text-center mb-5">
                         <img :src="logoUrl" alt="Image" height="50" class="mb-3" />
-                        <div class="text-600 font-medium mb-3">Sign in to continue</div>
+                        <div class="text-600 font-medium mb-3">{{ t('signin.formLabel') }}</div>
                     </div>
 
                     <div>

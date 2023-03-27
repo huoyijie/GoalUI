@@ -100,16 +100,7 @@ const updateRecord = (c, $event) => {
                 <div v-else-if="crudHelper.isBool(c)">
                     <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" :disabled="isReadonly(c)" />
                 </div>
-                <Password
-                    v-else-if="crudHelper.isPassword(c)"
-                    :id="c.Name"
-                    :modelValue="record[c.Name]"
-                    @update:modelValue="updateRecord(c, $event)"
-                    @focus="clearErr(c)"
-                    :class="{ 'p-invalid': hasErr(c) }"
-                    :feedback="false"
-                    :disabled="isReadonly(c)"
-                />
+                <Password v-else-if="crudHelper.isPassword(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :class="{ 'p-invalid': hasErr(c) }" :disabled="isReadonly(c)" />
                 <InputText v-else :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :disabled="isReadonly(c)" :autofocus="idx == 1" :class="{ 'p-invalid': hasErr(c) }" />
                 <small class="p-error">{{ showErr(c) }}</small>
             </template>

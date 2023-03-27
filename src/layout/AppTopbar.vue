@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout';
 import { useRouter } from 'vue-router';
+import { usePrimeVue } from 'primevue/config';
 import useValidate from '@vuelidate/core';
 import { required, minLength, sameAs } from '@vuelidate/validators';
 import AuthService from '@/service/AuthService';
@@ -9,7 +10,16 @@ import AuthService from '@/service/AuthService';
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
 const router = useRouter();
+const primevue = usePrimeVue();
+const lang = 'zh_CN';
+primevue.config.locale = primevue.config[lang];
+const selectedLang = ref(lang);
+const langs = ref([
+    { name: 'EN', value: 'en' },
+    { name: '简体中文', value: 'zh_CN' }
+]);
 
+const op = ref();
 const authService = new AuthService();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
@@ -94,8 +104,13 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onSwitchLang = () => {
+const onSwitchLang = (event) => {
+    op.value.toggle(event);
     topbarMenuActive.value = false;
+};
+const changeLang = () => {
+    primevue.config.locale = primevue.config[selectedLang.value];
+    op.value.toggle(false);
 };
 const onViewProfile = async () => {
     topbarMenuActive.value = false;
@@ -170,6 +185,10 @@ const isOutsideClicked = (event) => {
             </button>
         </div>
     </div>
+
+    <OverlayPanel ref="op">
+        <Listbox v-model="selectedLang" :options="langs" optionLabel="name" optionValue="value" class="w-full md:w-14rem" @change="changeLang" />
+    </OverlayPanel>
 
     <Dialog v-model:visible="changePWDialog" modal header="Change Password" :style="{ width: '400px' }" class="p-fluid">
         <div class="field">

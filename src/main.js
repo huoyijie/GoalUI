@@ -108,11 +108,17 @@ import OperationGroup from './components/crud/OperationGroup.vue';
 import RecordView from './components/crud/RecordView.vue';
 
 import '@/assets/styles.scss';
+import en from './i18n/en';
+import zh_CN from './i18n/zh-CN';
 
 const app = createApp(App);
 
 app.use(router);
-app.use(PrimeVue, { ripple: true });
+app.use(PrimeVue, {
+    ripple: true,
+    en,
+    zh_CN
+});
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);

@@ -47,6 +47,13 @@ export default {
             cancel: '取消',
             save: '保存'
         },
+        pickRolesDialog: {
+            header: '管理用户角色',
+            srcHeader: '可授予角色',
+            targetHeader: '已授予角色',
+            cancel: '取消',
+            save: '保存'
+        },
         delDialog: {
             confirm: '删除确认',
             confirmDelRecord: '你确定要删除',

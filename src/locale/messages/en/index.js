@@ -50,6 +50,13 @@ export default {
             cancel: 'Cancel',
             save: 'Save'
         },
+        pickRolesDialog: {
+            header: 'User roles',
+            srcHeader: 'Available roles',
+            targetHeader: 'Selected roles',
+            cancel: 'Cancel',
+            save: 'Save'
+        },
         delDialog: {
             confirm: 'Confirm',
             confirmDelRecord: 'Are you sure you want to delete',

@@ -24,6 +24,12 @@ const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
+const adminOpLog = computed(() => {
+    return group.value == 'admin' && item.value === 'operationlog';
+});
+const adminOpLogSkip = (c) => {
+    return c.Name === 'Group' || c.Name === 'Item';
+};
 
 const dt = ref(null);
 const filters = ref({});
@@ -51,8 +57,11 @@ const postProcess = (records) => {
     }
 };
 
-const crudGet = async () => {
-    let { perms, cols } = (await crudService.perms(router, group.value, item.value)) || {};
+const crudGet = async (to) => {
+    const g = to ? to.params.group : group.value;
+    const i = to ? to.params.item : item.value;
+
+    let { perms, cols } = (await crudService.perms(router, g, i)) || {};
     if (!perms) {
         return;
     }
@@ -60,13 +69,15 @@ const crudGet = async () => {
     crudPerms.value = perms;
 
     if (crudPerms.value.get) {
-        records.value = await crudService.get(router, group.value, item.value);
+        records.value = await crudService.get(router, g, i);
     } else {
-        records.value = await crudService.getMine(router, group.value, item.value);
+        records.value = await crudService.getMine(router, g, i);
     }
     // must update columns together with records
     columns.value = cols;
     postProcess(records.value);
+    group.value = g;
+    item.value = i;
     resetState();
 };
 
@@ -82,9 +93,7 @@ onMounted(() => {
     crudGet();
 });
 onBeforeRouteUpdate((to) => {
-    group.value = to.params.group;
-    item.value = to.params.item;
-    crudGet();
+    crudGet(to);
 });
 
 const recordDialog = ref(false);
@@ -311,6 +320,10 @@ const deleteSelectedRecords = async () => {
 const messagePath = (group, item) => {
     return `group.${group}.${item}.label`;
 };
+
+const columnPath = (group, item, column) => {
+    return `group.${group}.${item}.${column.Name}`;
+};
 </script>
 
 <template>
@@ -346,9 +359,9 @@ const messagePath = (group, item) => {
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
                     <template v-for="c in columns" :key="c.Name">
-                        <Column v-if="!c.Hidden" :field="c.Name" :header="c.Name" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <Column v-if="!(c.Hidden || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                             <template #body="slotProps">
-                                <RecordView :column="c" :record="slotProps.data" />
+                                <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
                             </template>
                         </Column>
                     </template>

@@ -65,6 +65,9 @@ export default {
             yes: 'Yes'
         }
     },
+    appFooter: {
+        goal: 'Powered by Goal'
+    },
     validations: {
         required: '{property} is required',
         minLength: `{property} must have a min length of {min}`,

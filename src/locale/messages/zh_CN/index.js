@@ -65,6 +65,9 @@ export default {
     changePassword: {
         invalidPassword: '密码错误'
     },
+    appFooter: {
+        goal: '由 Goal 提供支持'
+    },
     validations: {
         required: '必填字段',
         minLength: `字段长度不能小于 {min}`,

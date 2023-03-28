@@ -69,10 +69,14 @@ export default {
         goal: 'Powered by Goal'
     },
     validations: {
-        required: '{property} is required',
-        minLength: `{property} must have a min length of {min}`,
-        maxLength: `{property} must have a max length of {max}`,
-        alphaNum: `{property} can only contain letters and numbers`,
-        sameAs: 'The value must be equal to the other value'
+        required: 'The field is required',
+        minLength: 'The field must have a min length of {min}',
+        maxLength: 'The field must have a max length of {max}',
+        minValue: 'The field must have a min value of {min}',
+        maxValue: 'The field must have a max value of {max}',
+        alphaNum: 'The field can only contain letters and numbers',
+        alpha: 'The field can only contain letters',
+        email: 'The field is not a valid email address',
+        sameAs: 'The field must be equal to the other value'
     }
 };

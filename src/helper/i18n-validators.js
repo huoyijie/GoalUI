@@ -12,6 +12,14 @@ export const minLength = withI18nMessage(validators.minLength, { withArguments: 
 
 export const maxLength = withI18nMessage(validators.maxLength, { withArguments: true });
 
+export const minValue = withI18nMessage(validators.minValue, { withArguments: true });
+
+export const maxValue = withI18nMessage(validators.maxValue, { withArguments: true });
+
 export const alphaNum = withI18nMessage(validators.alphaNum);
+
+export const alpha = withI18nMessage(validators.alpha);
+
+export const email = withI18nMessage(validators.email);
 
 export const sameAs = withI18nMessage(validators.sameAs, { withArguments: true });

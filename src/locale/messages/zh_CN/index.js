@@ -70,9 +70,13 @@ export default {
     },
     validations: {
         required: '必填字段',
-        minLength: `字段长度不能小于 {min}`,
-        maxLength: `字段长度不能大于 {max}`,
+        minLength: '字段长度不能小于 {min}',
+        maxLength: '字段长度不能大于 {max}',
+        minValue: '字段不能小于 {min}',
+        maxValue: '字段不能大于 {max}',
         alphaNum: '字段只能由字母和数字组成',
+        alpha: '字段只能由字母组成',
+        email: '邮箱地址格式不正确',
         sameAs: '字段值必须和另一个字段值相同'
     }
 };

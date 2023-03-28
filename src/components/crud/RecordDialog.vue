@@ -85,7 +85,7 @@ const columnPath = (group, item, column) => {
                     :options="refList"
                     filter
                     :optionLabel="c.Ref.Field"
-                    :placeholder="`Select a ${c.Ref.Name}`"
+                    :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(c.Ref.Pkg, c.Ref.Name.toLowerCase()))}`"
                     :id="c.Name"
                     @focus="clearErr(c)"
                     :disabled="isReadonly(c)"

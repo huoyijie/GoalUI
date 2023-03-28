@@ -38,7 +38,8 @@ export default {
         recordDialog: {
             details: '详情',
             cancel: '取消',
-            save: '保存'
+            save: '保存',
+            select: '选择一个'
         },
         pickPermsDialog: {
             header: '管理角色权限',

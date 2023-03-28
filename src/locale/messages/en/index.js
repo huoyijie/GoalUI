@@ -41,7 +41,8 @@ export default {
         recordDialog: {
             details: ' Details',
             cancel: 'Cancel',
-            save: 'Save'
+            save: 'Save',
+            select: 'Select a '
         },
         pickPermsDialog: {
             header: 'Role permissions',

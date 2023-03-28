@@ -1,28 +1,33 @@
 <script setup>
+import { useI18n } from 'vue-i18n';
+
+const i18n = useI18n();
+const { t } = i18n;
+
 defineProps(['item', 'record', 'pk', 'visible', 'modelValue']);
 defineEmits(['update:visible', 'update:modelValue', 'delete-record', 'delete-records']);
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" header="Confirm" modal>
+    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="t('crud.delDialog.confirm')" modal>
         <div class="flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-            <span v-if="record">Are you sure you want to delete {{ item }} <Badge :value="record[pk]"></Badge> ?</span>
+            <span v-if="record">{{ t('crud.delDialog.confirmDelRecord') }} {{ item }} <Badge :value="record[pk]"></Badge> ?</span>
         </div>
         <template #footer>
-            <Button label="No" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
-            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="$emit('delete-record')" />
+            <Button :label="t('crud.delDialog.no')" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
+            <Button :label="t('crud.delDialog.yes')" icon="pi pi-check" class="p-button-text" @click="$emit('delete-record')" />
         </template>
     </Dialog>
 
-    <Dialog :visible="modelValue" @update:visible="$emit('update:modelValue', $event)" :style="{ width: '450px' }" header="Confirm" modal>
+    <Dialog :visible="modelValue" @update:visible="$emit('update:modelValue', $event)" :style="{ width: '450px' }" :header="t('crud.delDialog.confirm')" modal>
         <div class="flex align-items-center justify-content-center">
             <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-            <span>Are you sure you want to delete the selected {{ item }}s?</span>
+            <span>{{ t('crud.delDialog.confirmDelRecords') }} {{ item }}s?</span>
         </div>
         <template #footer>
-            <Button label="No" icon="pi pi-times" class="p-button-text" @click="$emit('update:modelValue', false)" />
-            <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="$emit('delete-records')" />
+            <Button :label="t('crud.delDialog.no')" icon="pi pi-times" class="p-button-text" @click="$emit('update:modelValue', false)" />
+            <Button :label="t('crud.delDialog.yes')" icon="pi pi-check" class="p-button-text" @click="$emit('delete-records')" />
         </template>
     </Dialog>
 </template>

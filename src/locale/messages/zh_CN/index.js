@@ -34,6 +34,13 @@ export default {
             delete: '删除',
             import: '导入',
             export: '导出'
+        },
+        delDialog: {
+            confirm: '删除确认',
+            confirmDelRecord: '你确定要删除',
+            confirmDelRecords: '你确定要删除选中的',
+            no: '否',
+            yes: '是'
         }
     },
     changePassword: {

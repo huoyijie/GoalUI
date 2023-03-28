@@ -3,6 +3,7 @@ import { FilterMatchMode } from 'primevue/api';
 import { ref, onMounted, onBeforeMount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
+import { useI18n } from 'vue-i18n';
 import CrudService from '@/service/CrudService';
 import AuthService from '@/service/AuthService';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +13,9 @@ import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxVa
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+
+const i18n = useI18n();
+const { t } = i18n;
 
 const crudService = new CrudService();
 const authService = new AuthService();
@@ -322,15 +326,15 @@ const deleteSelectedRecords = async () => {
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
-                    :currentPageReportTemplate="`Showing {first} to {last} of {totalRecords} ${item}`"
+                    :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${item}`"
                     responsiveLayout="scroll"
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Manage {{ item }}</h5>
+                            <h5 class="m-0">{{ t('crud.manage') }} {{ item }}</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" placeholder="Search..." />
+                                <InputText v-model="filters['global'].value" :placeholder="t('crud.search')" />
                             </span>
                         </div>
                     </template>

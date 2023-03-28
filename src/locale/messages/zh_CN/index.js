@@ -23,6 +23,13 @@ export default {
         yes: '是',
         no: '否'
     },
+    crud: {
+        showing: '显示',
+        to: '至',
+        total: '共计',
+        manage: '管理',
+        search: '搜索...'
+    },
     changePassword: {
         invalidPassword: '密码错误'
     },

@@ -26,6 +26,13 @@ export default {
     changePassword: {
         invalidPassword: 'Invalid password'
     },
+    crud: {
+        showing: 'Showing',
+        to: 'to',
+        total: 'total',
+        manage: 'Manage',
+        search: 'Search...'
+    },
     validations: {
         required: '{property} is required',
         minLength: `{property} must have a min length of {min}`,

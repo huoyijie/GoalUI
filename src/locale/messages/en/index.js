@@ -30,7 +30,7 @@ export default {
         showing: 'Showing',
         to: 'to',
         total: 'total',
-        manage: 'Manage',
+        manage: 'Manage ',
         search: 'Search...',
         topToolbar: {
             new: 'New',

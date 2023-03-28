@@ -307,6 +307,10 @@ const deleteSelectedRecords = async () => {
     selectedRecords.value = null;
     toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value}s Deleted`, life: 3000 });
 };
+
+const messagePath = (group, item) => {
+    return `group.${group}.${item}.label`;
+};
 </script>
 
 <template>
@@ -326,12 +330,12 @@ const deleteSelectedRecords = async () => {
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
-                    :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${item}`"
+                    :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item))}`"
                     responsiveLayout="scroll"
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">{{ t('crud.manage') }} {{ item }}</h5>
+                            <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText v-model="filters['global'].value" :placeholder="t('crud.search')" />

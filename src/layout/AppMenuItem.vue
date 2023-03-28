@@ -77,21 +77,21 @@ const checkActiveRoute = (it) => {
 };
 
 const messagePath = (item) => {
-    return props.root ? `group.${item.label}` : `group.${props.parentItemLabel}.${item.label}`;
+    return props.root ? `group.${item.label}.label` : `group.${props.parentItemLabel}.${item.label}.label`;
 };
 </script>
 
 <template>
     <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
-        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ t(`${messagePath(item)}.label`) }}</div>
+        <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ t(messagePath(item)) }}</div>
         <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url" @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
-            <span class="layout-menuitem-text">{{ t(`${messagePath(item)}.label`) }}</span>
+            <span class="layout-menuitem-text">{{ t(messagePath(item)) }}</span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </a>
         <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)" :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
-            <span class="layout-menuitem-text">{{ t(`${messagePath(item)}.label`) }}</span>
+            <span class="layout-menuitem-text">{{ t(messagePath(item)) }}</span>
             <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
         </router-link>
         <Transition v-if="item.items && item.visible !== false" name="layout-submenu">

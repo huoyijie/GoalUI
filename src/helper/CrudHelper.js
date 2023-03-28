@@ -78,7 +78,7 @@ export default class CrudHelper {
         return null;
     }
 
-    showPreloadField(c, data) {
+    fieldValue(c, data) {
         if (c.Preload) {
             return data[c.Name][c.PreloadField];
         }

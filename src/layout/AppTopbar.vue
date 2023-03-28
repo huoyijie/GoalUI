@@ -20,7 +20,6 @@ const langs = ref([
     { name: '简体中文', value: 'zh_CN' }
 ]);
 
-const op = ref();
 const authService = new AuthService();
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
@@ -28,6 +27,7 @@ const topbarMenuActive = ref(false);
 const username = localStorage.getItem('username');
 const userinfo = ref({});
 
+const switchLangDialog = ref(false);
 const signoutDialog = ref(false);
 const profileDialog = ref(false);
 const changePWDialog = ref(false);
@@ -105,9 +105,10 @@ const logoUrl = computed(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onSwitchLang = (event) => {
-    op.value.toggle(event);
+const onSwitchLang = () => {
     topbarMenuActive.value = false;
+    switchLangDialog.value = false;
+    switchLangDialog.value = true;
 };
 const changeLang = () => {
     if (selectedLang.value) {
@@ -117,7 +118,7 @@ const changeLang = () => {
     } else {
         selectedLang.value = i18n.locale.value;
     }
-    op.value.toggle(false);
+    switchLangDialog.value = false;
 };
 const onViewProfile = async () => {
     topbarMenuActive.value = false;
@@ -193,9 +194,9 @@ const isOutsideClicked = (event) => {
         </div>
     </div>
 
-    <OverlayPanel ref="op">
+    <Dialog v-model:visible="switchLangDialog" modal :header="t('appTopbar.language')" position="topright" :style="{ width: '240px' }">
         <Listbox v-model="selectedLang" :options="langs" optionLabel="name" optionValue="value" class="w-full md:w-14rem" @change="changeLang" />
-    </OverlayPanel>
+    </Dialog>
 
     <Dialog v-model:visible="changePWDialog" modal :header="t('appTopbar.changePassword')" :style="{ width: '400px' }" class="p-fluid">
         <div class="field">

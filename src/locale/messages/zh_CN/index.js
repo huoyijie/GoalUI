@@ -40,6 +40,13 @@ export default {
             cancel: '取消',
             save: '保存'
         },
+        pickPermsDialog: {
+            header: '管理角色权限',
+            srcHeader: '可授予权限',
+            targetHeader: '已授予权限',
+            cancel: '取消',
+            save: '保存'
+        },
         delDialog: {
             confirm: '删除确认',
             confirmDelRecord: '你确定要删除',

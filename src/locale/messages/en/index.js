@@ -43,6 +43,13 @@ export default {
             cancel: 'Cancel',
             save: 'Save'
         },
+        pickPermsDialog: {
+            header: 'Role permissions',
+            srcHeader: 'Available permissions',
+            targetHeader: 'Selected permissions',
+            cancel: 'Cancel',
+            save: 'Save'
+        },
         delDialog: {
             confirm: 'Confirm',
             confirmDelRecord: 'Are you sure you want to delete',

@@ -79,6 +79,12 @@ export default {
         email: 'The field is not a valid email address',
         sameAs: 'The field must be equal to the other value'
     },
+    action: {
+        get: 'Query',
+        put: 'Change',
+        post: 'Add',
+        delete: 'Delete'
+    },
     group: {
         admin: {
             label: 'Admin',

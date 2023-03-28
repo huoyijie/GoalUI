@@ -79,6 +79,12 @@ export default {
         email: '邮箱地址格式不正确',
         sameAs: '字段值必须和另一个字段值相同'
     },
+    action: {
+        get: '查询',
+        put: '修改',
+        post: '新增',
+        delete: '删除'
+    },
     group: {
         admin: {
             label: '通用管理',

@@ -6,6 +6,10 @@ const { t } = i18n;
 
 defineProps(['authRole', 'modelValue', 'visible', 'yes']);
 defineEmits(['update:modelValue', 'update:visible']);
+
+const messagePath = (group, item) => {
+    return item ? `group.${group}.${item}.label` : `group.${group}.label`;
+};
 </script>
 
 <template>
@@ -14,7 +18,7 @@ defineEmits(['update:modelValue', 'update:visible']);
             <template #sourceheader>{{ t('crud.pickPermsDialog.srcHeader') }}</template>
             <template #targetheader>{{ t('crud.pickPermsDialog.targetHeader') }}</template>
             <template #item="slotProps">
-                <div>{{ slotProps.item.Name }}</div>
+                <div>{{ t(messagePath(slotProps.item.Group)) }}|{{ t(messagePath(slotProps.item.Group, slotProps.item.Item)) }}|{{ t(`action.${slotProps.item.Action}`) }}</div>
             </template>
         </PickList>
         <template #footer>

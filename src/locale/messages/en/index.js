@@ -38,6 +38,11 @@ export default {
             import: 'Import',
             export: 'Export'
         },
+        recordDialog: {
+            details: 'Details',
+            cancel: 'Cancel',
+            save: 'Save'
+        },
         delDialog: {
             confirm: 'Confirm',
             confirmDelRecord: 'Are you sure you want to delete',

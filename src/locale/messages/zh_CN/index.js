@@ -35,6 +35,11 @@ export default {
             import: '导入',
             export: '导出'
         },
+        recordDialog: {
+            details: '详情',
+            cancel: '取消',
+            save: '保存'
+        },
         delDialog: {
             confirm: '删除确认',
             confirmDelRecord: '你确定要删除',

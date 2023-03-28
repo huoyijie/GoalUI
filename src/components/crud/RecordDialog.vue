@@ -1,6 +1,10 @@
 <script setup>
 import CrudHelper from '@/helper/CrudHelper';
 import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+
+const i18n = useI18n();
+const { t } = i18n;
 
 const props = defineProps(['visible', 'item', 'record', 'columns', 'pk', 'refList', 'errors']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
@@ -62,7 +66,7 @@ const updateRecord = (c, $event) => {
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${item} Details`" modal class="p-fluid">
+    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${item} ${t('crud.recordDialog.details')}`" modal class="p-fluid">
         <div v-for="(c, idx) in columns" :key="c.Name" class="field">
             <template v-if="!(c.Primary || c.Preload)">
                 <label :for="c.Name">{{ columnName(c) }}</label>
@@ -106,8 +110,8 @@ const updateRecord = (c, $event) => {
             </template>
         </div>
         <template #footer>
-            <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
-            <Button label="Save" icon="pi pi-check" class="p-button-text" @click="$emit('save-record')" />
+            <Button :label="t('crud.recordDialog.cancel')" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
+            <Button :label="t('crud.recordDialog.save')" icon="pi pi-check" class="p-button-text" @click="$emit('save-record')" />
         </template>
     </Dialog>
 </template>

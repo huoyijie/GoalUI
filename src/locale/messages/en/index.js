@@ -59,8 +59,8 @@ export default {
         },
         delDialog: {
             confirm: 'Confirm',
-            confirmDelRecord: 'Are you sure you want to delete',
-            confirmDelRecords: 'Are you sure you want to delete the selected',
+            confirmDelRecord: 'Are you sure you want to delete ',
+            confirmDelRecords: 'Are you sure you want to delete the selected ',
             no: 'No',
             yes: 'Yes'
         }

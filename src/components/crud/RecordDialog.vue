@@ -6,7 +6,7 @@ import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
 const { t } = i18n;
 
-const props = defineProps(['visible', 'item', 'record', 'columns', 'pk', 'refList', 'errors']);
+const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'refList', 'errors']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
@@ -63,10 +63,14 @@ const updateRecord = (c, $event) => {
     }
     $emit('update:record', tmpRecord);
 };
+
+const messagePath = (group, item) => {
+    return `group.${group}.${item}.label`;
+};
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${item} ${t('crud.recordDialog.details')}`" modal class="p-fluid">
+    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${t(messagePath(group, item))}${t('crud.recordDialog.details')}`" modal class="p-fluid">
         <div v-for="(c, idx) in columns" :key="c.Name" class="field">
             <template v-if="!(c.Primary || c.Preload)">
                 <label :for="c.Name">{{ columnName(c) }}</label>

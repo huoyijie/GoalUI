@@ -39,7 +39,7 @@ export default {
             export: 'Export'
         },
         recordDialog: {
-            details: 'Details',
+            details: ' Details',
             cancel: 'Cancel',
             save: 'Save'
         },
@@ -83,19 +83,19 @@ export default {
         admin: {
             label: 'Admin',
             operationlog: {
-                label: 'Operation Logs'
+                label: 'Operation Log | operation logs'
             }
         },
         auth: {
             label: 'Auth',
             role: {
-                label: 'Roles'
+                label: 'Role | roles'
             },
             session: {
-                label: 'Sessions'
+                label: 'Session | sessions'
             },
             user: {
-                label: 'Users'
+                label: 'User | users'
             }
         }
     }

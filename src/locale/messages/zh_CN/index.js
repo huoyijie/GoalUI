@@ -28,7 +28,13 @@ export default {
         to: '至',
         total: '共计',
         manage: '管理',
-        search: '搜索...'
+        search: '搜索...',
+        topToolbar: {
+            new: '新建',
+            delete: '删除',
+            import: '导入',
+            export: '导出'
+        }
     },
     changePassword: {
         invalidPassword: '密码错误'

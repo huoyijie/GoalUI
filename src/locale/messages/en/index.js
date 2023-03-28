@@ -31,7 +31,13 @@ export default {
         to: 'to',
         total: 'total',
         manage: 'Manage',
-        search: 'Search...'
+        search: 'Search...',
+        topToolbar: {
+            new: 'New',
+            delete: 'Delete',
+            import: 'Import',
+            export: 'Export'
+        }
     },
     validations: {
         required: '{property} is required',

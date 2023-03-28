@@ -115,6 +115,7 @@ export default {
                 ID: 'ID',
                 Username: 'Username',
                 Email: 'Email',
+                Password: 'Password',
                 IsSuperuser: 'Super User',
                 IsActive: 'Active'
             }

@@ -115,6 +115,7 @@ export default {
                 ID: 'ID',
                 Username: '用户名',
                 Email: '邮箱地址',
+                Password: '密码',
                 IsSuperuser: '超级管理员',
                 IsActive: '有效'
             }

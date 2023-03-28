@@ -67,13 +67,17 @@ const updateRecord = (c, $event) => {
 const messagePath = (group, item) => {
     return `group.${group}.${item}.label`;
 };
+
+const columnPath = (group, item, column) => {
+    return `group.${group}.${item}.${columnName(column)}`;
+};
 </script>
 
 <template>
     <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${t(messagePath(group, item))}${t('crud.recordDialog.details')}`" modal class="p-fluid">
         <div v-for="(c, idx) in columns" :key="c.Name" class="field">
             <template v-if="!(c.Primary || c.Preload)">
-                <label :for="c.Name">{{ columnName(c) }}</label>
+                <label :for="c.Name">{{ t(columnPath(group, item, c)) }}</label>
                 <Dropdown
                     v-if="crudHelper.isRef(c)"
                     :modelValue="selected(c)"

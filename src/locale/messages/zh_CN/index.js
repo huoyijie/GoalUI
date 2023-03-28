@@ -17,7 +17,7 @@ export default {
         password: '密码',
         newPassword: '新密码',
         confirmPassword: '确认新密码',
-        submit: '提交修改',
+        submit: '提交',
         confirm: '登出确认',
         isConfirmSignout: '你确定要退出登录吗?',
         yes: '是',

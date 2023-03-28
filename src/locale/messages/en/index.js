@@ -78,5 +78,25 @@ export default {
         alpha: 'The field can only contain letters',
         email: 'The field is not a valid email address',
         sameAs: 'The field must be equal to the other value'
+    },
+    group: {
+        admin: {
+            label: 'Admin',
+            operationlog: {
+                label: 'Operation Logs'
+            }
+        },
+        auth: {
+            label: 'Auth',
+            role: {
+                label: 'Roles'
+            },
+            session: {
+                label: 'Sessions'
+            },
+            user: {
+                label: 'Users'
+            }
+        }
     }
 };

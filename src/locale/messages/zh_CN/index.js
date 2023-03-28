@@ -78,5 +78,25 @@ export default {
         alpha: '字段只能由字母组成',
         email: '邮箱地址格式不正确',
         sameAs: '字段值必须和另一个字段值相同'
+    },
+    group: {
+        admin: {
+            label: '通用管理',
+            operationlog: {
+                label: '操作日志'
+            }
+        },
+        auth: {
+            label: '认证授权',
+            role: {
+                label: '角色'
+            },
+            session: {
+                label: '会话'
+            },
+            user: {
+                label: '用户'
+            }
+        }
     }
 };

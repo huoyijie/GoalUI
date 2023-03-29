@@ -1,11 +1,5 @@
 import doFetch from './FetchService';
-
-const menuConfig = new Map([
-    ['auth.role', { icon: 'key' }],
-    ['auth.session', { icon: 'ticket' }],
-    ['auth.user', { icon: 'users' }],
-    ['admin.operationlog', { icon: 'save' }]
-]);
+import { menuConfig } from '@/settings';
 
 export default class MenuService {
     async getMenus(router) {
@@ -13,7 +7,7 @@ export default class MenuService {
         menus ||= [];
         for (let menu of menus) {
             for (let item of menu.items) {
-                let config = menuConfig.get(`${menu.label}.${item.label}`);
+                const config = (menuConfig[menu.label] || {})[item.label];
                 if (config) {
                     item.icon = `pi pi-fw pi-${config.icon}`;
                 }

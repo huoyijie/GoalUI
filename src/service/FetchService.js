@@ -1,8 +1,8 @@
-const contextPath = 'http://127.0.0.1:8100/admin/';
+import { appConfig } from '@/settings';
 
 export function doRawFetch(router, url, method, body) {
     method ||= 'GET';
-    return fetch(contextPath + url, {
+    return fetch(appConfig.serverContextPath + url, {
         method,
         mode: 'cors',
         credentials: 'include',

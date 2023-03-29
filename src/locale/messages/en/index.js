@@ -1,4 +1,4 @@
-import group from './group.json';
+import group from './group';
 
 export default {
     signin: {

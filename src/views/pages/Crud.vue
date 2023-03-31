@@ -63,12 +63,12 @@ const crudGet = async (to) => {
     const g = to ? to.params.group : group.value;
     const i = to ? to.params.item : item.value;
 
-    let { perms, cols } = (await crudService.perms(router, g, i)) || {};
-    if (!perms) {
+    const data = (await crudService.columns(router, g, i)) || {};
+    if (!data.perms) {
         return;
     }
 
-    crudPerms.value = perms;
+    crudPerms.value = data.perms;
 
     if (crudPerms.value.get) {
         records.value = await crudService.get(router, g, i);
@@ -76,7 +76,7 @@ const crudGet = async (to) => {
         records.value = await crudService.getMine(router, g, i);
     }
     // must update columns together with records
-    columns.value = cols;
+    columns.value = data.columns;
     postProcess(records.value);
     group.value = g;
     item.value = i;

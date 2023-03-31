@@ -30,7 +30,7 @@ export default class CrudService {
     exist(router, group, item, record) {
         return crudFetch(router, group, item, 'POST', JSON.stringify(record), 'exist');
     }
-    perms(router, group, item) {
-        return crudFetch(router, group, item, 'GET', null, 'perms');
+    columns(router, group, item) {
+        return crudFetch(router, group, item, 'GET', null, 'columns');
     }
 }

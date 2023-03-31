@@ -3,9 +3,7 @@ import CrudHelper from '@/helper/CrudHelper';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
-const { t } = i18n;
-
+const { t } = useI18n();
 const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'refList', 'errors']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
@@ -28,10 +26,11 @@ const isEditRecord = computed(() => {
 });
 
 const selected = (c) => {
-    let defOption = props.record[c.Ref.Name] || {};
+    const belongTo = crudHelper.belongTo(c);
+    const defOption = props.record[belongTo.Name] || {};
     if (defOption) {
         for (let option of props.refList) {
-            if (defOption[c.Ref.Field] === option[c.Ref.Field]) {
+            if (defOption[belongTo.Field] === option[belongTo.Field]) {
                 return option;
             }
         }
@@ -40,23 +39,12 @@ const selected = (c) => {
 };
 
 const isReadonly = (c) => {
-    return c.Readonly || (c.Postonly && isEditRecord.value);
-};
-
-const columnName = (c) => {
-    if (c.Ref) {
-        return c.Ref.Name;
-    }
-    return c.Name;
+    return crudHelper.isReadonly(c) || (crudHelper.isPostonly(c) && isEditRecord.value);
 };
 
 const updateRecord = (c, $event) => {
     let tmpRecord = props.record;
-    if (c.Ref) {
-        // todo hardcode `ID`
-        tmpRecord[c.Name] = $event.ID;
-        tmpRecord[c.Ref.Name] = $event;
-    } else if (crudHelper.isTime(c)) {
+    if (crudHelper.isCalendar(c)) {
         tmpRecord[c.Name] = new Date($event);
     } else {
         tmpRecord[c.Name] = $event;
@@ -69,23 +57,23 @@ const messagePath = (group, item) => {
 };
 
 const columnPath = (group, item, column) => {
-    return `group.${group}.${item}.${columnName(column)}`;
+    return `group.${group}.${item}.${column.Name}`;
 };
 </script>
 
 <template>
     <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${t(messagePath(group, item))}${t('crud.recordDialog.details')}`" modal class="p-fluid">
         <div v-for="(c, idx) in columns" :key="c.Name" class="field">
-            <template v-if="!(c.Primary || c.Preload)">
+            <template v-if="!crudHelper.isPrimary(c)">
                 <label :for="c.Name">{{ t(columnPath(group, item, c)) }}</label>
                 <Dropdown
-                    v-if="crudHelper.isRef(c)"
+                    v-if="crudHelper.isDropdown(c)"
                     :modelValue="selected(c)"
                     @update:modelValue="updateRecord(c, $event)"
                     :options="refList"
                     filter
-                    :optionLabel="c.Ref.Field"
-                    :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(c.Ref.Pkg, c.Ref.Name.toLowerCase()))}`"
+                    :optionLabel="crudHelper.belongTo(c).Field"
+                    :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(crudHelper.belongTo(c).Pkg, crudHelper.belongTo(c).Name.toLowerCase()))}`"
                     :id="c.Name"
                     @focus="clearErr(c)"
                     :disabled="isReadonly(c)"
@@ -108,8 +96,18 @@ const columnPath = (group, item, column) => {
                     :class="{ 'p-invalid': hasErr(c) }"
                 >
                 </InputNumber>
-                <Calendar v-else-if="crudHelper.isTime(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @show="clearErr(c)" showTime showIcon :class="{ 'p-invalid': hasErr(c) }" :disabled="isReadonly(c)" />
-                <div v-else-if="crudHelper.isBool(c)">
+                <Calendar
+                    v-else-if="crudHelper.isCalendar(c)"
+                    :id="c.Name"
+                    :modelValue="record[c.Name]"
+                    @update:modelValue="updateRecord(c, $event)"
+                    @show="clearErr(c)"
+                    showTime
+                    showIcon
+                    :class="{ 'p-invalid': hasErr(c) }"
+                    :disabled="isReadonly(c)"
+                />
+                <div v-else-if="crudHelper.isSwitch(c)">
                     <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" :disabled="isReadonly(c)" />
                 </div>
                 <Password v-else-if="crudHelper.isPassword(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :class="{ 'p-invalid': hasErr(c) }" :disabled="isReadonly(c)" />

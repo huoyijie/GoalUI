@@ -1,8 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
-const { t } = i18n;
+const { t } = useI18n();
 
 defineProps(['authUser', 'visible', 'modelValue', 'yes']);
 defineEmits(['update:visible', 'update:modelValue']);

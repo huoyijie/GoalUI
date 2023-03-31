@@ -4,6 +4,7 @@ import { ref, onMounted, onBeforeMount, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { useI18n } from 'vue-i18n';
+import CrudHelper from '@/helper/CrudHelper';
 import CrudService from '@/service/CrudService';
 import AuthService from '@/service/AuthService';
 import { v4 as uuidv4 } from 'uuid';
@@ -13,10 +14,9 @@ import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxVa
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const { t } = useI18n();
 
-const i18n = useI18n();
-const { t } = i18n;
-
+const crudHelper = new CrudHelper();
 const crudService = new CrudService();
 const authService = new AuthService();
 
@@ -48,10 +48,12 @@ const resetState = () => {
 };
 
 const postProcess = (records) => {
-    for (let c of columns.value) {
-        if (c.Type === 'Time') {
-            for (let r of records) {
-                r[c.Name] = new Date(r[c.Name]);
+    if (columns.value) {
+        for (let c of columns.value) {
+            if (crudHelper.isCalendar(c)) {
+                for (let r of records) {
+                    r[c.Name] = new Date(r[c.Name]);
+                }
             }
         }
     }
@@ -131,7 +133,7 @@ const changeRoles = async () => {
 const primaryKey = computed(() => {
     if (columns.value) {
         for (let column of columns.value) {
-            if (column.Primary) {
+            if (crudHelper.isPrimary(column)) {
                 return column.Name;
             }
         }
@@ -143,7 +145,7 @@ const uniqueKeys = computed(() => {
     const keys = [];
     if (columns.value) {
         for (let column of columns.value) {
-            if (column.Unique) {
+            if (crudHelper.isUnique(column)) {
                 keys.push(column);
             }
         }
@@ -155,7 +157,7 @@ const uuids = computed(() => {
     const uuids = [];
     if (columns.value) {
         for (let column of columns.value) {
-            if (column.Uuid) {
+            if (crudHelper.isUuid(column)) {
                 uuids.push(column);
             }
         }
@@ -163,10 +165,10 @@ const uuids = computed(() => {
     return uuids;
 });
 
-const refs = computed(() => {
+const bts = computed(() => {
     if (columns.value) {
         for (let column of columns.value) {
-            if (column.Ref) {
+            if (crudHelper.isDropdown(column)) {
                 return column;
             }
         }
@@ -177,9 +179,6 @@ const refs = computed(() => {
 const rules = computed(() => {
     const rules = {};
     for (let column of columns.value) {
-        if (column.Primary || column.Preload) {
-            continue;
-        }
         if (column.ValidateRule) {
             rules[column.Name] = {};
             for (let rule of column.ValidateRule.split(',')) {
@@ -195,13 +194,13 @@ const rules = computed(() => {
                 if (rule.includes('=')) {
                     let parts = rule.split('=');
                     if (parts[0] === 'min') {
-                        if (column.Type === 'string') {
+                        if (crudHelper.isString(column)) {
                             rules[column.Name].minLength = minLength(parts[1]);
                         } else {
                             rules[column.Name].minValue = minValue(parts[1]);
                         }
                     } else if (parts[0] === 'max') {
-                        if (column.Type === 'string') {
+                        if (crudHelper.isString(column)) {
                             rules[column.Name].maxLength = maxLength(parts[1]);
                         } else {
                             rules[column.Name].maxValue = maxValue(parts[1]);
@@ -214,9 +213,10 @@ const rules = computed(() => {
     return rules;
 });
 
-const loadRefs = async () => {
-    if (refs.value) {
-        refList.value = await crudService.get(router, refs.value.Ref.Pkg, refs.value.Ref.Name);
+const loadDropdown = async () => {
+    if (bts.value) {
+        const belongTo = crudHelper.belongTo(bts.value);
+        refList.value = await crudService.get(router, belongTo.Pkg, belongTo.Name);
     }
 };
 
@@ -226,7 +226,7 @@ const openNew = async () => {
     for (let c of uuids.value) {
         record.value[c.Name] = uuidv4().replaceAll('-', '');
     }
-    await loadRefs();
+    await loadDropdown();
     recordDialog.value = true;
 };
 
@@ -283,7 +283,7 @@ const saveRecord = async () => {
 const changeRecord = async (changeRecord) => {
     record.value = { ...changeRecord };
     errors.value = {};
-    await loadRefs();
+    await loadDropdown();
     recordDialog.value = true;
 };
 
@@ -359,7 +359,7 @@ const columnPath = (group, item, column) => {
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
                     <template v-for="c in columns" :key="c.Name">
-                        <Column v-if="!(c.Hidden || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <Column v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="true" headerStyle="width:14%; min-width:10rem;">
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
                             </template>

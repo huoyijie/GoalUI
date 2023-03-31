@@ -1,86 +1,99 @@
 export default class CrudHelper {
+    isPrimary(c) {
+        return c.Component.Tag.Primary;
+    }
+
+    isUnique(c) {
+        return c.Component.Tag.Unique;
+    }
+
+    isHidden(c) {
+        return c.Component.Tag.Hidden;
+    }
+
+    isReadonly(c) {
+        return c.Component.Tag.Readonly;
+    }
+
+    isPostonly(c) {
+        return c.Component.Tag.Postonly;
+    }
+
     isPassword(c) {
-        return c.Type === 'string' && c.Name === 'Password';
+        return c.Component.Name === '<password>';
     }
 
-    isBool(c) {
-        return c.Type === 'bool';
+    isSwitch(c) {
+        return c.Component.Name === '<switch>';
     }
 
-    isTime(c) {
-        return c.Type === 'Time';
-    }
-
-    isUint(c) {
-        return c.Type === 'uint';
-    }
-
-    isInt(c) {
-        return c.Type === 'int';
-    }
-
-    isInteger(c) {
-        return this.isUint(c) || this.isInt(c);
-    }
-
-    isFloat(c) {
-        return c.Type === 'float';
+    isCalendar(c) {
+        return c.Component.Name === '<calendar>';
     }
 
     isNumber(c) {
-        return this.isInteger(c) || this.isFloat(c);
+        return c.Component.Name === '<number>';
     }
 
-    isRef(c) {
-        return this.isInteger(c) && c.Ref != null;
+    isUuid(c) {
+        return c.Component.Name === '<uuid>';
+    }
+
+    isDropdown(c) {
+        return c.Component.Name === '<dropdown>';
+    }
+
+    isText(c) {
+        return c.Component.Name === '<text>';
+    }
+
+    isString(c) {
+        return this.isText(c) || this.isPassword(c) || this.isUuid(c);
+    }
+
+    isFloat(c) {
+        return this.isInteger(c) && c.Component.Tag.Float;
+    }
+
+    isInteger(c) {
+        return this.isNumber(c) && !c.Component.Tag.Float;
+    }
+
+    belongTo(c) {
+        return c.Component.Tag.BelongTo;
     }
 
     minVal(c) {
         if (this.isInteger(c)) {
-            if (c.ValidateRule) {
-                for (let rule of c.ValidateRule.split(',')) {
-                    if (rule.includes('min=')) {
-                        return Number(rule.split('=')[1]);
-                    }
-                }
-            }
-            if (this.isUint(c)) {
-                return 0;
-            }
+            return c.Component.Tag.Min;
         }
         return null;
     }
 
     minFractionDigits(c) {
         if (this.isFloat(c)) {
-            return 2;
+            return c.Component.Tag.Min;
         }
         return null;
     }
 
     maxFractionDigits(c) {
         if (this.isFloat(c)) {
-            return 5;
+            return c.Component.Tag.Max;
         }
         return null;
     }
 
     maxVal(c) {
         if (this.isInteger(c)) {
-            if (c.ValidateRule) {
-                for (let rule of c.ValidateRule.split(',')) {
-                    if (rule.includes('max=')) {
-                        return Number(rule.split('=')[1]);
-                    }
-                }
-            }
+            return c.Component.Tag.Max;
         }
         return null;
     }
 
     fieldValue(c, data) {
-        if (c.Preload) {
-            return data[c.Name][c.PreloadField];
+        if (c.Component.Tag.BelongTo) {
+            return data[c.Name][c.Component.Tag.BelongTo.Field];
         }
         return data[c.Name];
     }

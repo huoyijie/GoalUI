@@ -26,11 +26,11 @@ const columnPath = (group, item, column) => {
 
 <template>
     <span class="p-column-title">{{ t(columnPath(group, item, column)) }}</span>
-    <template v-if="crudHelper.isBool(column)">
+    <template v-if="crudHelper.isSwitch(column)">
         <Badge v-if="crudHelper.fieldValue(column, record)" value="✓" severity="success"> </Badge>
         <Badge v-else value="x" severity="danger"></Badge>
     </template>
-    <template v-else-if="crudHelper.isTime(column)">
+    <template v-else-if="crudHelper.isCalendar(column)">
         <Calendar :modelValue="crudHelper.fieldValue(column, record)" showTime readonly />
     </template>
     <template v-else-if="adminOpLog && adminOpLogAction(column)"> {{ t(groupPath(record.Group)) }}|{{ t(itemPath(record.Group, record.Item)) }}|{{ t(`action.${record.Action}`) }} </template>

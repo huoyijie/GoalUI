@@ -1,8 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
 
-const i18n = useI18n();
-const { t } = i18n;
+const { t } = useI18n();
 
 defineProps(['group', 'item', 'record', 'pk', 'visible', 'modelValue']);
 defineEmits(['update:visible', 'update:modelValue', 'delete-record', 'delete-records']);

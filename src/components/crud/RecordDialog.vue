@@ -71,7 +71,7 @@ const columnPath = (group, item, column) => {
                     :modelValue="selected(c)"
                     @update:modelValue="updateRecord(c, $event)"
                     :options="refList"
-                    filter
+                    :filter="crudHelper.isFilter(c)"
                     :optionLabel="crudHelper.belongTo(c).Field"
                     :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(crudHelper.belongTo(c).Pkg, crudHelper.belongTo(c).Name.toLowerCase()))}`"
                     :id="c.Name"
@@ -86,7 +86,7 @@ const columnPath = (group, item, column) => {
                     :max="crudHelper.maxVal(c)"
                     :minFractionDigits="crudHelper.minFractionDigits(c)"
                     :maxFractionDigits="crudHelper.maxFractionDigits(c)"
-                    showButtons
+                    :showButtons="crudHelper.isShowButtons(c)"
                     :id="c.Name"
                     :modelValue="record[c.Name]"
                     @update:modelValue="updateRecord(c, $event)"
@@ -102,8 +102,8 @@ const columnPath = (group, item, column) => {
                     :modelValue="record[c.Name]"
                     @update:modelValue="updateRecord(c, $event)"
                     @show="clearErr(c)"
-                    showTime
-                    showIcon
+                    :showTime="crudHelper.isShowTime(c)"
+                    :showIcon="crudHelper.isShowIcon(c)"
                     :class="{ 'p-invalid': hasErr(c) }"
                     :disabled="isReadonly(c)"
                 />

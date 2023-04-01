@@ -31,8 +31,52 @@ export default class CrudHelper {
         return c.Component.Name === '<calendar>';
     }
 
+    isShowTime(c) {
+        return c.Component.Tag.ShowTime;
+    }
+
+    isShowIcon(c) {
+        return c.Component.Tag.ShowIcon;
+    }
+
     isNumber(c) {
         return c.Component.Name === '<number>';
+    }
+
+    isFloat(c) {
+        return this.isNumber(c) && c.Component.Tag.Float;
+    }
+
+    isInteger(c) {
+        return this.isNumber(c) && !c.Component.Tag.Float;
+    }
+
+    isShowButtons(c) {
+        return c.Component.Tag.ShowButtons;
+    }
+
+    minVal(c) {
+        if (this.isInteger(c)) {
+            return c.Component.Tag.Min;
+        }
+    }
+
+    maxVal(c) {
+        if (this.isInteger(c)) {
+            return c.Component.Tag.Max;
+        }
+    }
+
+    minFractionDigits(c) {
+        if (this.isFloat(c)) {
+            return c.Component.Tag.Min;
+        }
+    }
+
+    maxFractionDigits(c) {
+        if (this.isFloat(c)) {
+            return c.Component.Tag.Max;
+        }
     }
 
     isUuid(c) {
@@ -43,6 +87,10 @@ export default class CrudHelper {
         return c.Component.Name === '<dropdown>';
     }
 
+    isFilter(c) {
+        return c.Component.Tag.Filter;
+    }
+
     isText(c) {
         return c.Component.Name === '<text>';
     }
@@ -51,44 +99,8 @@ export default class CrudHelper {
         return this.isText(c) || this.isPassword(c) || this.isUuid(c);
     }
 
-    isFloat(c) {
-        return this.isInteger(c) && c.Component.Tag.Float;
-    }
-
-    isInteger(c) {
-        return this.isNumber(c) && !c.Component.Tag.Float;
-    }
-
     belongTo(c) {
         return c.Component.Tag.BelongTo;
-    }
-
-    minVal(c) {
-        if (this.isInteger(c)) {
-            return c.Component.Tag.Min;
-        }
-        return null;
-    }
-
-    minFractionDigits(c) {
-        if (this.isFloat(c)) {
-            return c.Component.Tag.Min;
-        }
-        return null;
-    }
-
-    maxFractionDigits(c) {
-        if (this.isFloat(c)) {
-            return c.Component.Tag.Max;
-        }
-        return null;
-    }
-
-    maxVal(c) {
-        if (this.isInteger(c)) {
-            return c.Component.Tag.Max;
-        }
-        return null;
     }
 
     fieldValue(c, data) {

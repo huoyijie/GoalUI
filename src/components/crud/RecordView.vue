@@ -31,7 +31,7 @@ const columnPath = (group, item, column) => {
         <Badge v-else value="x" severity="danger"></Badge>
     </template>
     <template v-else-if="crudHelper.isCalendar(column)">
-        <Calendar :modelValue="crudHelper.fieldValue(column, record)" showTime readonly />
+        <Calendar :modelValue="crudHelper.fieldValue(column, record)" :showTime="crudHelper.isShowTime(column)" readonly />
     </template>
     <template v-else-if="adminOpLog && adminOpLogAction(column)"> {{ t(groupPath(record.Group)) }}|{{ t(itemPath(record.Group, record.Item)) }}|{{ t(`action.${record.Action}`) }} </template>
     <template v-else>

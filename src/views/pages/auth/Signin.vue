@@ -7,7 +7,7 @@ import { useI18n } from 'vue-i18n';
 import AuthService from '@/service/AuthService';
 import { InvalidUserOrPassword } from '@/service/ErrCodes';
 import useValidate from '@vuelidate/core';
-import { required, alphaNum, minLength, maxLength } from '@/helper/i18n-validators';
+import { required, alphaNum, minLength, maxLength } from '@/i18n/validators';
 
 const router = useRouter();
 const { layoutConfig, contextPath } = useLayout();

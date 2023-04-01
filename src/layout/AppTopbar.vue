@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 import { usePrimeVue } from 'primevue/config';
 import { useI18n } from 'vue-i18n';
 import useValidate from '@vuelidate/core';
-import { required, minLength, sameAs } from '@/helper/i18n-validators';
+import { required, minLength, sameAs } from '@/i18n/validators';
 import AuthService from '@/service/AuthService';
 import { InvalidPassword } from '@/service/ErrCodes';
 

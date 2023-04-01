@@ -9,7 +9,7 @@ import CrudService from '@/service/CrudService';
 import AuthService from '@/service/AuthService';
 import { v4 as uuidv4 } from 'uuid';
 import useValidate from '@vuelidate/core';
-import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxValue } from '@/helper/i18n-validators';
+import { required, email, alphaNum, alpha, minLength, maxLength, minValue, maxValue } from '@/i18n/validators';
 
 const route = useRoute();
 const router = useRouter();

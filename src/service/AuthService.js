@@ -1,14 +1,8 @@
-import doFetch from './FetchService';
+import doFetch, { doRawFetch } from './FetchService';
 
 export default class AuthService {
     signin(router, data) {
-        return doFetch(router, 'signin', 'POST', JSON.stringify(data)).then((username) => {
-            if (username) {
-                localStorage.setItem('username', username);
-                router.push({ name: 'dashboard' });
-            }
-            return username;
-        });
+        return doRawFetch(router, 'signin', 'POST', JSON.stringify(data));
     }
     signout(router) {
         return doFetch(router, 'signout').then(() => {
@@ -32,6 +26,6 @@ export default class AuthService {
         return doFetch(router, 'userinfo');
     }
     changePassword(router, data) {
-        return doFetch(router, 'changepw', 'POST', JSON.stringify(data));
+        return doRawFetch(router, 'changepw', 'POST', JSON.stringify(data));
     }
 }

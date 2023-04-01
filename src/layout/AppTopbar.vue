@@ -7,6 +7,7 @@ import { useI18n } from 'vue-i18n';
 import useValidate from '@vuelidate/core';
 import { required, minLength, sameAs } from '@/helper/i18n-validators';
 import AuthService from '@/service/AuthService';
+import { InvalidPassword } from '@/service/ErrCodes';
 
 const { layoutConfig, onMenuToggle, contextPath } = useLayout();
 
@@ -78,7 +79,8 @@ const changePassword = async () => {
         return;
     }
 
-    if (!(await authService.changePassword(router, { Password: passwords.value.Password, NewPassword: passwords.value.NewPassword }))) {
+    const { code } = await authService.changePassword(router, { Password: passwords.value.Password, NewPassword: passwords.value.NewPassword });
+    if (code === InvalidPassword) {
         errors.value.Password = t('changePassword.invalidPassword');
         submitDisabled.value = false;
         return;

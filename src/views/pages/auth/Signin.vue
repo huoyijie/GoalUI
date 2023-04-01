@@ -5,6 +5,7 @@ import AppConfig from '@/layout/AppConfig.vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AuthService from '@/service/AuthService';
+import { InvalidUserOrPassword } from '@/service/ErrCodes';
 import useValidate from '@vuelidate/core';
 import { required, alphaNum, minLength, maxLength } from '@/helper/i18n-validators';
 
@@ -59,9 +60,13 @@ const signin = async () => {
         return;
     }
 
-    if (!(await authService.signin(router, signinForm.value))) {
+    const { code, data } = await authService.signin(router, signinForm.value);
+    if (code === InvalidUserOrPassword) {
         errors.value.Global = t('signin.invalidUserOrPassword');
         btnSigninDisabled.value = false;
+    } else if (data) {
+        localStorage.setItem('username', data);
+        router.push({ name: 'dashboard' });
     }
 };
 </script>

@@ -44,7 +44,11 @@ export default {
             details: ' Details',
             cancel: 'Cancel',
             save: 'Save',
-            select: 'Select a '
+            select: 'Select a ',
+            successful: 'Successful',
+            created: ' Created',
+            updated: ' Updated',
+            deleted: ' Deleted'
         },
         pickPermsDialog: {
             header: 'Role permissions',
@@ -80,7 +84,8 @@ export default {
         alphaNum: 'The field can only contain letters and numbers',
         alpha: 'The field can only contain letters',
         email: 'The field is not a valid email address',
-        sameAs: 'The field must be equal to the other value'
+        sameAs: 'The field must be equal to the other value',
+        used: 'Value is used'
     },
     action: {
         get: 'Query',

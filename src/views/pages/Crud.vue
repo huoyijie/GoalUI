@@ -249,7 +249,7 @@ const saveRecord = async () => {
         let exist = await crudService.exist(router, group.value, item.value, data);
         if (exist) {
             if (exist[primaryKey.value] != record.value[primaryKey.value]) {
-                errors.value[c.Name] = 'Value is used';
+                errors.value[c.Name] = t('validations.used');
                 return;
             }
         }
@@ -264,16 +264,16 @@ const saveRecord = async () => {
                 records.value[i] = record.value;
             }
         }
-        msg = 'Updated';
+        msg = t('crud.recordDialog.updated');
     } else {
         let res = await crudService.add(router, group.value, item.value, record.value);
         postProcess([res]);
         records.value ||= [];
         records.value.push(res);
-        msg = 'Created';
+        msg = t('crud.recordDialog.created');
     }
 
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} ${msg}`, life: 3000 });
+    toast.add({ severity: 'success', summary: t('crud.recordDialog.successful'), detail: `${t(messagePath(group.value, item.value))}${msg}`, life: 3000 });
 
     recordDialog.value = false;
     record.value = {};
@@ -297,7 +297,7 @@ const deleteRecord = async () => {
     records.value = records.value.filter((val) => val[primaryKey.value] !== record.value[primaryKey.value]);
     deleteRecordDialog.value = false;
     record.value = {};
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value} Deleted`, life: 3000 });
+    toast.add({ severity: 'success', summary: t('crud.recordDialog.successful'), detail: `${t(messagePath(group.value, item.value))}${t('crud.recordDialog.deleted')}`, life: 3000 });
 };
 
 const exportCSV = () => {
@@ -314,7 +314,7 @@ const deleteSelectedRecords = async () => {
     records.value = records.value.filter((val) => !selectedRecords.value.includes(val));
     deleteRecordsDialog.value = false;
     selectedRecords.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: `${item.value}s Deleted`, life: 3000 });
+    toast.add({ severity: 'success', summary: t('crud.recordDialog.successful'), detail: `${t(messagePath(group.value, item.value), 2)}${t('crud.recordDialog.deleted')}`, life: 3000 });
 };
 
 const messagePath = (group, item) => {

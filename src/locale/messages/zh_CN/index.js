@@ -41,7 +41,11 @@ export default {
             details: '详情',
             cancel: '取消',
             save: '保存',
-            select: '选择一个'
+            select: '选择一个',
+            successful: '成功',
+            created: '已创建',
+            updated: '已更新',
+            deleted: '已删除'
         },
         pickPermsDialog: {
             header: '管理角色权限',
@@ -80,7 +84,8 @@ export default {
         alphaNum: '字段只能由字母和数字组成',
         alpha: '字段只能由字母组成',
         email: '邮箱地址格式不正确',
-        sameAs: '字段值必须和另一个字段值相同'
+        sameAs: '字段值必须和另一个字段值相同',
+        used: '已被占用'
     },
     action: {
         get: '查询',

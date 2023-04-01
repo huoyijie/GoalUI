@@ -84,7 +84,8 @@ export default {
         alphaNum: '字段只能由字母和数字组成',
         alpha: '字段只能由字母组成',
         email: '邮箱地址格式不正确',
-        sameAs: '字段值必须和另一个字段值相同',
+        sameAs: '字段值必须和前一个字段值相同',
+        not: '字段值不能和前一个字段值相同',
         used: '已被占用'
     },
     action: {

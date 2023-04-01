@@ -84,7 +84,8 @@ export default {
         alphaNum: 'The field can only contain letters and numbers',
         alpha: 'The field can only contain letters',
         email: 'The field is not a valid email address',
-        sameAs: 'The field must be equal to the other value',
+        sameAs: 'The field must be equal to the previous value',
+        not: 'The field must not be equal to the previous value',
         used: 'Value is used'
     },
     action: {

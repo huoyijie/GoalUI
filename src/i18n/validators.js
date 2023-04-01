@@ -23,3 +23,5 @@ export const alpha = withI18nMessage(validators.alpha);
 export const email = withI18nMessage(validators.email);
 
 export const sameAs = withI18nMessage(validators.sameAs, { withArguments: true });
+
+export const not = withI18nMessage(validators.not, { withArguments: true });

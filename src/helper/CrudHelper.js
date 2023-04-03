@@ -95,6 +95,10 @@ export default class CrudHelper {
         return c.Component.Name === '<text>';
     }
 
+    isFile(c) {
+        return c.Component.Name === '<file>';
+    }
+
     isString(c) {
         return this.isText(c) || this.isPassword(c) || this.isUuid(c);
     }

@@ -1,8 +1,8 @@
-import { appConfig } from '@/settings';
+import { getURL } from '@/settings';
 
-export function doRawFetch(router, url, method, body) {
+export function doRawFetch(router, path, method, body) {
     method ||= 'GET';
-    return fetch(appConfig.serverContextPath + url, {
+    return fetch(getURL(path), {
         method,
         mode: 'cors',
         credentials: 'include',
@@ -23,6 +23,6 @@ export function doRawFetch(router, url, method, body) {
     });
 }
 
-export default function doFetch(router, url, method, body) {
-    return doRawFetch(router, url, method, body).then((d) => d && d.data);
+export default function doFetch(router, path, method, body) {
+    return doRawFetch(router, path, method, body).then((d) => d && d.data);
 }

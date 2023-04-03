@@ -1,11 +1,20 @@
+import { getURL } from '@/settings';
 import doFetch from './FetchService';
 
 const crudFetch = (router, group, item, method, body, path) => {
+    return doFetch(router, getCrudPath(group, item, path), method, body);
+};
+
+export const getCrudPath = (group, item, path) => {
     let url = `crud/${group}/${item}`;
     if (path) {
         url += `/${path}`;
     }
-    return doFetch(router, url, method, body);
+    return url;
+};
+
+export const getCrudURL = (group, item, path) => {
+    return getURL(getCrudPath(group, item, path));
 };
 
 export default class CrudService {

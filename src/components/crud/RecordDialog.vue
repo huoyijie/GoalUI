@@ -1,4 +1,5 @@
 <script setup>
+import { getCrudURL } from '@/service/CrudService';
 import CrudHelper from '@/helper/CrudHelper';
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -49,6 +50,13 @@ const updateRecord = (c, $event) => {
     } else {
         tmpRecord[c.Name] = $event;
     }
+    $emit('update:record', tmpRecord);
+};
+
+const onUpload = (c, res) => {
+    clearErr(c);
+    let tmpRecord = props.record;
+    tmpRecord[c.Name] = JSON.parse(res).data;
     $emit('update:record', tmpRecord);
 };
 
@@ -109,6 +117,10 @@ const columnPath = (group, item, column) => {
                 />
                 <div v-else-if="crudHelper.isSwitch(c)">
                     <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" :disabled="isReadonly(c)" />
+                </div>
+                <div v-else-if="crudHelper.isFile(c)" style="display: flex">
+                    <InputText :id="c.Name" :modelValue="record[c.Name]" readonly :class="{ 'p-invalid': hasErr(c), 'w-9': true }" />
+                    <FileUpload mode="basic" auto name="file" :url="getCrudURL(group, item, `upload/${c.Name}`)" :maxFileSize="10000000" :disabled="isReadonly(c)" @upload="onUpload(c, $event.xhr.response)" withCredentials class="ml-3" />
                 </div>
                 <Password v-else-if="crudHelper.isPassword(c)" :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :class="{ 'p-invalid': hasErr(c) }" :disabled="isReadonly(c)" />
                 <InputText v-else :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" @focus="clearErr(c)" :disabled="isReadonly(c)" :autofocus="idx == 1" :class="{ 'p-invalid': hasErr(c) }" />

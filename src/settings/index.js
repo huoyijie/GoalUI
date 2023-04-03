@@ -5,6 +5,14 @@ import zh_CN from './locale.zh_CN.json';
 
 export const appConfig = config;
 
+export function getURL(path) {
+    return appConfig.serverContextPath + path;
+}
+
+export function getMediaURL(path) {
+    return appConfig.serverMediaPath + path;
+}
+
 export const menuConfig = {
     auth: {
         role: {

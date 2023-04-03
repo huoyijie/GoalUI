@@ -1,5 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n';
+import { getMediaURL } from '@/settings';
 import CrudHelper from '@/helper/CrudHelper';
 
 const { t } = useI18n();
@@ -32,6 +33,9 @@ const columnPath = (group, item, column) => {
     </template>
     <template v-else-if="crudHelper.isCalendar(column)">
         <Calendar :modelValue="crudHelper.fieldValue(column, record)" :showTime="crudHelper.isShowTime(column)" readonly />
+    </template>
+    <template v-else-if="crudHelper.isFile(column)">
+        <a :href="getMediaURL(crudHelper.fieldValue(column, record))" target="_blank" class="text-blue-600">{{ crudHelper.fieldValue(column, record) }}</a>
     </template>
     <template v-else-if="adminOpLog && adminOpLogAction(column)"> {{ t(groupPath(record.Group)) }}|{{ t(itemPath(record.Group, record.Item)) }}|{{ t(`action.${record.Action}`) }} </template>
     <template v-else>

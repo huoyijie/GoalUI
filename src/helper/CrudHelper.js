@@ -39,6 +39,22 @@ export default class CrudHelper {
         return c.Component.Tag.ShowIcon;
     }
 
+    isSortable(c) {
+        return c.Component.Tag.Sortable;
+    }
+
+    isAsc(c) {
+        return c.Component.Tag.Asc;
+    }
+
+    isDesc(c) {
+        return c.Component.Tag.Desc;
+    }
+
+    isPresort(c) {
+        return this.isSortable(c) && (this.isAsc(c) || this.isDesc(c));
+    }
+
     isNumber(c) {
         return c.Component.Name === '<number>';
     }

@@ -153,6 +153,30 @@ const uniqueKeys = computed(() => {
     return keys;
 });
 
+const sortField = computed(() => {
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (crudHelper.isPresort(column)) {
+                return column.Name;
+            }
+        }
+    }
+    return null;
+});
+
+const sortOrder = computed(() => {
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (crudHelper.isAsc(column)) {
+                return 1;
+            } else if (crudHelper.isDesc(column)) {
+                return -1;
+            }
+        }
+    }
+    return -1;
+});
+
 const uuids = computed(() => {
     const uuids = [];
     if (columns.value) {
@@ -340,6 +364,8 @@ const columnPath = (group, item, column) => {
                     :dataKey="primaryKey"
                     :paginator="true"
                     :rows="10"
+                    :sortField="sortField"
+                    :sortOrder="sortOrder"
                     :filters="filters"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
@@ -359,7 +385,7 @@ const columnPath = (group, item, column) => {
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
                     <template v-for="c in columns" :key="c.Name">
-                        <Column v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="true" headerStyle="width:14%; min-width:10rem;">
+                        <Column v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="crudHelper.isSortable(c)" headerStyle="width:14%; min-width:10rem;">
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
                             </template>

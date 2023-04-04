@@ -114,6 +114,7 @@ const columnPath = (group, item, column) => {
                     :showIcon="crudHelper.isShowIcon(c)"
                     :class="{ 'p-invalid': hasErr(c) }"
                     :disabled="isReadonly(c)"
+                    placeholder="mm/dd/yyyy hh:MM"
                 />
                 <div v-else-if="crudHelper.isSwitch(c)">
                     <InputSwitch :id="c.Name" :modelValue="record[c.Name]" @update:modelValue="updateRecord(c, $event)" :disabled="isReadonly(c)" />

@@ -140,6 +140,15 @@ export default class CrudHelper {
         }
     }
 
+    filterField(c) {
+        const bt = this.belongTo(c);
+        if (bt) {
+            return `${bt.Name}.${bt.Field}`;
+        } else {
+            return c.Name;
+        }
+    }
+
     isGlobalSearch(c) {
         return c.Component.Tag.GlobalSearch;
     }

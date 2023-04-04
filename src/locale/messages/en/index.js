@@ -32,13 +32,20 @@ export default {
         showing: 'Showing',
         to: 'to',
         total: 'total',
+        clear: 'Clear',
         manage: 'Manage ',
         search: 'Search...',
+        loading: 'Loading customers data. Please wait.',
+        empty: 'No data found.',
         topToolbar: {
             new: 'New',
             delete: 'Delete',
             import: 'Import',
             export: 'Export'
+        },
+        filterView: {
+            input: 'Input ',
+            searchBy: 'Search by '
         },
         recordDialog: {
             details: ' Details',

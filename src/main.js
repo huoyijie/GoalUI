@@ -107,6 +107,7 @@ import TopToolbar from './components/crud/TopToolbar.vue';
 import RecordDialog from './components/crud/RecordDialog.vue';
 import OperationGroup from './components/crud/OperationGroup.vue';
 import RecordView from './components/crud/RecordView.vue';
+import FilterView from './components/crud/FilterView.vue';
 
 import '@/assets/styles.scss';
 import primeEn from './locale/prime/en';
@@ -233,5 +234,6 @@ app.component('TopToolbar', TopToolbar);
 app.component('RecordDialog', RecordDialog);
 app.component('OperationGroup', OperationGroup);
 app.component('RecordView', RecordView);
+app.component('FilterView', FilterView);
 
 app.mount('#app');

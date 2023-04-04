@@ -29,13 +29,20 @@ export default {
         showing: '显示',
         to: '至',
         total: '共计',
+        clear: '清空',
         manage: '管理',
         search: '搜索...',
+        loading: '正在加载数据...',
+        empty: '没有找到数据',
         topToolbar: {
             new: '新建',
             delete: '删除',
             import: '导入',
             export: '导出'
+        },
+        filterView: {
+            input: '输入',
+            searchBy: '搜索'
         },
         recordDialog: {
             details: '详情',

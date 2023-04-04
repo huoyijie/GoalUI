@@ -28,8 +28,7 @@ const columnPath = (group, item, column) => {
 <template>
     <span class="p-column-title">{{ t(columnPath(group, item, column)) }}</span>
     <template v-if="crudHelper.isSwitch(column)">
-        <Badge v-if="crudHelper.fieldValue(column, record)" value="✓" severity="success"> </Badge>
-        <Badge v-else value="x" severity="danger"></Badge>
+        <i class="pi" :class="{ 'pi-check-circle text-green-500 ': crudHelper.fieldValue(column, record), 'pi-times-circle text-red-500': !crudHelper.fieldValue(column, record) }"></i>
     </template>
     <template v-else-if="crudHelper.isCalendar(column)">
         <Calendar :modelValue="crudHelper.fieldValue(column, record)" :showTime="crudHelper.isShowTime(column)" readonly />

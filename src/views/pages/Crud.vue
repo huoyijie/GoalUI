@@ -1,6 +1,6 @@
 <script setup>
-import { FilterMatchMode } from 'primevue/api';
-import { ref, onMounted, onBeforeMount, computed } from 'vue';
+import { FilterMatchMode, FilterOperator } from 'primevue/api';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
 import { useI18n } from 'vue-i18n';
@@ -33,6 +33,7 @@ const adminOpLogSkip = (c) => {
 
 const dt = ref(null);
 const filters = ref({});
+const loading = ref(true);
 const columns = ref(null);
 const records = ref(null);
 const record = ref({});
@@ -60,6 +61,7 @@ const postProcess = (records) => {
 };
 
 const crudGet = async (to) => {
+    loading.value = true;
     const g = to ? to.params.group : group.value;
     const i = to ? to.params.item : item.value;
 
@@ -80,17 +82,38 @@ const crudGet = async (to) => {
     postProcess(records.value);
     group.value = g;
     item.value = i;
+    initFilters();
     resetState();
+    loading.value = false;
 };
 
 const initFilters = () => {
-    filters.value = {
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-    };
+    if (columns.value) {
+        filters.value = {
+            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+        };
+        for (let column of columns.value) {
+            let config = {};
+            if (crudHelper.isSwitch(column)) {
+                config = { value: null, matchMode: FilterMatchMode.EQUALS };
+            } else if (crudHelper.isCalendar(column)) {
+                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] };
+            } else if (crudHelper.isNumber(column)) {
+                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] };
+            } else {
+                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] };
+            }
+            filters.value[crudHelper.filterField(column)] = config;
+        }
+    }
 };
-onBeforeMount(() => {
-    initFilters();
+const globalFilterModel = computed(() => {
+    if (filters.value.global) {
+        return filters.value.global.value;
+    }
+    return null;
 });
+
 onMounted(() => {
     crudGet();
 });
@@ -205,12 +228,7 @@ const globalFilterFields = computed(() => {
     if (columns.value) {
         for (let column of columns.value) {
             if (crudHelper.isGlobalSearch(column)) {
-                const bt = crudHelper.belongTo(column);
-                if (bt) {
-                    fields.push(`${bt.Name}.${bt.Field}`);
-                } else {
-                    fields.push(column.Name);
-                }
+                fields.push(crudHelper.filterField(column));
             }
         }
     }
@@ -383,8 +401,10 @@ const columnPath = (group, item, column) => {
                     :rows="10"
                     :sortField="sortField"
                     :sortOrder="sortOrder"
-                    :filters="filters"
+                    v-model:filters="filters"
                     :globalFilterFields="globalFilterFields"
+                    filterDisplay="menu"
+                    :loading="loading"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
@@ -392,13 +412,16 @@ const columnPath = (group, item, column) => {
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="initFilters" />
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="filters['global'].value" :placeholder="t('crud.search')" />
+                                <InputText :modelValue="globalFilterModel" @update:modelValue="filters['global'].value = $event" :placeholder="t('crud.search')" />
                             </span>
                         </div>
                     </template>
+                    <template #empty>{{ t('crud.empty') }}</template>
+                    <template #loading>{{ t('crud.loading') }}</template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
@@ -406,6 +429,7 @@ const columnPath = (group, item, column) => {
                         <Column
                             v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))"
                             :field="c.Name"
+                            :filterField="crudHelper.filterField(c)"
                             :header="t(columnPath(group, item, c))"
                             :dataType="crudHelper.dataType(c)"
                             :sortable="crudHelper.isSortable(c)"
@@ -413,6 +437,9 @@ const columnPath = (group, item, column) => {
                         >
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
+                            </template>
+                            <template #filter="{ filterModel }">
+                                <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" />
                             </template>
                         </Column>
                     </template>

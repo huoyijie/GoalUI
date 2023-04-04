@@ -200,6 +200,23 @@ const bts = computed(() => {
     return null;
 });
 
+const globalFilterFields = computed(() => {
+    const fields = [];
+    if (columns.value) {
+        for (let column of columns.value) {
+            if (crudHelper.isGlobalSearch(column)) {
+                const bt = crudHelper.belongTo(column);
+                if (bt) {
+                    fields.push(`${bt.Name}.${bt.Field}`);
+                } else {
+                    fields.push(column.Name);
+                }
+            }
+        }
+    }
+    return fields;
+});
+
 const rules = computed(() => {
     const rules = {};
     for (let column of columns.value) {
@@ -367,6 +384,7 @@ const columnPath = (group, item, column) => {
                     :sortField="sortField"
                     :sortOrder="sortOrder"
                     :filters="filters"
+                    :globalFilterFields="globalFilterFields"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
@@ -385,7 +403,14 @@ const columnPath = (group, item, column) => {
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
                     <template v-for="c in columns" :key="c.Name">
-                        <Column v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))" :field="c.Name" :header="t(columnPath(group, item, c))" :sortable="crudHelper.isSortable(c)" headerStyle="width:14%; min-width:10rem;">
+                        <Column
+                            v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))"
+                            :field="c.Name"
+                            :header="t(columnPath(group, item, c))"
+                            :dataType="crudHelper.dataType(c)"
+                            :sortable="crudHelper.isSortable(c)"
+                            headerStyle="width:14%; min-width:10rem;"
+                        >
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
                             </template>

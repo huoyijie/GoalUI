@@ -129,4 +129,18 @@ export default class CrudHelper {
         }
         return data[c.Name];
     }
+
+    dataType(c) {
+        if (this.isNumber(c)) {
+            return 'numeric';
+        } else if (this.isCalendar(c)) {
+            return 'date';
+        } else if (this.isSwitch(c)) {
+            return 'boolean';
+        }
+    }
+
+    isGlobalSearch(c) {
+        return c.Component.Tag.GlobalSearch;
+    }
 }

@@ -124,8 +124,9 @@ export default class CrudHelper {
     }
 
     fieldValue(c, data) {
-        if (c.Component.Tag.BelongTo) {
-            return data[c.Name][c.Component.Tag.BelongTo.Field];
+        const belongTo = this.belongTo(c);
+        if (belongTo) {
+            return data[c.Name][belongTo.Field];
         }
         return data[c.Name];
     }

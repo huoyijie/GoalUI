@@ -176,28 +176,17 @@ const uniqueKeys = computed(() => {
     return keys;
 });
 
-const sortField = computed(() => {
+const sort = computed(() => {
+    const res = {};
     if (columns.value) {
         for (let column of columns.value) {
             if (crudHelper.isPresort(column)) {
-                return column.Name;
+                res.field = column.Name;
+                res.order = crudHelper.isDesc(column) ? -1 : 1;
             }
         }
     }
-    return null;
-});
-
-const sortOrder = computed(() => {
-    if (columns.value) {
-        for (let column of columns.value) {
-            if (crudHelper.isAsc(column)) {
-                return 1;
-            } else if (crudHelper.isDesc(column)) {
-                return -1;
-            }
-        }
-    }
-    return -1;
+    return res;
 });
 
 const uuids = computed(() => {
@@ -399,8 +388,8 @@ const columnPath = (group, item, column) => {
                     :dataKey="primaryKey"
                     :paginator="true"
                     :rows="10"
-                    :sortField="sortField"
-                    :sortOrder="sortOrder"
+                    :sortField="sort.field"
+                    :sortOrder="sort.order"
                     v-model:filters="filters"
                     :globalFilterFields="globalFilterFields"
                     filterDisplay="menu"

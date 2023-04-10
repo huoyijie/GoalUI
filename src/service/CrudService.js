@@ -1,14 +1,39 @@
 import { getURL } from '@/settings';
 import doFetch from './FetchService';
 
-const crudFetch = (router, group, item, method, body, path) => {
-    return doFetch(router, getCrudPath(group, item, path), method, body);
+const filterOn = (filter) => {
+    if (filter.value) {
+        return true;
+    }
+
+    if (filter.constraints) {
+        for (let constraint of filter.constraints) {
+            if (constraint.value) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 };
 
-export const getCrudPath = (group, item, path) => {
+const filters = (lazyParams) => {
+    return Object.keys(lazyParams.filters)
+        .filter((k) => filterOn(lazyParams.filters[k]))
+        .map((k) => [k, lazyParams.filters[k]]);
+};
+
+const crudFetch = (router, group, item, method, body, path, params) => {
+    return doFetch(router, getCrudPath(group, item, path, params), method, body);
+};
+
+export const getCrudPath = (group, item, path, params) => {
     let url = `crud/${group}/${item}`;
     if (path) {
         url += `/${path}`;
+    }
+    if (params) {
+        url += `?${params}`;
     }
     return url;
 };
@@ -18,8 +43,10 @@ export const getCrudURL = (group, item, path) => {
 };
 
 export default class CrudService {
-    get(router, group, item) {
-        return crudFetch(router, group, item);
+    get(router, group, item, lazyParams) {
+        const params = lazyParams ? `offset=${lazyParams.first}&limit=${lazyParams.rows}&sortField=${lazyParams.sortField || ''}&sortOrder=${lazyParams.sortOrder || 1}&filters=${encodeURIComponent(JSON.stringify(filters(lazyParams)))}` : '';
+
+        return crudFetch(router, group, item, 'GET', null, null, params);
     }
     getMine(router, group, item) {
         return crudFetch(router, group, item, 'GET', null, 'mine');
@@ -39,7 +66,7 @@ export default class CrudService {
     exist(router, group, item, record) {
         return crudFetch(router, group, item, 'POST', JSON.stringify(record), 'exist');
     }
-    columns(router, group, item) {
-        return crudFetch(router, group, item, 'GET', null, 'columns');
+    datatable(router, group, item) {
+        return crudFetch(router, group, item, 'GET', null, 'datatable');
     }
 }

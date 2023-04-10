@@ -34,13 +34,28 @@ const adminOpLogSkip = (c) => {
 const dt = ref(null);
 const filters = ref({});
 const loading = ref(true);
-const columns = ref(null);
+const lazyParams = ref({});
+const initLazyParams = (columns) => {
+    const { field, order } = getSort(columns);
+    lazyParams.value = {
+        first: 0,
+        rows: dt.value.rows,
+        sortField: field,
+        sortOrder: order,
+        filters: filters.value
+    };
+};
+const datatable = ref({
+    lazy: false,
+    columns: [],
+    perms: {}
+});
+const totalRecords = ref(0);
 const records = ref(null);
 const record = ref({});
 const refList = ref([]);
 const selectedRecords = ref(null);
 const errors = ref({});
-const crudPerms = ref({});
 
 const resetState = () => {
     record.value = {};
@@ -49,8 +64,8 @@ const resetState = () => {
 };
 
 const postProcess = (records) => {
-    if (columns.value) {
-        for (let c of columns.value) {
+    if (datatable.value.columns) {
+        for (let c of datatable.value.columns) {
             if (crudHelper.isCalendar(c)) {
                 for (let r of records) {
                     r[c.Name] = new Date(r[c.Name]);
@@ -60,39 +75,61 @@ const postProcess = (records) => {
     }
 };
 
-const crudGet = async (to) => {
+const onLazyLoad = (event) => {
+    if (datatable.value.lazy) {
+        lazyParams.value = event;
+        getRecordList(group.value, item.value, datatable.value);
+    }
+};
+
+const onSearch = (event) => {
+    filters.value['global'].value = event;
+    if (datatable.value.lazy) {
+        lazyParams.value.filters = filters.value;
+        onLazyLoad(lazyParams.value);
+    }
+};
+
+const getRecordList = async (g, i, data) => {
     loading.value = true;
+    const f = data.perms.get ? crudService.get : crudService.getMine;
+    const recordList = await f(router, g, i, data.lazy && lazyParams.value);
+    totalRecords.value = recordList.total;
+    records.value = recordList.list;
+    if (data != datatable.value) {
+        // must update columns/group/item together with records
+        datatable.value = data;
+        group.value = g;
+        item.value = i;
+    }
+    postProcess(records.value);
+    loading.value = false;
+};
+
+const crudGet = async (to) => {
     const g = to ? to.params.group : group.value;
     const i = to ? to.params.item : item.value;
 
-    const data = (await crudService.columns(router, g, i)) || {};
+    const data = (await crudService.datatable(router, g, i)) || {};
     if (!data.perms) {
         return;
     }
 
-    crudPerms.value = data.perms;
-
-    if (crudPerms.value.get) {
-        records.value = await crudService.get(router, g, i);
-    } else {
-        records.value = await crudService.getMine(router, g, i);
+    if (data.lazy) {
+        initLazyParams(data.columns);
     }
-    // must update columns together with records
-    columns.value = data.columns;
-    postProcess(records.value);
-    group.value = g;
-    item.value = i;
+
+    await getRecordList(g, i, data);
     initFilters();
     resetState();
-    loading.value = false;
 };
 
 const initFilters = () => {
-    if (columns.value) {
+    if (datatable.value.columns) {
         filters.value = {
             global: { value: null, matchMode: FilterMatchMode.CONTAINS }
         };
-        for (let column of columns.value) {
+        for (let column of datatable.value.columns) {
             let config = {};
             if (crudHelper.isSwitch(column)) {
                 config = { value: null, matchMode: FilterMatchMode.EQUALS };
@@ -154,8 +191,8 @@ const changeRoles = async () => {
 };
 
 const primaryKey = computed(() => {
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
             if (crudHelper.isPrimary(column)) {
                 return column.Name;
             }
@@ -166,8 +203,8 @@ const primaryKey = computed(() => {
 
 const uniqueKeys = computed(() => {
     const keys = [];
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
             if (crudHelper.isUnique(column)) {
                 keys.push(column);
             }
@@ -176,10 +213,10 @@ const uniqueKeys = computed(() => {
     return keys;
 });
 
-const sort = computed(() => {
+const getSort = (columns) => {
     const res = {};
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (columns) {
+        for (let column of columns) {
             if (crudHelper.isPresort(column)) {
                 res.field = column.Name;
                 res.order = crudHelper.isDesc(column) ? -1 : 1;
@@ -187,12 +224,16 @@ const sort = computed(() => {
         }
     }
     return res;
+};
+
+const sort = computed(() => {
+    return getSort(datatable.value.columns);
 });
 
 const uuids = computed(() => {
     const uuids = [];
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
             if (crudHelper.isUuid(column)) {
                 uuids.push(column);
             }
@@ -202,8 +243,8 @@ const uuids = computed(() => {
 });
 
 const bts = computed(() => {
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
             if (crudHelper.isDropdown(column)) {
                 return column;
             }
@@ -214,8 +255,8 @@ const bts = computed(() => {
 
 const globalFilterFields = computed(() => {
     const fields = [];
-    if (columns.value) {
-        for (let column of columns.value) {
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
             if (crudHelper.isGlobalSearch(column)) {
                 fields.push(crudHelper.filterField(column));
             }
@@ -226,7 +267,7 @@ const globalFilterFields = computed(() => {
 
 const rules = computed(() => {
     const rules = {};
-    for (let column of columns.value) {
+    for (let column of datatable.value.columns) {
         if (column.ValidateRule) {
             rules[column.Name] = {};
             for (let rule of column.ValidateRule.split(',')) {
@@ -264,7 +305,8 @@ const rules = computed(() => {
 const loadDropdown = async () => {
     if (bts.value) {
         const belongTo = crudHelper.belongTo(bts.value);
-        refList.value = await crudService.get(router, belongTo.Pkg, belongTo.Name);
+        const recordList = await crudService.get(router, belongTo.Pkg, belongTo.Name);
+        refList.value = recordList.list;
     }
 };
 
@@ -379,13 +421,15 @@ const columnPath = (group, item, column) => {
         <div class="col-12">
             <div class="card">
                 <Toast />
-                <TopToolbar :crudPerms="crudPerms" :selectedRecords="selectedRecords" @new-record="openNew" @delete-records="confirmDeleteSelected" @export="exportCSV($event)" />
+                <TopToolbar :crudPerms="datatable.perms" :selectedRecords="selectedRecords" @new-record="openNew" @delete-records="confirmDeleteSelected" @export="exportCSV($event)" />
 
                 <DataTable
                     ref="dt"
+                    :totalRecords="totalRecords"
                     :value="records"
                     v-model:selection="selectedRecords"
                     :dataKey="primaryKey"
+                    :lazy="datatable.lazy"
                     :paginator="true"
                     :rows="10"
                     :sortField="sort.field"
@@ -394,6 +438,9 @@ const columnPath = (group, item, column) => {
                     :globalFilterFields="globalFilterFields"
                     filterDisplay="menu"
                     :loading="loading"
+                    @page="onLazyLoad"
+                    @sort="onLazyLoad"
+                    @filter="onLazyLoad"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
@@ -405,7 +452,7 @@ const columnPath = (group, item, column) => {
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText :modelValue="globalFilterModel" @update:modelValue="filters['global'].value = $event" :placeholder="t('crud.search')" />
+                                <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="t('crud.search')" />
                             </span>
                         </div>
                     </template>
@@ -414,10 +461,10 @@ const columnPath = (group, item, column) => {
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                    <template v-for="c in columns" :key="c.Name">
+                    <template v-for="c in datatable.columns" :key="c.Name">
                         <Column
                             v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))"
-                            :field="c.Name"
+                            :field="crudHelper.filterField(c)"
                             :filterField="crudHelper.filterField(c)"
                             :header="t(columnPath(group, item, c))"
                             :dataType="crudHelper.dataType(c)"
@@ -438,7 +485,7 @@ const columnPath = (group, item, column) => {
                             <OperationGroup
                                 :group="group"
                                 :item="item"
-                                :crudPerms="crudPerms"
+                                :crudPerms="datatable.perms"
                                 @pick-perms="pickPerms(slotProps.data)"
                                 @pick-roles="pickRoles(slotProps.data)"
                                 @change-record="changeRecord(slotProps.data)"
@@ -448,7 +495,7 @@ const columnPath = (group, item, column) => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="columns" :pk="primaryKey" :refList="refList" @save-record="saveRecord" />
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="datatable.columns" :pk="primaryKey" :refList="refList" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 

@@ -5,6 +5,7 @@ export default {
         label: '通用管理',
         operationlog: {
             label: '操作日志',
+            ID: 'ID',
             User: '用户名',
             Date: '时间',
             IP: 'IP',
@@ -21,6 +22,7 @@ export default {
         },
         session: {
             label: '会话',
+            ID: 'ID',
             Key: '会话',
             User: '用户',
             ExpireDate: '过期时间'

@@ -5,6 +5,7 @@ export default {
         label: 'Admin',
         operationlog: {
             label: 'Operation Log | operation logs',
+            ID: 'ID',
             User: 'User',
             Date: 'Date',
             IP: 'IP',
@@ -21,6 +22,7 @@ export default {
         },
         session: {
             label: 'Session | sessions',
+            ID: 'ID',
             Key: 'Session',
             User: 'User',
             ExpireDate: 'Expire Date'

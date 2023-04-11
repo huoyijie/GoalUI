@@ -35,7 +35,6 @@ export default {
         clear: 'Clear',
         manage: 'Manage ',
         search: 'Search ',
-        loading: 'Loading customers data. Please wait.',
         empty: 'No data found.',
         topToolbar: {
             new: 'New',

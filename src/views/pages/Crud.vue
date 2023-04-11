@@ -33,7 +33,6 @@ const adminOpLogSkip = (c) => {
 
 const dt = ref(null);
 const filters = ref({});
-const loading = ref(true);
 const lazyParams = ref({});
 const initLazyParams = (columns) => {
     const { field, order } = getSort(columns);
@@ -91,7 +90,6 @@ const onSearch = (event) => {
 };
 
 const getRecordList = async (g, i, data) => {
-    loading.value = true;
     const f = data.perms.get ? crudService.get : crudService.getMine;
     const recordList = await f(router, g, i, data.lazy && lazyParams.value);
     totalRecords.value = recordList.total;
@@ -103,7 +101,6 @@ const getRecordList = async (g, i, data) => {
         item.value = i;
     }
     postProcess(records.value);
-    loading.value = false;
 };
 
 const crudGet = async (to) => {
@@ -467,7 +464,6 @@ const columnPath = (group, item, column) => {
                     :globalFilterFields="globalFilterFields"
                     v-model:filters="filters"
                     filterDisplay="menu"
-                    :loading="loading"
                     @page="onLazyLoad"
                     @sort="onLazyLoad"
                     @filter="onLazyLoad"
@@ -487,7 +483,6 @@ const columnPath = (group, item, column) => {
                         </div>
                     </template>
                     <template #empty>{{ t('crud.empty') }}</template>
-                    <template #loading>{{ t('crud.loading') }}</template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 

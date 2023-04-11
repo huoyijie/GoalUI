@@ -35,6 +35,7 @@ const dt = ref(null);
 const filters = ref({});
 const lazyParams = ref({});
 const initLazyParams = (columns) => {
+    filters.value = {};
     const { field, order } = getSort(columns);
     lazyParams.value = {
         first: 0,

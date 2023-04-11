@@ -79,10 +79,10 @@ const columnPath = (group, item, column) => {
                     :modelValue="selected(c)"
                     @update:modelValue="updateRecord(c, $event)"
                     :options="refList"
-                    :filter="crudHelper.isFilter(c)"
                     :optionLabel="crudHelper.belongTo(c).Field"
                     :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(crudHelper.belongTo(c).Pkg, crudHelper.belongTo(c).Name.toLowerCase()))}`"
                     :id="c.Name"
+                    filter
                     @focus="clearErr(c)"
                     :disabled="isReadonly(c)"
                     :autofocus="idx == 1"

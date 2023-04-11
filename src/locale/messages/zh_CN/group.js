@@ -6,7 +6,7 @@ export default {
         operationlog: {
             label: '操作日志',
             ID: 'ID',
-            User: '用户名',
+            User: '用户',
             Date: '时间',
             IP: 'IP',
             Action: '动作',

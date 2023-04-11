@@ -31,7 +31,7 @@ export default {
         total: '共计',
         clear: '清空',
         manage: '管理',
-        search: '搜索...',
+        search: '搜索',
         loading: '正在加载数据...',
         empty: '没有找到数据',
         topToolbar: {

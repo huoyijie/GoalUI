@@ -125,11 +125,12 @@ const crudGet = async (to) => {
 };
 
 const initFilters = () => {
-    if (datatable.value.columns) {
-        filters.value = {
-            global: { value: null, matchMode: FilterMatchMode.CONTAINS }
-        };
-        for (let column of datatable.value.columns) {
+    if (filterFields.value) {
+        filters.value = {};
+        if (globalFilterFields.value.length > 0) {
+            filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS };
+        }
+        for (let column of filterFields.value) {
             let config = {};
             if (crudHelper.isSwitch(column)) {
                 config = { value: null, matchMode: FilterMatchMode.EQUALS };
@@ -262,12 +263,32 @@ const bts = computed(() => {
     return null;
 });
 
-const globalFilterFields = computed(() => {
+const globalSearchFields = computed(() => {
     const fields = [];
     if (datatable.value.columns) {
         for (let column of datatable.value.columns) {
             if (crudHelper.isGlobalSearch(column)) {
-                fields.push(crudHelper.filterField(column));
+                fields.push(column);
+            }
+        }
+    }
+    return fields;
+});
+
+const globalFilterFields = computed(() => {
+    const fields = [];
+    if (globalSearchFields.value.length > 0) {
+        fields.push(crudHelper.filterField(globalSearchFields.value[0]));
+    }
+    return fields;
+});
+
+const filterFields = computed(() => {
+    const fields = [];
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
+            if (crudHelper.isFilter(column)) {
+                fields.push(column);
             }
         }
     }
@@ -443,8 +464,8 @@ const columnPath = (group, item, column) => {
                     :rows="10"
                     :sortField="sort.field"
                     :sortOrder="sort.order"
-                    v-model:filters="filters"
                     :globalFilterFields="globalFilterFields"
+                    v-model:filters="filters"
                     filterDisplay="menu"
                     :loading="loading"
                     @page="onLazyLoad"
@@ -457,12 +478,12 @@ const columnPath = (group, item, column) => {
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <span v-if="globalSearchFields.length > 0" class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="t('crud.search')" />
+                                <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="`${t('crud.search')}${t(columnPath(group, item, globalSearchFields[0]))}`" />
                             </span>
+                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
                         </div>
                     </template>
                     <template #empty>{{ t('crud.empty') }}</template>
@@ -483,7 +504,7 @@ const columnPath = (group, item, column) => {
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
                             </template>
-                            <template #filter="{ filterModel }">
+                            <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
                                 <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" />
                             </template>
                         </Column>

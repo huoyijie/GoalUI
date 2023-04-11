@@ -34,7 +34,7 @@ export default {
         total: 'total',
         clear: 'Clear',
         manage: 'Manage ',
-        search: 'Search...',
+        search: 'Search ',
         loading: 'Loading customers data. Please wait.',
         empty: 'No data found.',
         topToolbar: {

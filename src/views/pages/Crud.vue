@@ -42,7 +42,7 @@ const initLazyParams = (columns) => {
         rows: dt.value.rows,
         sortField: field,
         sortOrder: order,
-        filters: filters.value
+        filters: {}
     };
 };
 const datatable = ref({
@@ -144,6 +144,15 @@ const initFilters = () => {
         }
     }
 };
+
+const clearFilters = () => {
+    initFilters();
+    if (datatable.value.lazy) {
+        lazyParams.value.filters = filters.value;
+        onLazyLoad(lazyParams.value);
+    }
+};
+
 const globalFilterModel = computed(() => {
     if (filters.value.global) {
         return filters.value.global.value;
@@ -448,7 +457,7 @@ const columnPath = (group, item, column) => {
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="initFilters" />
+                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />

@@ -2,13 +2,13 @@ import { getURL } from '@/settings';
 import doFetch from './FetchService';
 
 const filterOn = (filter) => {
-    if (filter.value) {
+    if (filter.value != null) {
         return true;
     }
 
     if (filter.constraints) {
         for (let constraint of filter.constraints) {
-            if (constraint.value) {
+            if (constraint.value != null) {
                 return true;
             }
         }

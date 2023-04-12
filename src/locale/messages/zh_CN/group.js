@@ -1,6 +1,12 @@
 import { locale } from '@/settings';
 
 export default {
+    home: {
+        label: 'home',
+        dashboard: {
+            label: '首页'
+        }
+    },
     admin: {
         label: '通用管理',
         operationlog: {

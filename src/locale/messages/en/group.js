@@ -1,6 +1,12 @@
 import { locale } from '@/settings';
 
 export default {
+    home: {
+        label: 'Home',
+        dashboard: {
+            label: 'Dashboard'
+        }
+    },
     admin: {
         label: 'Admin',
         operationlog: {

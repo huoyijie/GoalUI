@@ -6,10 +6,10 @@ import { useI18n } from 'vue-i18n';
 const i18n = useI18n();
 const { t } = i18n;
 
-const { layoutConfig, contextPath } = useLayout();
+const { layoutConfig } = useLayout();
 
 const logoUrl = computed(() => {
-    return `${contextPath}layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 </script>
 

@@ -19,6 +19,10 @@ export function doRawFetch(router, path, method, body) {
             router.push({ name: 'denied' });
             return;
         }
+        if (res.status === 500) {
+            router.push({ name: 'error' });
+            return;
+        }
         return res.json();
     });
 }

@@ -14,6 +14,11 @@ export function getMediaURL(path) {
 }
 
 export const menuConfig = {
+    home: {
+        dashboard: {
+            icon: 'house'
+        }
+    },
     auth: {
         role: {
             icon: 'key'

@@ -9,7 +9,7 @@ import { required, minLength, sameAs, not } from '@/i18n/validators';
 import AuthService from '@/service/AuthService';
 import { InvalidPassword } from '@/service/ErrCodes';
 
-const { layoutConfig, onMenuToggle, contextPath } = useLayout();
+const { layoutConfig, onMenuToggle } = useLayout();
 
 const router = useRouter();
 const primevue = usePrimeVue();
@@ -101,7 +101,7 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `${contextPath}layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
+    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 
 const onTopBarMenuButton = () => {

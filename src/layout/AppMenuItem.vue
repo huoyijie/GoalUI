@@ -71,6 +71,9 @@ const itemClick = (event, item) => {
 };
 
 const checkActiveRoute = (it) => {
+    if (it.to.name === 'dashboard') {
+        return route.path === '/';
+    }
     let { group, item } = it.to.params;
     let itemPath = `/${it.to.name}/${group}/${item}`;
     return route.path === itemPath;

@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
-import messagesEn from '../locale/messages/en';
-import messagesZh_CN from '../locale/messages/zh_CN';
+import messagesEn from './locale/messages/en';
+import messagesZh_CN from './locale/messages/zh_CN';
 
 const lang = localStorage.getItem('lang') || 'zh_CN';
 

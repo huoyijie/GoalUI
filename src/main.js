@@ -110,8 +110,8 @@ import RecordView from './components/crud/RecordView.vue';
 import FilterView from './components/crud/FilterView.vue';
 
 import '@/assets/styles.scss';
-import primeEn from './locale/prime/en';
-import primeZh_CN from './locale/prime/zh_CN';
+import primeEn from '@/i18n/locale/prime/en';
+import primeZh_CN from '@/i18n/locale/prime/zh_CN';
 
 const lang = localStorage.getItem('lang') || 'zh_CN';
 

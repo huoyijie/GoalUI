@@ -107,6 +107,9 @@ const getRecordList = async (g, i, data) => {
 const crudGet = async (to) => {
     const g = to ? to.params.group : group.value;
     const i = to ? to.params.item : item.value;
+    if (to) {
+        resetState();
+    }
 
     const data = (await crudService.datatable(router, g, i)) || {};
     if (!data.perms) {
@@ -117,35 +120,42 @@ const crudGet = async (to) => {
         initLazyParams(data.columns);
     }
 
+    initFilters(filterFields(data.columns));
     await getRecordList(g, i, data);
-    initFilters();
-    resetState();
 };
 
-const initFilters = () => {
-    if (filterFields.value) {
-        filters.value = {};
-        if (globalFilterFields.value.length > 0) {
-            filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS };
+const filterFields = (columns) => {
+    const fields = [];
+    for (let column of columns) {
+        if (crudHelper.isFilter(column)) {
+            fields.push(column);
         }
-        for (let column of filterFields.value) {
-            let config = {};
-            if (crudHelper.isSwitch(column)) {
-                config = { value: null, matchMode: FilterMatchMode.EQUALS };
-            } else if (crudHelper.isCalendar(column)) {
-                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] };
-            } else if (crudHelper.isNumber(column)) {
-                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] };
-            } else {
-                config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] };
-            }
-            filters.value[crudHelper.filterField(column)] = config;
+    }
+    return fields;
+};
+
+const initFilters = (filterFields) => {
+    filters.value = {};
+    if (globalFilterFields.value.length > 0) {
+        filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS };
+    }
+    for (let column of filterFields) {
+        let config = {};
+        if (crudHelper.isSwitch(column)) {
+            config = { value: null, matchMode: FilterMatchMode.EQUALS };
+        } else if (crudHelper.isCalendar(column)) {
+            config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] };
+        } else if (crudHelper.isNumber(column)) {
+            config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] };
+        } else {
+            config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }] };
         }
+        filters.value[crudHelper.filterField(column)] = config;
     }
 };
 
 const clearFilters = () => {
-    initFilters();
+    initFilters(filterFields(datatable.value.columns));
     if (datatable.value.lazy) {
         lazyParams.value.filters = filters.value;
         onLazyLoad(lazyParams.value);
@@ -277,18 +287,6 @@ const globalFilterFields = computed(() => {
     const fields = [];
     if (globalSearchFields.value.length > 0) {
         fields.push(crudHelper.filterField(globalSearchFields.value[0]));
-    }
-    return fields;
-});
-
-const filterFields = computed(() => {
-    const fields = [];
-    if (datatable.value.columns) {
-        for (let column of datatable.value.columns) {
-            if (crudHelper.isFilter(column)) {
-                fields.push(column);
-            }
-        }
     }
     return fields;
 });

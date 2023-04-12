@@ -79,7 +79,7 @@ export default {
         }
     },
     appFooter: {
-        goal: 'Powered by Goal'
+        power: 'powers web developer'
     },
     validations: {
         required: 'The field is required',

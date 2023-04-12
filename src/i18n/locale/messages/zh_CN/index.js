@@ -79,7 +79,7 @@ export default {
         invalidPassword: '密码错误'
     },
     appFooter: {
-        goal: '由 Goal 提供支持'
+        power: '为开发人员提供支持'
     },
     validations: {
         required: '必填字段',

@@ -24,12 +24,6 @@ const group = ref(route.params.group);
 const item = ref(route.params.item);
 const authRole = computed(() => group.value == 'auth' && item.value == 'role');
 const authUser = computed(() => group.value == 'auth' && item.value == 'user');
-const adminOpLog = computed(() => {
-    return group.value == 'admin' && item.value === 'operationlog';
-});
-const adminOpLogSkip = (c) => {
-    return c.Name === 'Group' || c.Name === 'Item';
-};
 
 const dt = ref(null);
 const filters = ref({});
@@ -487,7 +481,7 @@ const columnPath = (group, item, column) => {
 
                     <template v-for="c in datatable.columns" :key="c.Name">
                         <Column
-                            v-if="!(crudHelper.isHidden(c) || (adminOpLog && adminOpLogSkip(c)))"
+                            v-if="!crudHelper.isHidden(c)"
                             :field="crudHelper.filterField(c)"
                             :filterField="crudHelper.filterField(c)"
                             :header="t(columnPath(group, item, c))"
@@ -496,7 +490,7 @@ const columnPath = (group, item, column) => {
                             headerStyle="width:14%; min-width:10rem;"
                         >
                             <template #body="slotProps">
-                                <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :adminOpLog="adminOpLog" />
+                                <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
                             </template>
                             <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
                                 <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" />

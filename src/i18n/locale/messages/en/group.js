@@ -15,6 +15,8 @@ export default {
             User: 'User',
             Date: 'Date',
             IP: 'IP',
+            Group: 'Group',
+            Item: 'Item',
             Action: 'Action',
             ObjectID: 'Object ID'
         }

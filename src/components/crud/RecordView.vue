@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getMediaURL } from '@/settings';
 import CrudHelper from '@/helper/CrudHelper';
@@ -6,9 +7,21 @@ import CrudHelper from '@/helper/CrudHelper';
 const { t } = useI18n();
 const crudHelper = new CrudHelper();
 
-defineProps(['adminOpLog', 'group', 'item', 'column', 'record']);
+const props = defineProps(['group', 'item', 'column', 'record']);
 
-const adminOpLogAction = (c) => {
+const adminOpLog = computed(() => {
+    return props.group == 'admin' && props.item === 'operationlog';
+});
+
+const logGroup = (c) => {
+    return c.Name === 'Group';
+};
+
+const logItem = (c) => {
+    return c.Name === 'Item';
+};
+
+const logAction = (c) => {
     return c.Name === 'Action';
 };
 
@@ -36,7 +49,9 @@ const columnPath = (group, item, column) => {
     <template v-else-if="crudHelper.isFile(column)">
         <a :href="getMediaURL(crudHelper.fieldValue(column, record))" target="_blank" class="text-blue-600">{{ crudHelper.fieldValue(column, record) }}</a>
     </template>
-    <template v-else-if="adminOpLog && adminOpLogAction(column)"> {{ t(groupPath(record.Group)) }}|{{ t(itemPath(record.Group, record.Item)) }}|{{ t(`action.${record.Action}`) }} </template>
+    <template v-else-if="adminOpLog && logGroup(column)">{{ t(groupPath(record.Group)) }}</template>
+    <template v-else-if="adminOpLog && logItem(column)">{{ t(itemPath(record.Group, record.Item)) }}</template>
+    <template v-else-if="adminOpLog && logAction(column)">{{ t(`action.${record.Action}`) }}</template>
     <template v-else>
         {{ crudHelper.fieldValue(column, record) }}
     </template>

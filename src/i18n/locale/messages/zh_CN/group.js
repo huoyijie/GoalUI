@@ -15,6 +15,8 @@ export default {
             User: '用户',
             Date: '时间',
             IP: 'IP',
+            Group: '组',
+            Item: '项',
             Action: '动作',
             ObjectID: '目标 ID'
         }

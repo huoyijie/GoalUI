@@ -130,9 +130,7 @@ const filterFields = (columns) => {
 
 const initFilters = (filterFields) => {
     filters.value = {};
-    if (globalFilterFields.value.length > 0) {
-        filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS };
-    }
+    filters.value.global = { value: null, matchMode: FilterMatchMode.CONTAINS };
     for (let column of filterFields) {
         let config = {};
         if (crudHelper.isSwitch(column)) {

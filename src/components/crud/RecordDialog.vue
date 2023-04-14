@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'refList', 'errors']);
+const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'errors']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
@@ -27,16 +27,48 @@ const isEditRecord = computed(() => {
 });
 
 const selected = (c) => {
+    let curValue = props.record[c.Name];
     const belongTo = crudHelper.belongTo(c);
-    const defOption = props.record[belongTo.Name] || {};
-    if (defOption) {
-        for (let option of props.refList) {
-            if (defOption[belongTo.Field] === option[belongTo.Field]) {
+    if (belongTo) {
+        curValue ||= {};
+        for (let option of props.dropdownData[c.Name]) {
+            if (curValue[belongTo.Field] === option[belongTo.Field]) {
+                return option;
+            }
+        }
+    } else {
+        for (let option of props.dropdownData[c.Name]) {
+            if (curValue === option) {
                 return option;
             }
         }
     }
-    return defOption;
+    return curValue;
+};
+
+const optionLabel = (c) => {
+    const belongTo = crudHelper.belongTo(c);
+    if (belongTo) {
+        return belongTo.Field;
+    } else {
+        return 'label';
+    }
+};
+
+const optionValue = (c) => {
+    const belongTo = crudHelper.belongTo(c);
+    if (!belongTo) {
+        return 'value';
+    }
+};
+
+const dropdownPlaceholder = (c) => {
+    const belongTo = crudHelper.belongTo(c);
+    if (belongTo) {
+        return `${t('crud.recordDialog.select')}${t(messagePath(belongTo.Pkg, belongTo.Name.toLowerCase()))}`;
+    } else {
+        return `${t('crud.recordDialog.select')}${t(columnPath(props.group, props.item, c))}`;
+    }
 };
 
 const isReadonly = (c) => {
@@ -78,9 +110,10 @@ const columnPath = (group, item, column) => {
                     v-if="crudHelper.isDropdown(c)"
                     :modelValue="selected(c)"
                     @update:modelValue="updateRecord(c, $event)"
-                    :options="refList"
-                    :optionLabel="crudHelper.belongTo(c).Field"
-                    :placeholder="`${t('crud.recordDialog.select')}${t(messagePath(crudHelper.belongTo(c).Pkg, crudHelper.belongTo(c).Name.toLowerCase()))}`"
+                    :options="dropdownData[c.Name]"
+                    :optionLabel="optionLabel(c)"
+                    :optionValue="optionValue(c)"
+                    :placeholder="dropdownPlaceholder(c)"
                     :id="c.Name"
                     filter
                     @focus="clearErr(c)"

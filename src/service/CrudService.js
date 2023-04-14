@@ -69,4 +69,7 @@ export default class CrudService {
     datatable(router, group, item) {
         return crudFetch(router, group, item, 'GET', null, 'datatable');
     }
+    select(router, group, item, field) {
+        return crudFetch(router, group, item, 'GET', null, `select/${field}`);
+    }
 }

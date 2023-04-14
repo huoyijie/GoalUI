@@ -119,18 +119,6 @@ export default class CrudHelper {
         return this.isText(c) || this.isPassword(c) || this.isUuid(c);
     }
 
-    belongTo(c) {
-        return c.Component.Tag.BelongTo;
-    }
-
-    fieldValue(c, data) {
-        const belongTo = this.belongTo(c);
-        if (belongTo) {
-            return data[c.Name][belongTo.Field];
-        }
-        return data[c.Name];
-    }
-
     dataType(c) {
         if (this.isNumber(c)) {
             return 'numeric';
@@ -139,6 +127,14 @@ export default class CrudHelper {
         } else if (this.isSwitch(c)) {
             return 'boolean';
         }
+    }
+
+    isGlobalSearch(c) {
+        return c.Component.Tag.GlobalSearch;
+    }
+
+    belongTo(c) {
+        return c.Component.Tag.BelongTo;
     }
 
     filterField(c) {
@@ -150,7 +146,15 @@ export default class CrudHelper {
         }
     }
 
-    isGlobalSearch(c) {
-        return c.Component.Tag.GlobalSearch;
+    fieldValue(c, data) {
+        const belongTo = this.belongTo(c);
+        if (belongTo) {
+            return data[c.Name][belongTo.Field];
+        }
+        return data[c.Name];
+    }
+
+    isDropdownOptions(c) {
+        return this.isDropdown(c) && !this.belongTo(c);
     }
 }

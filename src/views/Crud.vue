@@ -47,7 +47,7 @@ const datatable = ref({
 const totalRecords = ref(0);
 const records = ref(null);
 const record = ref({});
-const refList = ref([]);
+const dropdownData = ref({});
 const selectedRecords = ref(null);
 const errors = ref({});
 
@@ -110,6 +110,8 @@ const crudGet = async (to) => {
         return;
     }
 
+    await loadDropdown(g, i, data);
+
     if (data.lazy) {
         initLazyParams(data.columns);
     }
@@ -137,6 +139,8 @@ const initFilters = (filterFields) => {
             config = { value: null, matchMode: FilterMatchMode.EQUALS };
         } else if (crudHelper.isCalendar(column)) {
             config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }] };
+        } else if (crudHelper.isDropdownOptions(column)) {
+            config = { value: null, matchMode: FilterMatchMode.EQUALS };
         } else if (crudHelper.isNumber(column)) {
             config = { operator: FilterOperator.AND, constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }] };
         } else {
@@ -152,6 +156,13 @@ const clearFilters = () => {
         lazyParams.value.filters = filters.value;
         onLazyLoad(lazyParams.value);
     }
+};
+
+const showFilterMatchModes = (c) => {
+    if (crudHelper.isDropdownOptions(c)) {
+        return false;
+    }
+    return true;
 };
 
 const globalFilterModel = computed(() => {
@@ -252,17 +263,6 @@ const uuids = computed(() => {
     return uuids;
 });
 
-const bts = computed(() => {
-    if (datatable.value.columns) {
-        for (let column of datatable.value.columns) {
-            if (crudHelper.isDropdown(column)) {
-                return column;
-            }
-        }
-    }
-    return null;
-});
-
 const globalSearchFields = computed(() => {
     const fields = [];
     if (datatable.value.columns) {
@@ -320,11 +320,25 @@ const rules = computed(() => {
     return rules;
 });
 
-const loadDropdown = async () => {
-    if (bts.value) {
-        const belongTo = crudHelper.belongTo(bts.value);
-        const recordList = await crudService.get(router, belongTo.Pkg, belongTo.Name);
-        refList.value = recordList.list;
+const dropdowns = (columns) => {
+    const dds = [];
+    for (let column of columns) {
+        if (crudHelper.isDropdown(column)) {
+            dds.push(column);
+        }
+    }
+    return dds;
+};
+
+const loadDropdown = async (g, i, data) => {
+    for (let dropdown of dropdowns(data.columns)) {
+        const belongTo = crudHelper.belongTo(dropdown);
+        if (belongTo) {
+            const recordList = await crudService.get(router, belongTo.Pkg, belongTo.Name);
+            dropdownData.value[dropdown.Name] = recordList.list;
+        } else {
+            dropdownData.value[dropdown.Name] = await crudService.select(router, g, i, dropdown.Name);
+        }
     }
 };
 
@@ -334,7 +348,6 @@ const openNew = async () => {
     for (let c of uuids.value) {
         record.value[c.Name] = uuidv4().replaceAll('-', '');
     }
-    await loadDropdown();
     recordDialog.value = true;
 };
 
@@ -363,25 +376,20 @@ const saveRecord = async () => {
         }
     }
 
-    let msg = null;
+    let res, msg;
     const pk = primaryKey.value;
     if (record.value[pk]) {
-        await crudService.change(router, group.value, item.value, record.value);
-        for (let i = 0; i < records.value.length; i++) {
-            if (records.value[i][pk] == record.value[pk]) {
-                records.value[i] = record.value;
-            }
-        }
+        res = await crudService.change(router, group.value, item.value, record.value);
         msg = t('crud.recordDialog.updated');
     } else {
-        let res = await crudService.add(router, group.value, item.value, record.value);
-        postProcess([res]);
-        records.value ||= [];
-        records.value.push(res);
+        res = await crudService.add(router, group.value, item.value, record.value);
         msg = t('crud.recordDialog.created');
     }
 
-    toast.add({ severity: 'success', summary: t('crud.recordDialog.successful'), detail: `${t(messagePath(group.value, item.value))}${msg}`, life: 3000 });
+    if (res) {
+        await getRecordList(group.value, item.value, datatable.value);
+        toast.add({ severity: 'success', summary: t('crud.recordDialog.successful'), detail: `${t(messagePath(group.value, item.value))}${msg}`, life: 3000 });
+    }
 
     recordDialog.value = false;
     record.value = {};
@@ -391,7 +399,6 @@ const saveRecord = async () => {
 const changeRecord = async (changeRecord) => {
     record.value = { ...changeRecord };
     errors.value = {};
-    await loadDropdown();
     recordDialog.value = true;
 };
 
@@ -482,6 +489,7 @@ const columnPath = (group, item, column) => {
                             v-if="!crudHelper.isHidden(c)"
                             :field="crudHelper.filterField(c)"
                             :filterField="crudHelper.filterField(c)"
+                            :showFilterMatchModes="showFilterMatchModes(c)"
                             :header="t(columnPath(group, item, c))"
                             :dataType="crudHelper.dataType(c)"
                             :sortable="crudHelper.isSortable(c)"
@@ -491,7 +499,7 @@ const columnPath = (group, item, column) => {
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
                             </template>
                             <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
-                                <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" />
+                                <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" :dropdownData="dropdownData" />
                             </template>
                         </Column>
                     </template>
@@ -511,7 +519,7 @@ const columnPath = (group, item, column) => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="datatable.columns" :pk="primaryKey" :refList="refList" @save-record="saveRecord" />
+                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="datatable.columns" :pk="primaryKey" :dropdownData="dropdownData" @save-record="saveRecord" />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
 

@@ -25,6 +25,13 @@ const logAction = (c) => {
     return c.Name === 'Action';
 };
 
+const showOption = (column) => {
+    const option = crudHelper.fieldValue(column, props.record);
+    if (option) {
+        return t(optionPath(props.group, props.item, column, option));
+    }
+};
+
 const groupPath = (group) => {
     return `group.${group}.label`;
 };
@@ -35,6 +42,10 @@ const itemPath = (group, item) => {
 
 const columnPath = (group, item, column) => {
     return `group.${group}.${item}.${column.Name}`;
+};
+
+const optionPath = (group, item, column, option) => {
+    return `group.${group}.${item}.options.${column.Name}.${option}`;
 };
 </script>
 
@@ -52,6 +63,9 @@ const columnPath = (group, item, column) => {
     <template v-else-if="adminOpLog && logGroup(column)">{{ t(groupPath(record.Group)) }}</template>
     <template v-else-if="adminOpLog && logItem(column)">{{ t(itemPath(record.Group, record.Item)) }}</template>
     <template v-else-if="adminOpLog && logAction(column)">{{ t(`action.${record.Action}`) }}</template>
+    <template v-else-if="crudHelper.isDropdownOptions(column)">
+        {{ showOption(column) }}
+    </template>
     <template v-else>
         {{ crudHelper.fieldValue(column, record) }}
     </template>

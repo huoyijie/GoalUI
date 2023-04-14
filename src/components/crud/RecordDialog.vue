@@ -46,6 +46,19 @@ const selected = (c) => {
     return curValue;
 };
 
+const options = (column) => {
+    const opts = [];
+    const belongTo = crudHelper.belongTo(column);
+    if (belongTo) {
+        return props.dropdownData[column.Name];
+    }
+    for (let { label, value } of props.dropdownData[column.Name]) {
+        label = t(optionPath(props.group, props.item, column, label));
+        opts.push({ label, value });
+    }
+    return opts;
+};
+
 const optionLabel = (c) => {
     const belongTo = crudHelper.belongTo(c);
     if (belongTo) {
@@ -96,6 +109,10 @@ const messagePath = (group, item) => {
     return `group.${group}.${item}.label`;
 };
 
+const optionPath = (group, item, column, option) => {
+    return `group.${group}.${item}.options.${column.Name}.${option}`;
+};
+
 const columnPath = (group, item, column) => {
     return `group.${group}.${item}.${column.Name}`;
 };
@@ -110,7 +127,7 @@ const columnPath = (group, item, column) => {
                     v-if="crudHelper.isDropdown(c)"
                     :modelValue="selected(c)"
                     @update:modelValue="updateRecord(c, $event)"
-                    :options="dropdownData[c.Name]"
+                    :options="options(c)"
                     :optionLabel="optionLabel(c)"
                     :optionValue="optionValue(c)"
                     :placeholder="dropdownPlaceholder(c)"

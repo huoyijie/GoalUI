@@ -468,16 +468,16 @@ const columnPath = (group, item, column) => {
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
-                    responsiveLayout="scroll"
+                    responsiveLayout="stack"
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
-                            <span v-if="globalSearchFields.length > 0" class="block mt-2 md:mt-0 p-input-icon-left">
+                            <span v-if="globalSearchFields.length > 0" class="block mt-3 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="`${t('crud.search')}${t(columnPath(group, item, globalSearchFields[0]))}`" />
                             </span>
-                            <Button type="button" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
+                            <Button type="button" class="mt-3 md:mt-0" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
                         </div>
                     </template>
                     <template #empty>{{ t('crud.empty') }}</template>

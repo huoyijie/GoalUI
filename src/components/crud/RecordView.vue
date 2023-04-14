@@ -40,17 +40,12 @@ const itemPath = (group, item) => {
     return `group.${group}.${item}.label`;
 };
 
-const columnPath = (group, item, column) => {
-    return `group.${group}.${item}.${column.Name}`;
-};
-
 const optionPath = (group, item, column, option) => {
     return `group.${group}.${item}.options.${column.Name}.${option}`;
 };
 </script>
 
 <template>
-    <span class="p-column-title">{{ t(columnPath(group, item, column)) }}</span>
     <template v-if="crudHelper.isSwitch(column)">
         <i class="pi" :class="{ 'pi-check-circle text-green-500 ': crudHelper.fieldValue(column, record), 'pi-times-circle text-red-500': !crudHelper.fieldValue(column, record) }"></i>
     </template>

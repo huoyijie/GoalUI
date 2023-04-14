@@ -439,6 +439,14 @@ const messagePath = (group, item) => {
 const columnPath = (group, item, column) => {
     return `group.${group}.${item}.${column.Name}`;
 };
+
+const headerStyle = (c) => {
+    if (crudHelper.isPrimary(c)) {
+        return 'width: 3rem';
+    } else {
+        return 'width: 14%; min-width: 10rem;';
+    }
+};
 </script>
 
 <template>
@@ -469,6 +477,7 @@ const columnPath = (group, item, column) => {
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
                     responsiveLayout="stack"
+                    resizableColumns
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
@@ -493,7 +502,7 @@ const columnPath = (group, item, column) => {
                             :header="t(columnPath(group, item, c))"
                             :dataType="crudHelper.dataType(c)"
                             :sortable="crudHelper.isSortable(c)"
-                            headerStyle="width:14%; min-width:10rem;"
+                            :headerStyle="headerStyle(c)"
                         >
                             <template #body="slotProps">
                                 <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
@@ -504,7 +513,7 @@ const columnPath = (group, item, column) => {
                         </Column>
                     </template>
 
-                    <Column headerStyle="min-width:15rem;">
+                    <Column headerStyle="min-width: 15rem;">
                         <template #body="slotProps">
                             <OperationGroup
                                 :group="group"

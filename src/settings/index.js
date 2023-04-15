@@ -1,4 +1,3 @@
-import menu from './app.menu.json';
 import en from './locale.en.json';
 import zh_CN from './locale.zh_CN.json';
 
@@ -9,26 +8,6 @@ export function getURL(path) {
 export function getMediaURL(path) {
     return import.meta.env.VITE_SERVER_MEDIA_PATH + path;
 }
-
-export const menuConfig = {
-    auth: {
-        role: {
-            icon: 'key'
-        },
-        session: {
-            icon: 'ticket'
-        },
-        user: {
-            icon: 'users'
-        }
-    },
-    admin: {
-        operationlog: {
-            icon: 'save'
-        }
-    },
-    ...menu
-};
 
 export const locale = {
     en,

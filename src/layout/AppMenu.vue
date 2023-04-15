@@ -4,7 +4,6 @@ import { ref, onBeforeMount } from 'vue';
 import { useRouter } from 'vue-router';
 import AppMenuItem from './AppMenuItem.vue';
 import MenuService from '@/service/MenuService';
-import { menuConfig } from '@/settings';
 
 const router = useRouter();
 const menuService = new MenuService();
@@ -20,10 +19,7 @@ onBeforeMount(() => {
         menus.value.push(home);
         for (let menu of data) {
             for (let item of menu.items) {
-                const config = (menuConfig[menu.label] || {})[item.label];
-                if (config) {
-                    item.icon = `pi pi-fw pi-${config.icon}`;
-                }
+                item.icon = `pi pi-fw pi-${item.icon}`;
                 item.to = {
                     name: 'crud',
                     params: {

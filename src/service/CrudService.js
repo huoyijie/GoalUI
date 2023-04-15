@@ -1,5 +1,4 @@
-import { getURL } from '@/settings';
-import doFetch from './FetchService';
+import doFetch, { getURL } from './FetchService';
 
 const filterOn = (filter) => {
     if (filter.value != null) {

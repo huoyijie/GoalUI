@@ -1,4 +1,10 @@
-import { getURL } from '@/settings';
+export function getURL(path) {
+    return import.meta.env.VITE_SERVER_CONTEXT_PATH + path;
+}
+
+export function getMediaURL(path) {
+    return import.meta.env.VITE_SERVER_MEDIA_PATH + path;
+}
 
 export function doRawFetch(router, path, method, body) {
     method ||= 'GET';

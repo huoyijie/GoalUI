@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { getMediaURL } from '@/settings';
+import { getMediaURL } from '@/service/FetchService';
 import CrudHelper from '@/helper/CrudHelper';
 
 const { t } = useI18n();

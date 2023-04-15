@@ -41,15 +41,40 @@ const initLazyParams = (columns) => {
 };
 const datatable = ref({
     lazy: false,
+    ctrl: false,
     columns: [],
     perms: {}
 });
+const selectedColumns = ref([]);
 const totalRecords = ref(0);
 const records = ref(null);
 const record = ref({});
 const dropdownData = ref({});
 const selectedRecords = ref(null);
 const errors = ref({});
+
+const traslateColumn = (col) => {
+    const copy = { ...col };
+    copy.label = t(columnPath(group.value, item.value, col));
+    return copy;
+};
+const selectedOptions = computed(() => {
+    return selectedColumns.value.map(traslateColumn);
+});
+const options = computed(() => {
+    return datatable.value.columns.filter((col) => !crudHelper.isHidden(col)).map(traslateColumn);
+});
+const includes = (val, col) => {
+    for (let v of val) {
+        if (v.Name == col.Name) {
+            return true;
+        }
+    }
+    return false;
+};
+const onToggle = (val) => {
+    selectedColumns.value = datatable.value.columns.filter((col) => !crudHelper.isHidden(col) && includes(val, col));
+};
 
 const resetState = () => {
     record.value = {};
@@ -89,9 +114,10 @@ const getRecordList = async (g, i, data) => {
     const recordList = await f(router, g, i, data.lazy && lazyParams.value);
     totalRecords.value = recordList.total;
     records.value = recordList.list;
-    if (data != datatable.value) {
+    if (datatable.value != data) {
         // must update columns/group/item together with records
         datatable.value = data;
+        selectedColumns.value = datatable.value.columns.filter((col) => !crudHelper.isHidden(col));
         group.value = g;
         item.value = i;
     }
@@ -483,6 +509,17 @@ const headerStyle = (c) => {
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
+                            <MultiSelect
+                                v-if="datatable.ctrl"
+                                class="mt-3 md:mt-0"
+                                :modelValue="selectedOptions"
+                                :options="options"
+                                optionLabel="label"
+                                display="chip"
+                                :maxSelectedLabels="2"
+                                @update:modelValue="onToggle"
+                                :placeholder="t('crud.selectColumns')"
+                            />
                             <span v-if="globalSearchFields.length > 0" class="block mt-3 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
                                 <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="`${t('crud.search')}${t(columnPath(group, item, globalSearchFields[0]))}`" />
@@ -494,9 +531,8 @@ const headerStyle = (c) => {
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                    <template v-for="c in datatable.columns" :key="c.Name">
+                    <template v-for="c in selectedColumns" :key="c.Name">
                         <Column
-                            v-if="!crudHelper.isHidden(c)"
                             :field="crudHelper.filterField(c)"
                             :filterField="crudHelper.filterField(c)"
                             :showFilterMatchModes="showFilterMatchModes(c)"

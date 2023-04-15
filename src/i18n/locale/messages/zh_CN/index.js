@@ -33,6 +33,7 @@ export default {
         manage: '管理',
         search: '搜索',
         empty: '没有找到数据',
+        selectColumns: '选择显示列',
         topToolbar: {
             new: '新建',
             delete: '删除',

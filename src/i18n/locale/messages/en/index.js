@@ -36,6 +36,7 @@ export default {
         manage: 'Manage ',
         search: 'Search ',
         empty: 'No data found.',
+        selectColumns: 'Select columns to display',
         topToolbar: {
             new: 'New',
             delete: 'Delete',

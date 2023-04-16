@@ -1,8 +1,13 @@
 import { createI18n } from 'vue-i18n';
-import messagesEn from './locales/messages/en';
-import messagesZh_CN from './locales/messages/zh_CN';
 import primeEn from './locales/primevue/en.json';
 import primeZh_CN from './locales/primevue/zh_CN.json';
+import en from './locales/messages/en.json';
+import zh_CN from './locales/messages/zh_CN.json';
+import settingEn from '@/settings/en.json';
+import settingZh_CN from '@/settings/zh_CN.json';
+
+en.group = { ...en.group, ...settingEn };
+zh_CN.group = { ...zh_CN.group, ...settingZh_CN };
 
 const lang = localStorage.getItem('lang') || import.meta.env.VITE_DEFAULT_LANG || 'en';
 
@@ -11,8 +16,8 @@ const i18n = createI18n({
     locale: lang,
     fallbackLocale: 'en',
     messages: {
-        en: messagesEn,
-        zh_CN: messagesZh_CN
+        en,
+        zh_CN
     }
 });
 i18n.global.langs = [

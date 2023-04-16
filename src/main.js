@@ -115,7 +115,7 @@ const app = createApp(App);
 
 app.use(router);
 app.use(i18n);
-app.use(PrimeVue, i18n.primevue);
+app.use(PrimeVue, i18n.global.primevue);
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);

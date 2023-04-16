@@ -25,7 +25,7 @@ i18n.global.langs = [
     { name: '简体中文', value: 'zh_CN' }
 ];
 i18n.global.primevue = {
-    locale: lang === 'en' ? primeEn : primeZh_CN
+    locale: messages[lang]
 };
 
 i18n.global.setLang = (primevue, lang) => {

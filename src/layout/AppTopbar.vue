@@ -15,11 +15,8 @@ const router = useRouter();
 const primevue = usePrimeVue();
 const i18n = useI18n();
 const { t } = i18n;
+const langs = ref(i18n.langs);
 const selectedLang = ref(i18n.locale.value);
-const langs = ref([
-    { name: 'EN', value: 'en' },
-    { name: '简体中文', value: 'zh_CN' }
-]);
 
 const authService = new AuthService();
 const outsideClickListener = ref(null);
@@ -109,14 +106,11 @@ const onTopBarMenuButton = () => {
 };
 const onSwitchLang = () => {
     topbarMenuActive.value = false;
-    switchLangDialog.value = false;
     switchLangDialog.value = true;
 };
 const changeLang = () => {
     if (selectedLang.value) {
-        i18n.locale.value = selectedLang.value;
-        primevue.config.locale = primevue.config[selectedLang.value];
-        localStorage.setItem('lang', selectedLang.value);
+        i18n.setLang(primevue, selectedLang.value);
     } else {
         selectedLang.value = i18n.locale.value;
     }

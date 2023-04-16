@@ -110,25 +110,12 @@ import RecordView from './components/crud/RecordView.vue';
 import FilterView from './components/crud/FilterView.vue';
 
 import '@/assets/styles.scss';
-import primeEn from '@/i18n/locale/prime/en';
-import primeZh_CN from '@/i18n/locale/prime/zh_CN';
-
-const lang = localStorage.getItem('lang') || 'zh_CN';
-
-const primeConfig = {
-    ripple: true,
-    en: primeEn,
-    zh_CN: primeZh_CN
-};
 
 const app = createApp(App);
 
 app.use(router);
-app.use(PrimeVue, {
-    ...primeConfig,
-    locale: primeConfig[lang]
-});
 app.use(i18n);
+app.use(PrimeVue, i18n.primevue);
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);

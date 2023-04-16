@@ -18,15 +18,15 @@ export function doRawFetch(router, path, method, body) {
         body
     }).then((res) => {
         if (res.status === 401) {
-            router.push({ name: 'signin' });
+            router && router.push({ name: 'signin' });
             return;
         }
         if (res.status === 403) {
-            router.push({ name: 'denied' });
+            router && router.push({ name: 'denied' });
             return;
         }
         if (res.status === 500) {
-            router.push({ name: 'error' });
+            router && router.push({ name: 'error' });
             return;
         }
         return res.json();

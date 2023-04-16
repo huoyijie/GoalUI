@@ -3,11 +3,12 @@ import primeEn from './locales/primevue/en.json';
 import primeZh_CN from './locales/primevue/zh_CN.json';
 import en from './locales/messages/en.json';
 import zh_CN from './locales/messages/zh_CN.json';
-import settingEn from '@/settings/en.json';
-import settingZh_CN from '@/settings/zh_CN.json';
+import LocaleService from '@/service/LocaleService';
 
-en.group = { ...en.group, ...settingEn };
-zh_CN.group = { ...zh_CN.group, ...settingZh_CN };
+const localeService = new LocaleService();
+const locale = await localeService.getLocale();
+en.group = { ...en.group, ...locale.en };
+zh_CN.group = { ...zh_CN.group, ...locale.zh_CN };
 
 const lang = localStorage.getItem('lang') || import.meta.env.VITE_DEFAULT_LANG || 'en';
 

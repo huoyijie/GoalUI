@@ -463,7 +463,7 @@ const messagePath = (group, item) => {
 };
 
 const columnPath = (group, item, column) => {
-    return `group.${group}.${item}.${column.Name}`;
+    return `group.${group}.${item}.fields.${column.Name}`;
 };
 
 const headerStyle = (c) => {

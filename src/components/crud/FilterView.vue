@@ -49,7 +49,7 @@ const optionPath = (group, item, column, option) => {
 };
 
 const columnPath = (group, item, column) => {
-    return `group.${group}.${item}.${column.Name}`;
+    return `group.${group}.${item}.fields.${column.Name}`;
 };
 </script>
 

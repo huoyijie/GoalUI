@@ -1,5 +1,4 @@
 <script setup>
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import CrudHelper from '@/helper/CrudHelper';
 
@@ -9,39 +8,13 @@ const crudHelper = new CrudHelper();
 const props = defineProps(['group', 'item', 'column', 'dropdownData', 'modelValue']);
 const $emit = defineEmits(['update:modelValue']);
 
-const adminOpLog = computed(() => {
-    return props.group == 'admin' && props.item === 'operationlog';
-});
-
 const options = (column) => {
     const opts = [];
     for (let { label, value } of props.dropdownData[column.Name]) {
-        if (adminOpLog.value) {
-            switch (column.Name) {
-                case 'Group': {
-                    label = t(groupPath(label));
-                    break;
-                }
-                case 'Item': {
-                    label = t(groupPath(label));
-                    value = value.split('.')[1];
-                    break;
-                }
-                case 'Action': {
-                    label = t(`action.${label}`);
-                    break;
-                }
-            }
-        } else {
-            label = t(optionPath(props.group, props.item, column, label));
-        }
+        label = t(optionPath(props.group, props.item, column, label));
         opts.push({ label, value });
     }
     return opts;
-};
-
-const groupPath = (group) => {
-    return `group.${group}.label`;
 };
 
 const optionPath = (group, item, column, option) => {

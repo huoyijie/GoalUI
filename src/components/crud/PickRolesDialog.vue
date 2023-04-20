@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-defineProps(['authUser', 'visible', 'modelValue', 'yes']);
+defineProps(['authUser', 'visible', 'modelValue', 'yes', 'disabled']);
 defineEmits(['update:visible', 'update:modelValue']);
 </script>
 
@@ -18,7 +18,7 @@ defineEmits(['update:visible', 'update:modelValue']);
         </PickList>
         <template #footer>
             <Button :label="t('crud.pickRolesDialog.cancel')" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
-            <Button :label="t('crud.pickRolesDialog.save')" icon="pi pi-check" class="p-button-text" @click="yes" />
+            <Button :label="t('crud.pickRolesDialog.save')" icon="pi pi-check" class="p-button-text" @click="yes" :disabled="disabled" />
         </template>
     </Dialog>
 </template>

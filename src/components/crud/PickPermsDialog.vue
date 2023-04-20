@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
 
-defineProps(['authRole', 'modelValue', 'visible', 'yes']);
+defineProps(['authRole', 'modelValue', 'visible', 'yes', 'disabled']);
 defineEmits(['update:modelValue', 'update:visible']);
 
 const messagePath = (group, item) => {
@@ -22,7 +22,7 @@ const messagePath = (group, item) => {
         </PickList>
         <template #footer>
             <Button :label="t('crud.pickPermsDialog.cancel')" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
-            <Button :label="t('crud.pickPermsDialog.save')" icon="pi pi-check" class="p-button-text" @click="yes" />
+            <Button :label="t('crud.pickPermsDialog.save')" icon="pi pi-check" class="p-button-text" @click="yes" :disabled="disabled" />
         </template>
     </Dialog>
 </template>

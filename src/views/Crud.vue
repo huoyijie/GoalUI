@@ -210,6 +210,8 @@ const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
 const pickPermsDialog = ref(false);
 const pickRolesDialog = ref(false);
+const btnPickPermsDisabled = ref(false);
+const btnPickRolesDisabled = ref(false);
 
 const pickPermsValue = ref([[], []]);
 const pickPerms = async (pickRecord) => {
@@ -219,9 +221,11 @@ const pickPerms = async (pickRecord) => {
     pickPermsDialog.value = true;
 };
 const changePerms = async () => {
+    btnPickPermsDisabled.value = true;
     await authService.changePerms(router, record.value[primaryKey.value], pickPermsValue.value[1]);
     record.value = {};
     pickPermsDialog.value = false;
+    btnPickPermsDisabled.value = false;
 };
 
 const pickRolesValue = ref([[], []]);
@@ -232,9 +236,11 @@ const pickRoles = async (pickRecord) => {
     pickRolesDialog.value = true;
 };
 const changeRoles = async () => {
+    btnPickRolesDisabled.value = true;
     await authService.changeRoles(router, record.value[primaryKey.value], pickRolesValue.value[1]);
     record.value = {};
     pickRolesDialog.value = false;
+    btnPickRolesDisabled.value = false;
 };
 
 const primaryKey = computed(() => {
@@ -567,9 +573,9 @@ const headerStyle = (c) => {
 
                 <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="datatable.columns" :pk="primaryKey" :dropdownData="dropdownData" @save-record="saveRecord" />
 
-                <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :yes="changePerms" />
+                <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :disabled="btnPickPermsDisabled" :yes="changePerms" />
 
-                <PickRolesDialog :authUser="authUser" v-model:visible="pickRolesDialog" v-model="pickRolesValue" :yes="changeRoles" />
+                <PickRolesDialog :authUser="authUser" v-model:visible="pickRolesDialog" v-model="pickRolesValue" :yes="changeRoles" :disabled="btnPickRolesDisabled" />
 
                 <ConfirmDelDialog :group="group" :item="item" :record="record" :pk="primaryKey" v-model:visible="deleteRecordDialog" v-model="deleteRecordsDialog" @delete-record="deleteRecord" @delete-records="deleteSelectedRecords" />
             </div>

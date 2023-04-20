@@ -206,6 +206,7 @@ onBeforeRouteUpdate((to) => {
 });
 
 const recordDialog = ref(false);
+const btnSaveRecordDisabled = ref(false);
 const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
 const pickPermsDialog = ref(false);
@@ -384,6 +385,7 @@ const openNew = async () => {
 };
 
 const saveRecord = async () => {
+    btnSaveRecordDisabled.value = true;
     errors.value = {};
 
     // validate forms
@@ -392,6 +394,7 @@ const saveRecord = async () => {
         for (let err of v$.value.$errors) {
             errors.value[err.$property] = err.$message;
         }
+        btnSaveRecordDisabled.value = false;
         return;
     }
 
@@ -403,6 +406,7 @@ const saveRecord = async () => {
         if (exist) {
             if (exist[primaryKey.value] != record.value[primaryKey.value]) {
                 errors.value[c.Name] = t('validations.used');
+                btnSaveRecordDisabled.value = false;
                 return;
             }
         }
@@ -424,6 +428,7 @@ const saveRecord = async () => {
     }
 
     recordDialog.value = false;
+    btnSaveRecordDisabled.value = false;
     record.value = {};
     errors.value = {};
 };
@@ -571,7 +576,18 @@ const headerStyle = (c) => {
                     </Column>
                 </DataTable>
 
-                <RecordDialog v-model:visible="recordDialog" v-model:record="record" v-model:errors="errors" :group="group" :item="item" :columns="datatable.columns" :pk="primaryKey" :dropdownData="dropdownData" @save-record="saveRecord" />
+                <RecordDialog
+                    v-model:visible="recordDialog"
+                    v-model:record="record"
+                    v-model:errors="errors"
+                    :group="group"
+                    :item="item"
+                    :columns="datatable.columns"
+                    :pk="primaryKey"
+                    :dropdownData="dropdownData"
+                    @save-record="saveRecord"
+                    :disabled="btnSaveRecordDisabled"
+                />
 
                 <PickPermsDialog :authRole="authRole" v-model:visible="pickPermsDialog" v-model="pickPermsValue" :disabled="btnPickPermsDisabled" :yes="changePerms" />
 

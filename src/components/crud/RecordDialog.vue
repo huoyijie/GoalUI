@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'errors']);
+const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'errors', 'disabled']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
@@ -180,7 +180,7 @@ const columnPath = (group, item, column) => {
         </div>
         <template #footer>
             <Button :label="t('crud.recordDialog.cancel')" icon="pi pi-times" class="p-button-text" @click="$emit('update:visible', false)" />
-            <Button :label="t('crud.recordDialog.save')" icon="pi pi-check" class="p-button-text" @click="$emit('save-record')" />
+            <Button :label="t('crud.recordDialog.save')" icon="pi pi-check" class="p-button-text" @click="$emit('save-record')" :disabled="disabled" />
         </template>
     </Dialog>
 </template>

@@ -206,7 +206,23 @@ onBeforeRouteUpdate((to) => {
 });
 
 const recordDialog = ref(false);
-const btnSaveRecordDisabled = ref(false);
+const btnSaveRecordClicked = ref(false);
+const btnSaveRecordDisabled = computed(() => {
+    const pk = primaryKey.value;
+    if (record.value[pk]) {
+        if (btnSaveRecordClicked.value) {
+            return true;
+        }
+        for (let r of records.value) {
+            if (r[pk] == record.value[pk]) {
+                return JSON.stringify(r) == JSON.stringify(record.value);
+            }
+        }
+        return true;
+    } else {
+        return btnSaveRecordClicked.value;
+    }
+});
 const deleteRecordDialog = ref(false);
 const deleteRecordsDialog = ref(false);
 const pickPermsDialog = ref(false);
@@ -385,7 +401,7 @@ const openNew = async () => {
 };
 
 const saveRecord = async () => {
-    btnSaveRecordDisabled.value = true;
+    btnSaveRecordClicked.value = true;
     errors.value = {};
 
     // validate forms
@@ -394,7 +410,7 @@ const saveRecord = async () => {
         for (let err of v$.value.$errors) {
             errors.value[err.$property] = err.$message;
         }
-        btnSaveRecordDisabled.value = false;
+        btnSaveRecordClicked.value = false;
         return;
     }
 
@@ -406,7 +422,7 @@ const saveRecord = async () => {
         if (exist) {
             if (exist[primaryKey.value] != record.value[primaryKey.value]) {
                 errors.value[c.Name] = t('validations.used');
-                btnSaveRecordDisabled.value = false;
+                btnSaveRecordClicked.value = false;
                 return;
             }
         }
@@ -428,7 +444,7 @@ const saveRecord = async () => {
     }
 
     recordDialog.value = false;
-    btnSaveRecordDisabled.value = false;
+    btnSaveRecordClicked.value = false;
     record.value = {};
     errors.value = {};
 };

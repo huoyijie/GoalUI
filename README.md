@@ -2,11 +2,6 @@
 [Goal](https://github.com/huoyijie/Goal) is a lightweight web framework like Django written in Golang.
 [GoalUI](https://github.com/huoyijie/GoalUI)
 
-## TODO
-
-signin validate messages
-except crud, add another page cud, recently action
-
 ## Recommended IDE Setup
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
@@ -19,6 +14,26 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ```sh
 npm install
+```
+
+### create file .env.`mode`.local
+
+```
+# file: .env.development
+VITE_DEFAULT_LANG=en
+VITE_SERVER=http://127.0.0.1:8100
+VITE_SERVER_MEDIA_PATH=$VITE_SERVER/
+VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
+```
+
+and
+
+```
+# file: .env.production.local
+VITE_DEFAULT_LANG=en
+VITE_SERVER=http://127.0.0.1:8100
+VITE_SERVER_MEDIA_PATH=$VITE_SERVER/
+VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 ```
 
 ### Compile and Hot-Reload for Development
@@ -37,13 +52,4 @@ npm run build
 
 ```sh
 npm run lint
-```
-
-## .env.development
-
-```
-VITE_DEFAULT_LANG=en
-VITE_SERVER=http://127.0.0.1:8100
-VITE_SERVER_MEDIA_PATH=$VITE_SERVER/
-VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 ```

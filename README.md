@@ -42,6 +42,8 @@ VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 npm run dev
 ```
 
+Open web browser and access `http://127.0.0.1:4000`.
+
 ### Compile and Minify for Production
 
 ```sh

@@ -19,7 +19,7 @@ npm install
 ### create file .env.`mode`.local
 
 ```
-# file: .env.development
+# file: .env.development.local
 VITE_DEFAULT_LANG=en
 VITE_SERVER=http://127.0.0.1:8100
 VITE_SERVER_MEDIA_PATH=$VITE_SERVER/

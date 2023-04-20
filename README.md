@@ -12,8 +12,13 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
-```sh
-npm install
+```bash
+$ node -v
+v18.15.0
+```
+
+```bash
+$ npm install
 ```
 
 ### create file .env.`mode`.local
@@ -38,20 +43,20 @@ VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 
 ### Compile and Hot-Reload for Development
 
-```sh
-npm run dev
+```bash
+$ npm run dev
 ```
 
 Open web browser and access `http://127.0.0.1:4000`.
 
 ### Compile and Minify for Production
 
-```sh
-npm run build
+```bash
+$ npm run build
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
 
-```sh
-npm run lint
+```bash
+$ npm run lint
 ```

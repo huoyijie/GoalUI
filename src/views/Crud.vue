@@ -361,6 +361,9 @@ const rules = computed(() => {
                         } else {
                             rules[column.Name].maxValue = maxValue(parts[1]);
                         }
+                    } else if (parts[0] === 'len') {
+                        rules[column.Name].minLength = minLength(parts[1]);
+                        rules[column.Name].maxLength = maxLength(parts[1]);
                     }
                 }
             }

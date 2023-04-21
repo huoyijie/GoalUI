@@ -137,24 +137,35 @@ export default class CrudHelper {
         return c.Component.Tag.BelongTo;
     }
 
+    hasOne(c) {
+        return c.Component.Tag.HasOne;
+    }
+
     filterField(c) {
         const bt = this.belongTo(c);
+        const ho = this.hasOne(c);
         if (bt) {
             return `${bt.Name}.${bt.Field}`;
+        } else if (ho) {
+            return `${ho.Name}.${ho.Field}`;
         } else {
             return c.Name;
         }
     }
 
     fieldValue(c, data) {
-        const belongTo = this.belongTo(c);
-        if (belongTo) {
-            return data[c.Name][belongTo.Field];
+        const bt = this.belongTo(c);
+        const ho = this.hasOne(c);
+        if (bt) {
+            return data[c.Name][bt.Field];
+        } else if (ho) {
+            return data[c.Name][ho.Field];
+        } else {
+            return data[c.Name];
         }
-        return data[c.Name];
     }
 
     isDropdownOptions(c) {
-        return this.isDropdown(c) && !this.belongTo(c);
+        return this.isDropdown(c) && !(this.belongTo(c) || this.hasOne(c));
     }
 }

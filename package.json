@@ -2,7 +2,7 @@
     "name": "goal-ui",
     "version": "0.1.0",
     "scripts": {
-        "dev": "vite",
+        "dev": "vite --port 4000",
         "build": "vite build",
         "preview": "vite preview",
         "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"

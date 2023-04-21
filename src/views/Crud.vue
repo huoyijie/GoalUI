@@ -381,9 +381,13 @@ const dropdowns = (columns) => {
 
 const loadDropdown = async (g, i, data) => {
     for (let dropdown of dropdowns(data.columns)) {
-        const belongTo = crudHelper.belongTo(dropdown);
-        if (belongTo) {
-            const recordList = await crudService.get(router, belongTo.Pkg, belongTo.Name);
+        const bt = crudHelper.belongTo(dropdown);
+        const ho = crudHelper.hasOne(dropdown);
+        if (bt) {
+            const recordList = await crudService.get(router, bt.Pkg, bt.Name);
+            dropdownData.value[dropdown.Name] = recordList.list;
+        } else if (ho) {
+            const recordList = await crudService.get(router, ho.Pkg, ho.Name);
             dropdownData.value[dropdown.Name] = recordList.list;
         } else {
             dropdownData.value[dropdown.Name] = await crudService.select(router, g, i, dropdown.Name);

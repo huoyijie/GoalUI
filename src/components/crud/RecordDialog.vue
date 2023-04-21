@@ -28,11 +28,19 @@ const isEditRecord = computed(() => {
 
 const selected = (c) => {
     let curValue = props.record[c.Name];
-    const belongTo = crudHelper.belongTo(c);
-    if (belongTo) {
+    const bt = crudHelper.belongTo(c);
+    const ho = crudHelper.hasOne(c);
+    if (bt) {
         curValue ||= {};
         for (let option of props.dropdownData[c.Name]) {
-            if (curValue[belongTo.Field] === option[belongTo.Field]) {
+            if (curValue[bt.Field] === option[bt.Field]) {
+                return option;
+            }
+        }
+    } else if (ho) {
+        curValue ||= {};
+        for (let option of props.dropdownData[c.Name]) {
+            if (curValue[ho.Field] === option[ho.Field]) {
                 return option;
             }
         }
@@ -48,8 +56,9 @@ const selected = (c) => {
 
 const options = (column) => {
     const opts = [];
-    const belongTo = crudHelper.belongTo(column);
-    if (belongTo) {
+    const bt = crudHelper.belongTo(column);
+    const ho = crudHelper.hasOne(column);
+    if (bt || ho) {
         return props.dropdownData[column.Name];
     }
     for (let { label, value } of props.dropdownData[column.Name]) {
@@ -60,25 +69,32 @@ const options = (column) => {
 };
 
 const optionLabel = (c) => {
-    const belongTo = crudHelper.belongTo(c);
-    if (belongTo) {
-        return belongTo.Field;
+    const bt = crudHelper.belongTo(c);
+    const ho = crudHelper.hasOne(c);
+    if (bt) {
+        return bt.Field;
+    } else if (ho) {
+        return ho.Field;
     } else {
         return 'label';
     }
 };
 
 const optionValue = (c) => {
-    const belongTo = crudHelper.belongTo(c);
-    if (!belongTo) {
+    const bt = crudHelper.belongTo(c);
+    const ho = crudHelper.hasOne(c);
+    if (!(bt || ho)) {
         return 'value';
     }
 };
 
 const dropdownPlaceholder = (c) => {
-    const belongTo = crudHelper.belongTo(c);
-    if (belongTo) {
-        return `${t('crud.recordDialog.select')}${t(messagePath(belongTo.Pkg, belongTo.Name.toLowerCase()))}`;
+    const bt = crudHelper.belongTo(c);
+    const ho = crudHelper.hasOne(c);
+    if (bt) {
+        return `${t('crud.recordDialog.select')}${t(messagePath(bt.Pkg, bt.Name.toLowerCase()))}`;
+    } else if (ho) {
+        return `${t('crud.recordDialog.select')}${t(messagePath(ho.Pkg, ho.Name.toLowerCase()))}`;
     } else {
         return `${t('crud.recordDialog.select')}${t(columnPath(props.group, props.item, c))}`;
     }

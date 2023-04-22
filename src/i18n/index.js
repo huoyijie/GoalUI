@@ -1,14 +1,14 @@
 import { createI18n } from 'vue-i18n';
 import primeEn from './locales/primevue/en.json';
-import primeZh_CN from './locales/primevue/zh_CN.json';
+import primeZhCN from './locales/primevue/zh-CN.json';
 import en from './locales/messages/en.json';
-import zh_CN from './locales/messages/zh_CN.json';
+import zhCN from './locales/messages/zh-CN.json';
 import LocaleService from '@/service/LocaleService';
 
 const localeService = new LocaleService();
 const locale = await localeService.getLocale();
 en.group = { ...en.group, ...locale.en };
-zh_CN.group = { ...zh_CN.group, ...locale.zh_CN };
+zhCN.group = { ...zhCN.group, ...locale['zh-CN'] };
 
 const lang = localStorage.getItem('lang') || import.meta.env.VITE_DEFAULT_LANG || 'en';
 
@@ -60,17 +60,17 @@ const i18n = createI18n({
     },
     messages: {
         en,
-        zh_CN
+        'zh-CN': zhCN
     }
 });
 i18n.global.langs = [
     { name: 'EN', value: 'en' },
-    { name: '简体中文', value: 'zh_CN' }
+    { name: '简体中文', value: 'zh-CN' }
 ];
 i18n.global.primevue = {
     messages: {
         en: primeEn,
-        zh_CN: primeZh_CN
+        'zh-CN': primeZhCN
     }
 };
 const { primevue } = i18n.global;

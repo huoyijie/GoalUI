@@ -25,7 +25,7 @@ const optionPath = (group, item, column, option) => {
         <i class="pi" :class="{ 'pi-check-circle text-green-500 ': crudHelper.fieldValue(column, record), 'pi-times-circle text-red-500': !crudHelper.fieldValue(column, record) }"></i>
     </template>
     <template v-else-if="crudHelper.isCalendar(column)">
-        {{ d(crudHelper.fieldValue(column, record), crudHelper.isShowTime(column) ? 'datetime' : 'date', 'zh-CN') }}
+        {{ d(crudHelper.fieldValue(column, record), crudHelper.isShowTime(column) ? 'datetime' : 'date') }}
     </template>
     <template v-else-if="crudHelper.isFile(column)">
         <span class="text-right w-9">

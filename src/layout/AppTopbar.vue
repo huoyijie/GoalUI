@@ -220,7 +220,7 @@ const isOutsideClicked = (event) => {
         <div class="container text-left">
             <div class="grid">
                 <div class="col col-6"><i class="pi pi-mobile"></i> ID:</div>
-                <div class="col col-6"><Badge :value="userinfo.ID"></Badge></div>
+                <div class="col col-6">{{ userinfo.ID }}</div>
                 <div class="col-6"><i class="pi pi-user"></i> {{ t('appTopbar.username') }}:</div>
                 <div class="col-6">{{ userinfo.Username }}</div>
                 <div class="col-6"><i class="pi pi-inbox"></i> {{ t('appTopbar.email') }}:</div>

@@ -27,11 +27,9 @@
         "showing": "显示",
         "to": "至",
         "total": "共计",
-        "clear": "清空",
         "manage": "管理",
         "search": "搜索",
         "empty": "没有找到数据",
-        "selectColumns": "选择显示列",
         "topToolbar": {
             "new": "新建",
             "delete": "删除",

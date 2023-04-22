@@ -544,21 +544,9 @@ const headerStyle = (c) => {
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
-                            <MultiSelect
-                                v-if="datatable.ctrl"
-                                class="app-column-select"
-                                :modelValue="selectedOptions"
-                                :options="options"
-                                optionLabel="label"
-                                display="chip"
-                                :maxSelectedLabels="2"
-                                @update:modelValue="onToggle"
-                                :placeholder="t('crud.selectColumns')"
-                            >
-                                <template v-slot:value></template>
-                            </MultiSelect>
+                            <MultiSelect v-if="datatable.ctrl" class="app-column-select mt-3 md:m-0" :modelValue="selectedOptions" :options="options" optionLabel="label" @update:modelValue="onToggle" />
                             <div class="flex-1"></div>
-                            <div v-if="globalSearchFields.length > 0" class="p-inputgroup flex-1">
+                            <div v-if="globalSearchFields.length > 0" class="p-inputgroup flex-1 mt-3 md:m-0">
                                 <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="`${t('crud.search')}${t(columnPath(group, item, globalSearchFields[0]))}`" />
                                 <Button type="button" icon="pi pi-times" outlined @click="clearFilters" />
                             </div>

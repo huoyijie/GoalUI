@@ -28,16 +28,16 @@ const optionPath = (group, item, column, option) => {
         {{ d(crudHelper.fieldValue(column, record), crudHelper.isShowTime(column) ? 'datetime' : 'date', 'zh-CN') }}
     </template>
     <template v-else-if="crudHelper.isFile(column)">
-        <span class="text-right word-break w-9">
+        <span class="text-right w-9">
             <a :href="getMediaURL(crudHelper.fieldValue(column, record))" target="_blank" class="text-blue-600">
                 {{ crudHelper.fieldValue(column, record) }}
             </a>
         </span>
     </template>
     <template v-else-if="crudHelper.isDropdownOptions(column)">
-        <span class="text-right word-break w-9">{{ showOption(column) }}</span>
+        <span class="text-right w-9">{{ showOption(column) }}</span>
     </template>
     <template v-else>
-        <span class="text-right word-break w-9">{{ crudHelper.fieldValue(column, record) }}</span>
+        <span class="text-right w-9">{{ crudHelper.fieldValue(column, record) }}</span>
     </template>
 </template>

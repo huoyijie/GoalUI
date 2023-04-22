@@ -555,9 +555,7 @@ const headerStyle = (c) => {
                                 @update:modelValue="onToggle"
                                 :placeholder="t('crud.selectColumns')"
                             >
-                                <template v-slot:value>
-                                    
-                                </template>
+                                <template v-slot:value></template>
                             </MultiSelect>
                             <div class="flex-1"></div>
                             <div v-if="globalSearchFields.length > 0" class="p-inputgroup flex-1">
@@ -571,7 +569,9 @@ const headerStyle = (c) => {
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                    <Column v-for="c in selectedColumns" :key="c.Name"
+                    <Column
+                        v-for="c in selectedColumns"
+                        :key="c.Name"
                         :field="crudHelper.filterField(c)"
                         :filterField="crudHelper.filterField(c)"
                         :showFilterMatchModes="showFilterMatchModes(c)"

@@ -22,8 +22,16 @@ const btnDeleteDisabled = computed(() => {
 </script>
 
 <template>
-    <Button v-if="authRole" icon="pi pi-key" class="p-button-rounded p-button-primary mr-2" @click="$emit('pick-perms')" :disabled="btnPickPermsDisabled" />
-    <Button v-if="authUser" icon="pi pi-users" class="p-button-rounded p-button-primary mr-2" @click="$emit('pick-roles')" :disabled="btnPickRolesDisabled" />
-    <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="$emit('change-record')" :disabled="btnChangeDisabled" />
-    <Button icon="pi pi-trash" class="p-button-rounded p-button-warning" @click="$emit('delete-record')" :disabled="btnDeleteDisabled" />
+    <Button v-if="authRole" icon="pi pi-key" size="small" severity="primary" class="app-record-operation mr-2" @click="$emit('pick-perms')" :disabled="btnPickPermsDisabled"></Button>
+    <Button v-if="authUser" icon="pi pi-users" size="small" severity="primary" class="app-record-operation mr-2" @click="$emit('pick-roles')" :disabled="btnPickRolesDisabled"></Button>
+    <Button icon="pi pi-pencil" size="small" severity="success" class="app-record-operation mr-2" @click="$emit('change-record')" :disabled="btnChangeDisabled"></Button>
+    <Button icon="pi pi-trash" size="small" severity="warning" class="app-record-operation" @click="$emit('delete-record')" :disabled="btnDeleteDisabled"></Button>
 </template>
+
+<style scoped lang="scss">
+.app-record-operation {
+    width: 2rem;
+    height: 2rem;
+    border: 0 none;
+}
+</style>

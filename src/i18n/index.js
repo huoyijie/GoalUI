@@ -16,6 +16,32 @@ const i18n = createI18n({
     legacy: false,
     locale: lang,
     fallbackLocale: 'en',
+    datetimeFormats: {
+        'en': {
+            date: {
+                year: 'numeric', month: 'short', day: 'numeric'
+            },
+            time: {
+                hour: 'numeric', minute: 'numeric', second: 'numeric'
+            },
+            datetime: {
+                year: 'numeric', month: 'short', day: 'numeric',
+                hour: 'numeric', minute: 'numeric', second: 'numeric'
+            }
+        },
+        'zh-CN': {
+            date: {
+                year: 'numeric', month: 'numeric', day: 'numeric'
+            },
+            time: {
+                hour: 'numeric', minute: 'numeric', second: 'numeric'
+            },
+            datetime: {
+                year: 'numeric', month: 'numeric', day: 'numeric',
+                hour: 'numeric', minute: 'numeric', second: 'numeric'
+            }
+        }
+    },
     messages: {
         en,
         zh_CN

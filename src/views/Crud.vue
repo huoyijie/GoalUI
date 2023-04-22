@@ -505,13 +505,14 @@ const headerStyle = (c) => {
                     :rowsPerPageOptions="[5, 10, 25]"
                     :currentPageReportTemplate="`${t('crud.showing')} {first} ${t('crud.to')} {last}, ${t('crud.total')} {totalRecords} ${t(messagePath(group, item), 2)}`"
                     responsiveLayout="stack"
+                    striped-rows
                 >
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                             <h5 class="m-0">{{ t('crud.manage') }}{{ t(messagePath(group, item)) }}</h5>
                             <MultiSelect
                                 v-if="datatable.ctrl"
-                                class="mt-3 md:mt-0"
+                                class="app-column-select"
                                 :modelValue="selectedOptions"
                                 :options="options"
                                 optionLabel="label"
@@ -519,38 +520,41 @@ const headerStyle = (c) => {
                                 :maxSelectedLabels="2"
                                 @update:modelValue="onToggle"
                                 :placeholder="t('crud.selectColumns')"
-                            />
-                            <span v-if="globalSearchFields.length > 0" class="block mt-3 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search" />
+                            >
+                                <template v-slot:value>
+                                    
+                                </template>
+                            </MultiSelect>
+                            <div class="flex-1"></div>
+                            <div v-if="globalSearchFields.length > 0" class="p-inputgroup flex-1">
                                 <InputText :modelValue="globalFilterModel" @update:modelValue="onSearch" :placeholder="`${t('crud.search')}${t(columnPath(group, item, globalSearchFields[0]))}`" />
-                            </span>
-                            <Button type="button" class="mt-3 md:mt-0" icon="pi pi-filter-slash" :label="t('crud.clear')" outlined severity="info" @click="clearFilters" />
+                                <Button type="button" icon="pi pi-times" outlined @click="clearFilters" />
+                            </div>
                         </div>
                     </template>
+
                     <template #empty>{{ t('crud.empty') }}</template>
 
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                    <template v-for="c in selectedColumns" :key="c.Name">
-                        <Column
-                            :field="crudHelper.filterField(c)"
-                            :filterField="crudHelper.filterField(c)"
-                            :showFilterMatchModes="showFilterMatchModes(c)"
-                            :header="t(columnPath(group, item, c))"
-                            :dataType="crudHelper.dataType(c)"
-                            :sortable="crudHelper.isSortable(c)"
-                            :headerStyle="headerStyle(c)"
-                        >
-                            <template #body="slotProps">
-                                <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
-                            </template>
-                            <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
-                                <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" :dropdownData="dropdownData" />
-                            </template>
-                        </Column>
-                    </template>
+                    <Column v-for="c in selectedColumns" :key="c.Name"
+                        :field="crudHelper.filterField(c)"
+                        :filterField="crudHelper.filterField(c)"
+                        :showFilterMatchModes="showFilterMatchModes(c)"
+                        :header="t(columnPath(group, item, c))"
+                        :dataType="crudHelper.dataType(c)"
+                        :sortable="crudHelper.isSortable(c)"
+                        :headerStyle="headerStyle(c)"
+                    >
+                        <template #body="slotProps">
+                            <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
+                        </template>
+                        <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
+                            <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" :dropdownData="dropdownData" />
+                        </template>
+                    </Column>
 
-                    <Column headerStyle="min-width: 15rem;">
+                    <Column header=" " headerStyle="min-width: 15rem;">
                         <template #body="slotProps">
                             <OperationGroup
                                 :group="group"
@@ -577,4 +581,13 @@ const headerStyle = (c) => {
     </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style lang="scss">
+.app-column-select {
+    height: 1.25rem;
+    border: none;
+    background: transparent;
+    .p-multiselect-label-container {
+        display: none;
+    }
+}
+</style>

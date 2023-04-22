@@ -3,7 +3,7 @@ import { useI18n } from 'vue-i18n';
 import { getMediaURL } from '@/service/FetchService';
 import CrudHelper from '@/helper/CrudHelper';
 
-const { t } = useI18n();
+const { t, d } = useI18n();
 const crudHelper = new CrudHelper();
 
 const props = defineProps(['group', 'item', 'column', 'record']);
@@ -25,7 +25,7 @@ const optionPath = (group, item, column, option) => {
         <i class="pi" :class="{ 'pi-check-circle text-green-500 ': crudHelper.fieldValue(column, record), 'pi-times-circle text-red-500': !crudHelper.fieldValue(column, record) }"></i>
     </template>
     <template v-else-if="crudHelper.isCalendar(column)">
-        <Calendar :modelValue="crudHelper.fieldValue(column, record)" :showTime="crudHelper.isShowTime(column)" readonly class="text-right w-9" />
+        {{ d(crudHelper.fieldValue(column, record), crudHelper.isShowTime(column) ? 'datetime' : 'date', 'zh-CN') }}
     </template>
     <template v-else-if="crudHelper.isFile(column)">
         <span class="text-right word-break w-9">

@@ -22,6 +22,10 @@ const filters = (lazyParams) => {
         .map((k) => [k, lazyParams.filters[k]]);
 };
 
+const convertLazyParams = (lazyParams) => {
+    return lazyParams ? `offset=${lazyParams.first}&limit=${lazyParams.rows}&sortField=${lazyParams.sortField || ''}&sortOrder=${lazyParams.sortOrder || 1}&filters=${encodeURIComponent(JSON.stringify(filters(lazyParams)))}` : '';
+};
+
 const crudFetch = (router, group, item, method, body, path, params) => {
     return doFetch(router, getCrudPath(group, item, path, params), method, body);
 };
@@ -43,12 +47,10 @@ export const getCrudURL = (group, item, path) => {
 
 export default class CrudService {
     get(router, group, item, lazyParams) {
-        const params = lazyParams ? `offset=${lazyParams.first}&limit=${lazyParams.rows}&sortField=${lazyParams.sortField || ''}&sortOrder=${lazyParams.sortOrder || 1}&filters=${encodeURIComponent(JSON.stringify(filters(lazyParams)))}` : '';
-
-        return crudFetch(router, group, item, 'GET', null, null, params);
+        return crudFetch(router, group, item, 'GET', null, null, convertLazyParams(lazyParams));
     }
-    getMine(router, group, item) {
-        return crudFetch(router, group, item, 'GET', null, 'mine');
+    getMine(router, group, item, lazyParams) {
+        return crudFetch(router, group, item, 'GET', null, 'mine', convertLazyParams(lazyParams));
     }
     add(router, group, item, record) {
         return crudFetch(router, group, item, 'POST', JSON.stringify(record));

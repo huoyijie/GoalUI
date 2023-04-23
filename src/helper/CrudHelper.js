@@ -168,4 +168,20 @@ export default class CrudHelper {
     isDropdownOptions(c) {
         return this.isDropdown(c) && !(this.belongTo(c) || this.hasOne(c));
     }
+
+    isInline(c) {
+        return c.Component.Name === '<inline>';
+    }
+
+    hasMany(c) {
+        return c.Component.Tag.HasMany;
+    }
+
+    isMultiSelect(c) {
+        return c.Component.Name === '<multiSelect>';
+    }
+
+    many2Many(c) {
+        return c.Component.Tag.Many2Many;
+    }
 }

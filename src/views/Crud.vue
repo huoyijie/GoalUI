@@ -50,6 +50,7 @@ const totalRecords = ref(0);
 const records = ref(null);
 const record = ref({});
 const dropdownData = ref({});
+const multiSelectData = ref({});
 const selectedRecords = ref(null);
 const errors = ref({});
 
@@ -136,7 +137,8 @@ const crudGet = async (to) => {
         return;
     }
 
-    await loadDropdown(g, i, data);
+    loadDropdownData(g, i, data);
+    loadMultiSelectData(data);
 
     if (data.lazy) {
         initLazyParams(data.columns);
@@ -382,7 +384,7 @@ const dropdowns = (columns) => {
     return dds;
 };
 
-const loadDropdown = async (g, i, data) => {
+const loadDropdownData = async (g, i, data) => {
     for (let dropdown of dropdowns(data.columns)) {
         const bt = crudHelper.belongTo(dropdown);
         const ho = crudHelper.hasOne(dropdown);
@@ -394,6 +396,26 @@ const loadDropdown = async (g, i, data) => {
             dropdownData.value[dropdown.Name] = recordList.list;
         } else {
             dropdownData.value[dropdown.Name] = await crudService.select(router, g, i, dropdown.Name);
+        }
+    }
+};
+
+const multiSelects = (columns) => {
+    const mss = [];
+    for (let column of columns) {
+        if (crudHelper.isMultiSelect(column)) {
+            mss.push(column);
+        }
+    }
+    return mss;
+};
+
+const loadMultiSelectData = async (data) => {
+    for (let c of multiSelects(data.columns)) {
+        const many2Many = crudHelper.many2Many(c);
+        if (many2Many) {
+            const recordList = await crudService.get(router, many2Many.Pkg, many2Many.Name);
+            multiSelectData.value[c.Name] = recordList.list;
         }
     }
 };
@@ -600,6 +622,7 @@ const headerStyle = (c) => {
                     :columns="datatable.columns"
                     :pk="primaryKey"
                     :dropdownData="dropdownData"
+                    :multiSelectData="multiSelectData"
                     @save-record="saveRecord"
                     :disabled="btnSaveRecordDisabled"
                 />

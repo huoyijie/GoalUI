@@ -5,7 +5,7 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'errors', 'disabled']);
+const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'multiSelectData', 'errors', 'disabled']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
@@ -55,12 +55,12 @@ const selected = (c) => {
 };
 
 const options = (column) => {
-    const opts = [];
     const bt = crudHelper.belongTo(column);
     const ho = crudHelper.hasOne(column);
     if (bt || ho) {
         return props.dropdownData[column.Name];
     }
+    const opts = [];
     for (let { label, value } of props.dropdownData[column.Name]) {
         label = t(optionPath(props.group, props.item, column, label));
         opts.push({ label, value });
@@ -97,6 +97,21 @@ const dropdownPlaceholder = (c) => {
         return `${t('crud.recordDialog.select')}${t(messagePath(ho.Pkg, ho.Name.toLowerCase()))}`;
     } else {
         return `${t('crud.recordDialog.select')}${t(columnPath(props.group, props.item, c))}`;
+    }
+};
+
+const multiOptions = (column) => {
+    if (crudHelper.many2Many(column)) {
+        return props.multiSelectData[column.Name];
+    }
+};
+
+const multiOptionLabel = (column) => {
+    const m2m = crudHelper.many2Many(column);
+    if (m2m) {
+        return m2m.Field;
+    } else {
+        return 'label';
     }
 };
 
@@ -149,6 +164,20 @@ const columnPath = (group, item, column) => {
                     :placeholder="dropdownPlaceholder(c)"
                     :id="c.Name"
                     filter
+                    @focus="clearErr(c)"
+                    :disabled="isReadonly(c)"
+                    :autofocus="idx == 1"
+                    :class="{ 'p-invalid': hasErr(c) }"
+                />
+                <MultiSelect
+                    v-else-if="crudHelper.isMultiSelect(c)"
+                    :options="multiOptions(c)"
+                    :optionLabel="multiOptionLabel(c)"
+                    :modelValue="record[c.Name]"
+                    @update:modelValue="updateRecord(c, $event)"
+                    :id="c.Name"
+                    filter
+                    display="chip"
                     @focus="clearErr(c)"
                     :disabled="isReadonly(c)"
                     :autofocus="idx == 1"

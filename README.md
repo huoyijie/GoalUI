@@ -27,8 +27,6 @@ $ npm install
 # file: .env.development.local
 VITE_DEFAULT_LANG=en
 VITE_SERVER=http://127.0.0.1:8100
-VITE_SERVER_MEDIA_PATH=$VITE_SERVER/
-VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 ```
 
 and
@@ -37,8 +35,6 @@ and
 # file: .env.production.local
 VITE_DEFAULT_LANG=en
 VITE_SERVER=http://127.0.0.1:8100
-VITE_SERVER_MEDIA_PATH=$VITE_SERVER/
-VITE_SERVER_CONTEXT_PATH=$VITE_SERVER/admin/
 ```
 
 ### Compile and Hot-Reload for Development

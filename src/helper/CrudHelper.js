@@ -184,4 +184,8 @@ export default class CrudHelper {
     many2Many(c) {
         return c.Component.Tag.Many2Many;
     }
+
+    isDataTable(c) {
+        return this.isMultiSelect(c) && this.many2Many(c);
+    }
 }

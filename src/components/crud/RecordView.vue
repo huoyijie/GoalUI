@@ -1,31 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
 import { getMediaURL } from '@/service/FetchService';
-import CrudService from '@/service/CrudService';
 import CrudHelper from '@/helper/CrudHelper';
 
 const { t, d } = useI18n();
-const router = useRouter();
-const crudService = new CrudService();
 const crudHelper = new CrudHelper();
 
-const props = defineProps(['group', 'item', 'column', 'record']);
+const props = defineProps(['group', 'item', 'column', 'record', 'subDataTable']);
 const dataTableDialog = ref(false);
-const dataTable = ref([]);
 const m2m = ref(crudHelper.many2Many(props.column));
-
-const loadDataTable = async () => {
-    const data = (await crudService.datatable(router, m2m.value.Pkg, m2m.value.Name)) || {};
-    dataTable.value = data.columns;
-};
-
-onMounted(async () => {
-    if (crudHelper.isDataTable(props.column)) {
-        await loadDataTable();
-    }
-});
 
 const showOption = (column) => {
     const option = crudHelper.fieldValue(column, props.record);
@@ -69,7 +53,7 @@ const optionPath = (group, item, column, option) => {
 
     <Dialog v-model:visible="dataTableDialog" :style="{ 'min-width': '50rem' }" :header="t(columnPath(group, item, column))" modal class="p-fluid">
         <DataTable :value="crudHelper.fieldValue(column, record)">
-            <template v-for="c in dataTable" :key="c.Name">
+            <template v-for="c in subDataTable" :key="c.Name">
                 <Column v-if="!crudHelper.isHidden(c)" :field="c.Name" :header="t(columnPath(m2m.Pkg, m2m.Name.toLowerCase(), c))"></Column>
             </template>
         </DataTable>

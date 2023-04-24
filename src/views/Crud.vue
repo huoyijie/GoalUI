@@ -51,6 +51,7 @@ const records = ref(null);
 const record = ref({});
 const dropdownData = ref({});
 const multiSelectData = ref({});
+const subDataTables = ref({});
 const selectedRecords = ref(null);
 const errors = ref({});
 
@@ -139,6 +140,7 @@ const crudGet = async (to) => {
 
     loadDropdownData(g, i, data);
     loadMultiSelectData(data);
+    loadSubDataTables(data);
 
     if (data.lazy) {
         initLazyParams(data.columns);
@@ -420,6 +422,24 @@ const loadMultiSelectData = async (data) => {
     }
 };
 
+const subDataTableColumns = (columns) => {
+    const sdts = [];
+    for (let column of columns) {
+        if (crudHelper.isDataTable(column)) {
+            sdts.push(column);
+        }
+    }
+    return sdts;
+};
+
+const loadSubDataTables = async (data) => {
+    for (let c of subDataTableColumns(data.columns)) {
+        const m2m = crudHelper.many2Many(c);
+        const sub = (await crudService.datatable(router, m2m.Pkg, m2m.Name)) || {};
+        subDataTables.value[c.Name] = sub.columns;
+    }
+};
+
 const openNew = async () => {
     record.value = {};
     errors.value = {};
@@ -590,7 +610,7 @@ const headerStyle = (c) => {
                         :headerStyle="headerStyle(c)"
                     >
                         <template #body="slotProps">
-                            <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" />
+                            <RecordView :group="group" :item="item" :column="c" :record="slotProps.data" :subDataTable="subDataTables[c.Name]" />
                         </template>
                         <template v-if="crudHelper.isFilter(c)" #filter="{ filterModel }">
                             <FilterView v-model="filterModel.value" :group="group" :item="item" :column="c" :dropdownData="dropdownData" />

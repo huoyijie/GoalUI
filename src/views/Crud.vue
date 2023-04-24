@@ -506,8 +506,7 @@ const confirmDeleteSelected = () => {
 };
 
 const deleteSelectedRecords = async () => {
-    let ids = selectedRecords.value.map((val) => val[primaryKey.value]);
-    await crudService.batchDelete(router, group.value, item.value, ids);
+    await crudService.batchDelete(router, group.value, item.value, selectedRecords.value);
     records.value = records.value.filter((val) => !selectedRecords.value.includes(val));
     deleteRecordsDialog.value = false;
     selectedRecords.value = null;

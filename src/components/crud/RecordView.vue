@@ -37,6 +37,9 @@ const optionPath = (group, item, column, option) => {
     <template v-else-if="crudHelper.isDropdownOptions(column)">
         <span class="text-right w-9">{{ showOption(column) }}</span>
     </template>
+    <template v-else-if="crudHelper.isMultiSelect(column)">
+        <Chip v-for="item in crudHelper.fieldValue(column, record)" :key="item[crudHelper.many2Many(column).Field]" :label="item[crudHelper.many2Many(column).Field]" class="mr-1 mt-1" />
+    </template>
     <template v-else>
         <span class="text-right w-9">{{ crudHelper.fieldValue(column, record) }}</span>
     </template>

@@ -100,6 +100,10 @@ const dropdownPlaceholder = (c) => {
     }
 };
 
+const multiSelectPlaceholder = (c) => {
+    return `${t('crud.recordDialog.selects')}${t(columnPath(props.group, props.item, c))}`;
+};
+
 const multiOptions = (column) => {
     if (crudHelper.many2Many(column)) {
         return props.multiSelectData[column.Name];
@@ -173,6 +177,7 @@ const columnPath = (group, item, column) => {
                     v-else-if="crudHelper.isMultiSelect(c)"
                     :options="multiOptions(c)"
                     :optionLabel="multiOptionLabel(c)"
+                    :placeholder="multiSelectPlaceholder(c)"
                     :modelValue="record[c.Name]"
                     @update:modelValue="updateRecord(c, $event)"
                     :id="c.Name"

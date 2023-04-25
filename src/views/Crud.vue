@@ -544,10 +544,6 @@ const columnPath = (group, item, column) => {
 const headerStyle = (c) => {
     if (crudHelper.isPrimary(c)) {
         return 'width: 3rem';
-    } else if (crudHelper.isCalendar(c)) {
-        return 'width: 14%; min-width: 15rem;';
-    } else {
-        return 'width: 14%; min-width: 10rem;';
     }
 };
 </script>

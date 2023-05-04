@@ -336,9 +336,21 @@ const globalFilterFields = computed(() => {
     return fields;
 });
 
-const rules = computed(() => {
+const inlineFields = computed(() => {
+    const fields = [];
+    if (datatable.value.columns) {
+        for (let column of datatable.value.columns) {
+            if (crudHelper.isInline(column)) {
+                fields.push(column);
+            }
+        }
+    }
+    return fields;
+});
+
+const validateRule = (columns) => {
     const rules = {};
-    for (let column of datatable.value.columns) {
+    for (let column of columns) {
         if (column.ValidateRule) {
             rules[column.Name] = {};
             for (let rule of column.ValidateRule.split(',')) {
@@ -374,6 +386,10 @@ const rules = computed(() => {
         }
     }
     return rules;
+};
+
+const rules = computed(() => {
+    return validateRule(datatable.value.columns);
 });
 
 const dropdowns = (columns) => {
@@ -434,14 +450,17 @@ const subDataTableColumns = (columns) => {
 
 const loadSubDataTables = async (data) => {
     for (let c of subDataTableColumns(data.columns)) {
-        const m2m = crudHelper.many2Many(c);
-        const sub = (await crudService.datatable(router, m2m.Pkg, m2m.Name)) || {};
+        const relation = crudHelper.many2Many(c) || crudHelper.hasMany(c);
+        const sub = (await crudService.datatable(router, relation.Pkg, relation.Name)) || {};
         subDataTables.value[c.Name] = sub.columns;
     }
 };
 
 const openNew = async () => {
     record.value = {};
+    for (let inline of inlineFields.value) {
+        record.value[inline.Name] = crudHelper.isRequired(inline) ? [{}] : [];
+    }
     errors.value = {};
     for (let c of uuids.value) {
         record.value[c.Name] = uuidv4().replaceAll('-', '');
@@ -454,11 +473,34 @@ const saveRecord = async () => {
     errors.value = {};
 
     // validate forms
+    let hasErr = false;
     const v$ = useValidate(rules.value, record.value);
     if (!(await v$.value.$validate())) {
         for (let err of v$.value.$errors) {
             errors.value[err.$property] = err.$message;
         }
+        hasErr = true;
+    }
+
+    for (let c of inlineFields.value) {
+        const subColumns = subDataTables.value[c.Name];
+        const subRules = validateRule(subColumns);
+
+        if (crudHelper.hasMany(c)) {
+            for (let [idx, item] of record.value[c.Name].entries()) {
+                const v$ = useValidate(subRules, item);
+                if (!(await v$.value.$validate())) {
+                    for (let err of v$.value.$errors) {
+                        errors.value[c.Name] ||= [];
+                        errors.value[c.Name][idx] ||= {};
+                        errors.value[c.Name][idx][err.$property] = err.$message;
+                    }
+                    hasErr = true;
+                }
+            }
+        }
+    }
+    if (hasErr) {
         btnSaveRecordClicked.value = false;
         return;
     }
@@ -499,7 +541,7 @@ const saveRecord = async () => {
 };
 
 const changeRecord = async (changeRecord) => {
-    record.value = { ...changeRecord };
+    record.value = JSON.parse(JSON.stringify(changeRecord));
     errors.value = {};
     recordDialog.value = true;
 };
@@ -638,6 +680,7 @@ const headerStyle = (c) => {
                     :pk="primaryKey"
                     :dropdownData="dropdownData"
                     :multiSelectData="multiSelectData"
+                    :subDataTables="subDataTables"
                     @save-record="saveRecord"
                     :disabled="btnSaveRecordDisabled"
                 />

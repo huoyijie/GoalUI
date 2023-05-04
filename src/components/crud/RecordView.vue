@@ -9,7 +9,7 @@ const crudHelper = new CrudHelper();
 
 const props = defineProps(['group', 'item', 'column', 'record', 'subDataTable']);
 const dataTableDialog = ref(false);
-const m2m = ref(crudHelper.many2Many(props.column));
+const m2m = ref(crudHelper.many2Many(props.column) || crudHelper.hasMany(props.column));
 
 const showOption = (column) => {
     const option = crudHelper.fieldValue(column, props.record);

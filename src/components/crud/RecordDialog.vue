@@ -5,20 +5,34 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n();
-const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'multiSelectData', 'errors', 'disabled']);
+const props = defineProps(['visible', 'group', 'item', 'record', 'columns', 'pk', 'dropdownData', 'multiSelectData', 'subDataTables', 'errors', 'disabled']);
 const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', 'save-record']);
 
 const crudHelper = new CrudHelper();
 
-const hasErr = (c) => {
-    return !!props.errors[c.Name];
+const hasErr = (c, sub, idx) => {
+    if (props.errors[c.Name] && idx < props.errors[c.Name].length) {
+        return !sub || !!props.errors[c.Name][idx][sub.Name];
+    }
+    return false;
 };
-const showErr = (c) => {
-    return props.errors[c.Name];
+const showErr = (c, sub, idx) => {
+    if (!sub) {
+        if (typeof props.errors[c.Name] === 'string') {
+            return props.errors[c.Name];
+        }
+    } else if (props.errors[c.Name] && idx < props.errors[c.Name].length) {
+        return props.errors[c.Name][idx][sub.Name];
+    }
+    return null;
 };
-const clearErr = (c) => {
+const clearErr = (c, sub, idx) => {
     let errors = props.errors;
-    delete errors[c.Name];
+    if (!sub) {
+        delete errors[c.Name];
+    } else if (errors[c.Name] && idx < errors[c.Name].length) {
+        delete errors[c.Name][idx][sub.Name];
+    }
     $emit('update:errors', errors);
 };
 
@@ -151,6 +165,39 @@ const optionPath = (group, item, column, option) => {
 const columnPath = (group, item, column) => {
     return `group.${group}.${item}.fields.${column.Name}`;
 };
+
+const addOne = (c) => {
+    const items = props.record[c.Name];
+    items.push({});
+    updateRecord(c, items);
+};
+
+const deleteOne = (c, idx) => {
+    if (props.record[c.Name].length > 1 || !crudHelper.isRequired(c)) {
+        const items = props.record[c.Name].filter((_, i) => i !== idx);
+        updateRecord(c, items);
+    }
+};
+
+const updateSubRecord = (c, idx, sub, $event) => {
+    let tmpRecord = props.record;
+    if (crudHelper.isCalendar(sub)) {
+        tmpRecord[c.Name][idx][sub.Name] = new Date($event);
+    } else {
+        tmpRecord[c.Name][idx][sub.Name] = $event;
+    }
+    $emit('update:record', tmpRecord);
+};
+
+const moveUp = (c, idx) => {
+    if (idx > 0) {
+        const items = props.record[c.Name];
+        const it = items[idx - 1];
+        items[idx - 1] = items[idx];
+        items[idx] = it;
+        updateRecord(c, items);
+    }
+};
 </script>
 
 <template>
@@ -188,6 +235,28 @@ const columnPath = (group, item, column) => {
                     :autofocus="idx == 1"
                     :class="{ 'p-invalid': hasErr(c) }"
                 />
+                <template v-else-if="crudHelper.isInlineMany(c)">
+                    <Panel v-for="(it, idx) in record[c.Name]" :key="idx" :header="`${t(messagePath(crudHelper.hasMany(c).Pkg.toLowerCase(), crudHelper.hasMany(c).Name.toLowerCase()))} ${idx + 1}`" toggleable class="mb-2">
+                        <template #icons>
+                            <button v-if="idx !== 0" class="p-panel-header-icon p-link mr-2" @click="moveUp(c, idx)">
+                                <span class="pi pi-chevron-up"></span>
+                            </button>
+                            <button v-if="record[c.Name].length > 1 || !crudHelper.isRequired(c)" class="p-panel-header-icon p-link mr-2" @click="deleteOne(c, idx)">
+                                <span class="pi pi-trash"></span>
+                            </button>
+                        </template>
+                        <div class="field" v-for="sub in subDataTables[c.Name]" :key="sub.Name">
+                            <template v-if="!crudHelper.isPrimary(sub)">
+                                <label :for="sub.Name">{{ t(columnPath(crudHelper.hasMany(c).Pkg.toLowerCase(), crudHelper.hasMany(c).Name.toLowerCase(), sub)) }}</label>
+                                <InputText :id="sub.Name" :modelValue="it[sub.Name]" @update:modelValue="updateSubRecord(c, idx, sub, $event)" @focus="clearErr(c, sub, idx)" :class="{ 'p-invalid': hasErr(c, sub, idx) }" />
+                                <small class="p-error">{{ showErr(c, sub, idx) }}</small>
+                            </template>
+                        </div>
+                    </Panel>
+                    <div class="text-right">
+                        <Button icon="pi pi-plus" rounded severity="secondary" aria-label="Add" @click="addOne(c)" />
+                    </div>
+                </template>
                 <InputNumber
                     v-else-if="crudHelper.isNumber(c)"
                     :min="crudHelper.minVal(c)"

@@ -177,6 +177,14 @@ export default class CrudHelper {
         return c.Component.Tag.HasMany;
     }
 
+    isInlineMany(c) {
+        return this.isInline(c) && this.hasMany(c);
+    }
+
+    isInlineOne(c) {
+        return this.isInline(c) && this.hasOne(c);
+    }
+
     isMultiSelect(c) {
         return c.Component.Name === '<multiSelect>';
     }
@@ -186,6 +194,11 @@ export default class CrudHelper {
     }
 
     isDataTable(c) {
-        return this.isMultiSelect(c) && this.many2Many(c);
+        return (this.isMultiSelect(c) && this.many2Many(c)) || this.isInlineMany(c);
+    }
+
+    isRequired(c) {
+        const rule = c.ValidateRule;
+        return rule && rule.includes('required');
     }
 }

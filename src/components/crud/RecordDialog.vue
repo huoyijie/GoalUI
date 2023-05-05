@@ -11,17 +11,18 @@ const $emit = defineEmits(['update:visible', 'update:record', 'update:errors', '
 const crudHelper = new CrudHelper();
 
 const hasErr = (c, sub, idx) => {
-    if (props.errors[c.Name] && idx < props.errors[c.Name].length) {
-        return !sub || !!props.errors[c.Name][idx][sub.Name];
+    if (!sub) {
+        return !!props.errors[c.Name];
+    } else if (props.errors[c.Name] && props.errors[c.Name][idx]) {
+        return !!props.errors[c.Name][idx][sub.Name];
     }
-    return false;
 };
 const showErr = (c, sub, idx) => {
     if (!sub) {
         if (typeof props.errors[c.Name] === 'string') {
             return props.errors[c.Name];
         }
-    } else if (props.errors[c.Name] && idx < props.errors[c.Name].length) {
+    } else if (props.errors[c.Name] && props.errors[c.Name][idx]) {
         return props.errors[c.Name][idx][sub.Name];
     }
     return null;
@@ -30,7 +31,7 @@ const clearErr = (c, sub, idx) => {
     let errors = props.errors;
     if (!sub) {
         delete errors[c.Name];
-    } else if (errors[c.Name] && idx < errors[c.Name].length) {
+    } else if (errors[c.Name] && errors[c.Name][idx]) {
         delete errors[c.Name][idx][sub.Name];
     }
     $emit('update:errors', errors);
@@ -40,26 +41,21 @@ const isEditRecord = computed(() => {
     return !!props.record[props.pk];
 });
 
-const selected = (c) => {
-    let curValue = props.record[c.Name];
-    const bt = crudHelper.belongTo(c);
-    const ho = crudHelper.hasOne(c);
-    if (bt) {
+const selected = (c, sub, idx) => {
+    const col = !sub ? c : sub;
+    const opts = !sub ? props.dropdownData[c.Name] : props.dropdownData[c.Name][sub.Name];
+    let curValue = !sub ? props.record[c.Name] : props.record[c.Name][idx][sub.Name];
+
+    const one2one = crudHelper.belongTo(col) || crudHelper.hasOne(col);
+    if (one2one) {
         curValue ||= {};
-        for (let option of props.dropdownData[c.Name]) {
-            if (curValue[bt.Field] === option[bt.Field]) {
-                return option;
-            }
-        }
-    } else if (ho) {
-        curValue ||= {};
-        for (let option of props.dropdownData[c.Name]) {
-            if (curValue[ho.Field] === option[ho.Field]) {
+        for (let option of opts) {
+            if (curValue[one2one.Field] === option[one2one.Field]) {
                 return option;
             }
         }
     } else {
-        for (let option of props.dropdownData[c.Name]) {
+        for (let option of opts) {
             if (curValue === option) {
                 return option;
             }
@@ -68,64 +64,71 @@ const selected = (c) => {
     return curValue;
 };
 
-const options = (column) => {
-    const bt = crudHelper.belongTo(column);
-    const ho = crudHelper.hasOne(column);
-    if (bt || ho) {
-        return props.dropdownData[column.Name];
+const options = (c, sub) => {
+    const col = !sub ? c : sub;
+    const opts = !sub ? props.dropdownData[c.Name] : props.dropdownData[c.Name][sub.Name];
+    const one2one = crudHelper.belongTo(col) || crudHelper.hasOne(col);
+    if (one2one) {
+        return opts;
     }
-    const opts = [];
-    for (let { label, value } of props.dropdownData[column.Name]) {
-        label = t(optionPath(props.group, props.item, column, label));
-        opts.push({ label, value });
+    const options = [];
+    for (let { label, value } of opts) {
+        const hasMany = crudHelper.hasMany(c);
+        const g = hasMany ? hasMany.Pkg : props.group;
+        const i = hasMany ? hasMany.Name.toLowerCase() : props.item;
+        label = t(optionPath(g, i, col, label));
+        options.push({ label, value });
     }
-    return opts;
+    return options;
 };
 
-const optionLabel = (c) => {
-    const bt = crudHelper.belongTo(c);
-    const ho = crudHelper.hasOne(c);
-    if (bt) {
-        return bt.Field;
-    } else if (ho) {
-        return ho.Field;
+const optionLabel = (c, sub) => {
+    const col = !sub ? c : sub;
+    const one2one = crudHelper.belongTo(col) || crudHelper.hasOne(col);
+    if (one2one) {
+        return one2one.Field;
     } else {
         return 'label';
     }
 };
 
-const optionValue = (c) => {
-    const bt = crudHelper.belongTo(c);
-    const ho = crudHelper.hasOne(c);
-    if (!(bt || ho)) {
+const optionValue = (c, sub) => {
+    const col = !sub ? c : sub;
+    const one2one = crudHelper.belongTo(col) || crudHelper.hasOne(col);
+    if (!one2one) {
         return 'value';
     }
 };
 
-const dropdownPlaceholder = (c) => {
-    const bt = crudHelper.belongTo(c);
-    const ho = crudHelper.hasOne(c);
-    if (bt) {
-        return `${t('crud.recordDialog.select')}${t(messagePath(bt.Pkg, bt.Name.toLowerCase()))}`;
-    } else if (ho) {
-        return `${t('crud.recordDialog.select')}${t(messagePath(ho.Pkg, ho.Name.toLowerCase()))}`;
+const dropdownPlaceholder = (c, sub) => {
+    const col = !sub ? c : sub;
+    const one2one = crudHelper.belongTo(col) || crudHelper.hasOne(col);
+    if (one2one) {
+        return `${t('crud.recordDialog.select')}${t(messagePath(one2one.Pkg, one2one.Name.toLowerCase()))}`;
+    } else if (!sub) {
+        return `${t('crud.recordDialog.select')}${t(columnPath(props.group, props.item, col))}`;
     } else {
-        return `${t('crud.recordDialog.select')}${t(columnPath(props.group, props.item, c))}`;
+        const hasMany = crudHelper.hasMany(c);
+        if (hasMany) {
+            return `${t('crud.recordDialog.select')}${t(columnPath(hasMany.Pkg, hasMany.Name.toLowerCase(), col))}`;
+        }
     }
 };
 
-const multiSelectPlaceholder = (c) => {
-    return `${t('crud.recordDialog.selects')}${t(columnPath(props.group, props.item, c))}`;
+const multiSelectPlaceholder = (c, sub) => {
+    const col = !sub ? c : sub;
+    const g = !sub ? props.group : crudHelper.hasMany(c).Pkg;
+    const i = !sub ? props.item : crudHelper.hasMany(c).Name.toLowerCase();
+    return `${t('crud.recordDialog.selects')}${t(columnPath(g, i, col))}`;
 };
 
-const multiOptions = (column) => {
-    if (crudHelper.many2Many(column)) {
-        return props.multiSelectData[column.Name];
-    }
+const multiOptions = (c, sub) => {
+    return !sub ? props.multiSelectData[c.Name] : props.multiSelectData[c.Name][sub.Name];
 };
 
-const multiOptionLabel = (column) => {
-    const m2m = crudHelper.many2Many(column);
+const multiOptionLabel = (c, sub) => {
+    const col = !sub ? c : sub;
+    const m2m = crudHelper.many2Many(col);
     if (m2m) {
         return m2m.Field;
     } else {
@@ -147,10 +150,14 @@ const updateRecord = (c, $event) => {
     $emit('update:record', tmpRecord);
 };
 
-const onUpload = (c, res) => {
-    clearErr(c);
+const onUpload = (c, res, idx, sub) => {
+    clearErr(c, sub, idx);
     let tmpRecord = props.record;
-    tmpRecord[c.Name] = JSON.parse(res).data;
+    if (!sub) {
+        tmpRecord[c.Name] = JSON.parse(res).data;
+    } else {
+        tmpRecord[c.Name][idx][sub.Name] = JSON.parse(res).data;
+    }
     $emit('update:record', tmpRecord);
 };
 
@@ -201,7 +208,7 @@ const moveUp = (c, idx) => {
 </script>
 
 <template>
-    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '450px' }" :header="`${t(messagePath(group, item))}${t('crud.recordDialog.details')}`" modal class="p-fluid">
+    <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" :style="{ width: '500px' }" :header="`${t(messagePath(group, item))}${t('crud.recordDialog.details')}`" modal class="p-fluid">
         <div v-for="(c, idx) in columns" :key="c.Name" class="field">
             <template v-if="!crudHelper.isPrimary(c)">
                 <label :for="c.Name">{{ t(columnPath(group, item, c)) }}</label>
@@ -248,7 +255,81 @@ const moveUp = (c, idx) => {
                         <div class="field" v-for="sub in subDataTables[c.Name]" :key="sub.Name">
                             <template v-if="!crudHelper.isPrimary(sub)">
                                 <label :for="sub.Name">{{ t(columnPath(crudHelper.hasMany(c).Pkg.toLowerCase(), crudHelper.hasMany(c).Name.toLowerCase(), sub)) }}</label>
-                                <InputText :id="sub.Name" :modelValue="it[sub.Name]" @update:modelValue="updateSubRecord(c, idx, sub, $event)" @focus="clearErr(c, sub, idx)" :class="{ 'p-invalid': hasErr(c, sub, idx) }" />
+                                <Dropdown
+                                    v-if="crudHelper.isDropdown(sub)"
+                                    :modelValue="selected(c, sub, idx)"
+                                    @update:modelValue="updateSubRecord(c, idx, sub, $event)"
+                                    :options="options(c, sub)"
+                                    :optionLabel="optionLabel(c, sub)"
+                                    :optionValue="optionValue(c, sub)"
+                                    :placeholder="dropdownPlaceholder(c, sub)"
+                                    :id="sub.Name"
+                                    filter
+                                    @focus="clearErr(c, sub, idx)"
+                                    :class="{ 'p-invalid': hasErr(c, sub, idx) }"
+                                />
+                                <MultiSelect
+                                    v-else-if="crudHelper.isMultiSelect(sub)"
+                                    :options="multiOptions(c, sub)"
+                                    :optionLabel="multiOptionLabel(c, sub)"
+                                    :placeholder="multiSelectPlaceholder(c, sub)"
+                                    :modelValue="it[sub.Name]"
+                                    @update:modelValue="updateSubRecord(c, idx, sub, $event)"
+                                    :id="sub.Name"
+                                    filter
+                                    display="chip"
+                                    @focus="clearErr(c, sub, idx)"
+                                    :class="{ 'p-invalid': hasErr(c, sub, idx) }"
+                                />
+                                <InputNumber
+                                    v-else-if="crudHelper.isNumber(sub)"
+                                    :min="crudHelper.minVal(sub)"
+                                    :max="crudHelper.maxVal(sub)"
+                                    :minFractionDigits="crudHelper.minFractionDigits(sub)"
+                                    :maxFractionDigits="crudHelper.maxFractionDigits(sub)"
+                                    :showButtons="crudHelper.isShowButtons(sub)"
+                                    :id="sub.Name"
+                                    :modelValue="it[sub.Name]"
+                                    @update:modelValue="updateSubRecord(c, idx, sub, $event)"
+                                    @focus="clearErr(c, sub, idx)"
+                                    :class="{ 'p-invalid': hasErr(c, sub, idx) }"
+                                />
+                                <Calendar
+                                    v-else-if="crudHelper.isCalendar(sub)"
+                                    :id="sub.Name"
+                                    :modelValue="it[sub.Name]"
+                                    @update:modelValue="updateSubRecord(c, idx, sub, $event)"
+                                    @show="clearErr(c, sub, idx)"
+                                    :showTime="crudHelper.isShowTime(sub)"
+                                    :showIcon="crudHelper.isShowIcon(sub)"
+                                    :class="{ 'p-invalid': hasErr(c, sub, idx) }"
+                                    placeholder="mm/dd/yyyy hh:MM"
+                                />
+                                <div v-else-if="crudHelper.isSwitch(sub)">
+                                    <InputSwitch :id="sub.Name" :modelValue="it[sub.Name]" @update:modelValue="updateSubRecord(c, idx, sub, $event)" />
+                                </div>
+                                <div v-else-if="crudHelper.isFile(sub)" style="display: flex">
+                                    <InputText :id="sub.Name" :modelValue="it[sub.Name]" readonly :class="{ 'p-invalid': hasErr(c, sub, idx), 'w-9': true }" />
+                                    <FileUpload
+                                        mode="basic"
+                                        auto
+                                        name="file"
+                                        :url="getCrudURL(crudHelper.hasMany(c).Pkg, crudHelper.hasMany(c).Name, `upload/${sub.Name}`)"
+                                        :maxFileSize="10000000"
+                                        @upload="onUpload(c, $event.xhr.response, idx, sub)"
+                                        withCredentials
+                                        class="ml-3"
+                                    />
+                                </div>
+                                <Password
+                                    v-else-if="crudHelper.isPassword(sub)"
+                                    :id="sub.Name"
+                                    :modelValue="it[sub.Name]"
+                                    @update:modelValue="updateSubRecord(c, idx, sub, $event)"
+                                    @focus="clearErr(c, sub, idx)"
+                                    :class="{ 'p-invalid': hasErr(c, sub, idx) }"
+                                />
+                                <InputText v-else :id="sub.Name" :modelValue="it[sub.Name]" @update:modelValue="updateSubRecord(c, idx, sub, $event)" @focus="clearErr(c, sub, idx)" :class="{ 'p-invalid': hasErr(c, sub, idx) }" />
                                 <small class="p-error">{{ showErr(c, sub, idx) }}</small>
                             </template>
                         </div>

@@ -402,18 +402,27 @@ const dropdowns = (columns) => {
     return dds;
 };
 
+const loadInlineDropdowns = async (columns) => {
+    for (let c of columns) {
+        if (crudHelper.isInlineMany(c)) {
+            for (let sub of subDataTables.value[c.Name]) {
+                if (crudHelper.isDropdown(sub)) {
+                    dropdownData.value[c.Name] ||= {};
+                    dropdownData.value[c.Name][sub.Name] = await crudService.select(router, crudHelper.hasMany(c).Pkg, crudHelper.hasMany(c).Name, sub.Name);
+                }
+            }
+        }
+    }
+};
+
 const loadDropdownData = async (g, i, data) => {
-    for (let dropdown of dropdowns(data.columns)) {
-        const bt = crudHelper.belongTo(dropdown);
-        const ho = crudHelper.hasOne(dropdown);
-        if (bt) {
-            const recordList = await crudService.get(router, bt.Pkg, bt.Name);
-            dropdownData.value[dropdown.Name] = recordList.list;
-        } else if (ho) {
-            const recordList = await crudService.get(router, ho.Pkg, ho.Name);
-            dropdownData.value[dropdown.Name] = recordList.list;
+    for (let c of dropdowns(data.columns)) {
+        const one2one = crudHelper.belongTo(c) || crudHelper.hasOne(c);
+        if (one2one) {
+            const recordList = await crudService.get(router, one2one.Pkg, one2one.Name);
+            dropdownData.value[c.Name] = recordList.list;
         } else {
-            dropdownData.value[dropdown.Name] = await crudService.select(router, g, i, dropdown.Name);
+            dropdownData.value[c.Name] = await crudService.select(router, g, i, c.Name);
         }
     }
 };
@@ -428,11 +437,24 @@ const multiSelects = (columns) => {
     return mss;
 };
 
+const loadInlineMultiSelectData = async (columns) => {
+    for (let c of columns) {
+        if (crudHelper.isInlineMany(c)) {
+            for (let sub of subDataTables.value[c.Name]) {
+                if (crudHelper.isMultiSelect(sub) && crudHelper.many2Many(sub)) {
+                    multiSelectData.value[c.Name] ||= {};
+                    multiSelectData.value[c.Name][sub.Name] = (await crudService.get(router, crudHelper.many2Many(sub).Pkg, crudHelper.many2Many(sub).Name)).list;
+                }
+            }
+        }
+    }
+};
+
 const loadMultiSelectData = async (data) => {
     for (let c of multiSelects(data.columns)) {
-        const many2Many = crudHelper.many2Many(c);
-        if (many2Many) {
-            const recordList = await crudService.get(router, many2Many.Pkg, many2Many.Name);
+        const m2m = crudHelper.many2Many(c);
+        if (m2m) {
+            const recordList = await crudService.get(router, m2m.Pkg, m2m.Name);
             multiSelectData.value[c.Name] = recordList.list;
         }
     }
@@ -454,6 +476,8 @@ const loadSubDataTables = async (data) => {
         const sub = (await crudService.datatable(router, relation.Pkg, relation.Name)) || {};
         subDataTables.value[c.Name] = sub.columns;
     }
+    loadInlineDropdowns(data.columns);
+    loadInlineMultiSelectData(data.columns);
 };
 
 const openNew = async () => {
